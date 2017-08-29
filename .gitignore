@@ -1,0 +1,10 @@
+# OS-specific files
+.DS_Store
+
+# exclude .idea dir
+.idea
+
+# exclude build dirs
+bin/
+obj/
+outputs/
