@@ -262,6 +262,8 @@ int main(int argc, const char * argv[]) {
 	char fname[MAXCHAR];		// used to open files
 	args_struct in_args;		// data structure for holding the control input file info
 	rinfo_struct raster_info;	// data structure for storing raster input file specific info
+    
+    char mkoutputpathcmd[MAXCHAR]; // used to create the output path
 	
 	// for code control
 	int error_code = OK;		// 0 = ok; non-zero = error
@@ -293,6 +295,13 @@ int main(int argc, const char * argv[]) {
 	// create log file name and open it
 	strcpy(fname, in_args.outpath);
 	strcat(fname, in_args.lds_logname);
+    
+    // create the output path
+    strcpy(mkoutputpathcmd, "mkdir -p ");
+    strcat(mkoutputpathcmd, in_args.outpath);
+    printf("%s",mkoutputpathcmd);
+    system(mkoutputpathcmd);
+    
 	if ((fplog = fopen(fname, "w")) == NULL) {
 		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
 					get_systime(), ERROR_FILE, fname);

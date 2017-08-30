@@ -1,9 +1,9 @@
 /**********
  lds.h
-
+ 
  Created by Alan Di Vittorio on 3 May 2013
  Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
-
+ 
  September 2015 - renamed LDS (land data system) by Alan Di Vittorio
     This is to be the base code for developing a system that works with an arbitrary number of AEZs
     An AEZ (agro-ecological zone) can be defined arbitrarily
@@ -12,7 +12,7 @@
             agriculture and vegetation and land value
     Each AEZ is now a unique area on the globe
     This will ultimately be LDS version 2.0
-
+ 
 **********/
 
 #ifndef LDSHDR
@@ -255,7 +255,7 @@ typedef struct {
 	double cell_area_xmax;		// input longitude max grid boundary
 	double cell_area_ymin;		// input latitude min grid boundary
 	double cell_area_ymax;		// input latitude max grid boundary
-
+	
 	// sage land area file
 	int land_area_sage_nrows;		// input number of rows
 	int land_area_sage_ncols;		// input number of columns
@@ -267,7 +267,7 @@ typedef struct {
 	double land_area_sage_xmax;		// input longitude max grid boundary
 	double land_area_sage_ymin;		// input latitude min grid boundary
 	double land_area_sage_ymax;		// input latitude max grid boundary
-
+	
 	// hyde land grid cell area file
 	int cell_area_hyde_nrows;		// input number of rows
 	int cell_area_hyde_ncols;		// input number of columns
@@ -278,7 +278,7 @@ typedef struct {
 	double cell_area_hyde_xmax;		// input longitude max grid boundary
 	double cell_area_hyde_ymin;		// input latitude min grid boundary
 	double cell_area_hyde_ymax;		// input latitude max grid boundary
-
+	
 	// hyde land area file
 	int land_area_hyde_nrows;		// input number of rows
 	int land_area_hyde_ncols;		// input number of columns
@@ -289,7 +289,7 @@ typedef struct {
 	double land_area_hyde_xmax;		// input longitude max grid boundary
 	double land_area_hyde_ymin;		// input latitude min grid boundary
 	double land_area_hyde_ymax;		// input latitude max grid boundary
-
+	
 	// new aez boundaries file
 	int aez_new_nrows;			// input number of rows
 	int aez_new_ncols;			// input number of columns
@@ -301,7 +301,7 @@ typedef struct {
 	double aez_new_xmax;		// input longitude max grid boundary
 	double aez_new_ymin;		// input latitude min grid boundary
 	double aez_new_ymax;		// input latitude max grid boundary
-
+	
 	// orig aez boundaries file
 	int aez_orig_nrows;			// input number of rows
 	int aez_orig_ncols;			// input number of columns
@@ -324,7 +324,7 @@ typedef struct {
 	double cropland_xmax;		// input longitude max grid boundary
 	double cropland_ymin;		// input latitude min grid boundary
 	double cropland_ymax;		// input latitude max grid boundary
-
+	
 	// pasture area for potveg calc and animal land rent calc
 	int pasture_nrows;			// input number of rows
 	int pasture_ncols;			// input number of columns
@@ -335,7 +335,7 @@ typedef struct {
 	double pasture_xmax;		// input longitude max grid boundary
 	double pasture_ymin;		// input latitude min grid boundary
 	double pasture_ymax;		// input latitude max grid boundary
-
+	
 	// potveg file
 	int potveg_nrows;			// input number of rows
 	int potveg_ncols;			// input number of columns
@@ -346,7 +346,7 @@ typedef struct {
 	double potveg_xmax;			// input longitude max grid boundary
 	double potveg_ymin;			// input latitude min grid boundary
 	double potveg_ymax;			// input latitude max grid boundary
-
+	
 	// urban area for pot veg calc
 	int urban_nrows;		// input number of rows
 	int urban_ncols;		// input number of columns
@@ -357,7 +357,7 @@ typedef struct {
 	double urban_xmax;		// input longitude max grid boundary
 	double urban_ymin;		// input latitude min grid boundary
 	double urban_ymax;		// input latitude max grid boundary
-
+	
 	// fao country codes file (this is 2-byte integer file)
 	int country_fao_nrows;			// input number of rows
 	int country_fao_ncols;			// input number of columns
@@ -369,7 +369,7 @@ typedef struct {
 	double country_fao_xmax;		// input longitude max grid boundary
 	double country_fao_ymin;		// input latitude min grid boundary
 	double country_fao_ymax;		// input latitude max grid boundary
-
+    
     // protected pixel file (this is stored as a 2-byte integer file)
     int protected_nrows;			// input number of rows
     int protected_ncols;			// input number of columns
@@ -387,7 +387,7 @@ typedef struct {
 	// flags
 	int recalibrate;					// 1=recalibrate to a different reference year; 0=no recalibration
 	int diagnostics;					// 1=output diagnostics; 0=do not output diagnostics
-
+	
 	// useful paths
 	char inpath[MAXCHAR];				// path to the input data directory
 	char outpath[MAXCHAR];				// path to the output data directory
@@ -396,7 +396,7 @@ typedef struct {
     char wfpath[MAXCHAR];               // path to the directory containing the water footprint esri grid files
     char ldsdestpath[MAXCHAR];              // destination path for the gcam data system input files
     char mapdestpath[MAXCHAR];              // destination path for the gcam data system mapping files
-
+	
 	// input raster file names
 	char cell_area_fname[MAXCHAR];			// file name only of the working grid cell area raster file
 	char land_area_sage_fname[MAXCHAR];		// file name only of the sage working land fraction raster file
@@ -410,7 +410,7 @@ typedef struct {
     char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
     char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
     char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
-
+	
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
 	char country87_gtap_fname[MAXCHAR];		// file name only of the GTAP/GCAM ctry87 list
@@ -429,7 +429,7 @@ typedef struct {
 	char convert_usd_fname[MAXCHAR];		// file name only of the usd conversion factors
     char vegc_csv_fname[MAXCHAR];          // file name only of the veg c to pot veg file
     char soilc_csv_fname[MAXCHAR];         // file name only of the soil c file
-
+	
 	// output file names (without path)
 	char lds_logname[MAXCHAR];              // log file name for runtime output
 	char harvestarea_fname[MAXCHAR];		// file name for harvested area output
@@ -460,7 +460,8 @@ int read_urban(args_struct in_args, rinfo_struct *raster_info);
 int read_country_fao(args_struct in_args, rinfo_struct *raster_info);
 int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
-int read_sage_crop(char *fname, rinfo_struct raster_info);
+//int read_sage_crop(char *fname, rinfo_struct raster_info);
+int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
 int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
