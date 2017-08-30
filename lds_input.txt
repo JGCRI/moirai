@@ -5,7 +5,7 @@
 
 # flags
 0			# recalibrate: 0 = no, 1 = yes; this is hardcoded to zero because it is not working properly
-1			# diagnostics: 0 = no, 1 = yes
+0			# diagnostics: 0 = no, 1 = yes
 
 # file paths; must include final "/"
 ./indata/	# inpath: path to input data files
@@ -25,7 +25,7 @@
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
 sage_land_frac.bil			# land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
 hyde_land_plus.bil          # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
-Global235_CLM_0125_dissolve.gri     # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ) --updated 30Sep2017
+Global235_CLM_5arcmin.bil     # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ) --updated 30Sep2017
 #AEZ_orig_lds.gri			# aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_ORIG_AEZ)
 #AEZ_echam_2100_lds.gri      # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_ORIG_AEZ)
 AEZ_orig.gri				# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
@@ -42,7 +42,7 @@ GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
 GTAP_GCAM_ctry87.csv		# country87_gtap_fname: GTAP 87 country list, in GCAM order (alphabetical by iso)
 FAO_ctry_GCAM_ctry87.csv	# country87map_fao_fname: FAO country to 87 country mapping list
 FAO_iso_VMAP0_ctry.csv		# country_all_fname: FAO/VMAP0 and iso
-Global235_CLM_0125_dissolve.csv     # aez_new_info_fname: the new aez list of integer codes and names --updated 30Sep2017
+Global235_CLM_5arcmin.csv     # aez_new_info_fname: the new aez list of integer codes and names --updated 30Sep2017
 #AEZ_orig_lds.csv           # aez_new_info_fname: the new aez list of integer codes and names
 #AEZ_echam_2100_lds.csv    # aez_new_info_fname: the new aez list of integer codes and names
 #iso_GCAM_regID_14reg.csv	# countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
