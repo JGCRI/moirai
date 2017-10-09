@@ -26,10 +26,10 @@
 #include <ctype.h>
 #include "/usr/local/include/netcdf.h"
 
-#define CODENAME				"lds"				// name of the compiled program
-#define VERSION                 "2.beta4"           // current version
-#define MAXCHAR					1000						// maximum string length
-#define MAXRECSIZE				10000						// maximum record (csv line) length in characters
+#define CODENAME								"lds"				// name of the compiled program
+#define VERSION         				"2.beta4"           // current version
+#define MAXCHAR									1000						// maximum string length
+#define MAXRECSIZE							10000						// maximum record (csv line) length in characters
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
 #define HYDE_YEAR               2000
@@ -40,9 +40,9 @@
 #define MIN_SAGE_FOREST_CODE    1
 
 // counts of useful variables
-#define NUM_ORIG_AEZ			18							// number of original GTAP/GCAM AEZs
-#define NUM_FAO_YRS				11							// number of years in FAOSTAT production, yield, havested area, and price files
-#define NUM_IN_ARGS				49							// number of input variables in the input file
+#define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
+#define NUM_FAO_YRS							11							// number of years in FAOSTAT production, yield, havested area, and price files
+#define NUM_IN_ARGS							49							// number of input variables in the input file
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
@@ -460,7 +460,8 @@ int read_urban(args_struct in_args, rinfo_struct *raster_info);
 int read_country_fao(args_struct in_args, rinfo_struct *raster_info);
 int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
-int read_sage_crop(char *fname, rinfo_struct raster_info);
+//int read_sage_crop(char *fname, rinfo_struct raster_info);
+int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
 int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);

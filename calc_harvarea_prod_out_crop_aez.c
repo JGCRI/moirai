@@ -125,7 +125,7 @@ int calc_harvarea_prod_out_crop_aez(args_struct in_args, rinfo_struct raster_inf
 		// this function ensures that valid yield and area values exist for sage land cells
 		strcpy(fname, in_args.sagepath);
 		strcat(fname, &cropfilebase_sage[cropind][0]); // the read function will determine whether the file is zipped or not
-		if ((err = read_sage_crop(fname, raster_info))) {
+		if ((err = read_sage_crop(fname, in_args.sagepath, &cropfilebase_sage[cropind][0], raster_info))) {
 			fprintf(fplog, "Failed to read yield and area for crop %s: calc_harvarea_prod_out_aez()\n", fname);
 			return err;
 		}

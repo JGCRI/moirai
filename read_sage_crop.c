@@ -51,7 +51,7 @@
 
 #include "lds.h"
 
-int read_sage_crop(char *fname, rinfo_struct raster_info) {
+int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info) {
 
 	int i;
 	int nrows = 2160;				// num input lats
@@ -73,7 +73,8 @@ int read_sage_crop(char *fname, rinfo_struct raster_info) {
 	int ncid;						// netcdf file id
 	int ncvarid;					// variable id returned by nc_inq_varid()
 	int ncerr;						// error return value; 0 = ok
-	char *varname = "cropdata";		// name of the variable to read
+	// char *varname = "cropdata";		// name of the variable to read
+	char varname[MAXCHAR];  // name of the variable to read
 	static size_t start_yield[] = {0, 1, 0, 0};		// start indices for yield
 	static size_t start_harv[] = {0, 0, 0, 0};		// start indices for harvest area
 	static size_t start_qual_yield[] = {0, 3, 0, 0};		// start indices for yield
@@ -81,8 +82,8 @@ int read_sage_crop(char *fname, rinfo_struct raster_info) {
 	static size_t count[] = {1, 1, 2160, 4320};		// lengths for reading yield
 
 	// some input data file name suffixes
-	const char sage_crop_nctag[] = "_5min.nc";					// suffix for sage base file names, netcdf, unzipped
-	const char sage_crop_ncztag[] = "_5min.nc.zip";				// suffix for sage base file names, netcdf, zipped
+	const char sage_crop_nctag[] = "_AreaYieldProduction.nc";					// suffix for sage base file names, netcdf, unzipped
+	const char sage_crop_ncztag[] = "_HarvAreaYield2000_NetCDF.zip";				// suffix for sage base file names, netcdf, zipped
 
 	// allocate arrays for the quality fields
 	qual_harv = calloc(ncells, sizeof(float));
@@ -101,10 +102,12 @@ int read_sage_crop(char *fname, rinfo_struct raster_info) {
 	strcat(lname, sage_crop_nctag);
 	if((fpin = fopen(lname, "rb")) == NULL)
 	{
-		// unzip this file
-		strcpy(lname, "unzip -o -d ");
-		strcat(lname, fname);
-		strcat(lname, sage_crop_ncztag);
+			// unzip this file
+			strcpy(lname, "unzip -o -j -d ");
+			strcat(lname, sagepath);
+      strcat(lname, " ");
+      strcat(lname, fname);
+			strcat(lname, sage_crop_ncztag);
 		sysrv = system(lname);
 	} else {
 		fclose(fpin);
@@ -118,6 +121,9 @@ int read_sage_crop(char *fname, rinfo_struct raster_info) {
 		fprintf(fplog,"Failed to open %s for reading: read_sage_crop(); ncerr = %i\n", lname, ncerr);
 		return ERROR_FILE;
 	}
+
+  strcpy(varname,cropfilebase_sage);
+  strcat(varname,"Data");
 
 	if ((ncerr = nc_inq_varid(ncid, varname, &ncvarid))) {
 		fprintf(fplog,"Error %i when getting netcdf var id for %s: read_sage_crop()\n", ncerr, varname);
