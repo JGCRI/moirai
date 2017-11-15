@@ -36,10 +36,10 @@ ${OBJDIR}/%.o : %.c ${LDS_INCLUDE}
 	@mkdir -p ${OBJDIR}
 	${CC} -c $< -o $@ ${CFLAGS}
 
-lds2 : ${OBJ}
+lds : ${OBJ}
 	@mkdir -p ${EXEDIR}
 	${CC} -o ${EXEDIR}/$@ ${CFLAGS} ${OBJ} ${LDFLAGS}
 
 clean :
 	rm -f ${OBJDIR}/*.o
-	rm -f ${EXEDIR}/lds2
+	rm -f ${EXEDIR}/lds

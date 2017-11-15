@@ -1,0 +1,460 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4A077BC317DE3A4800CA7332 /* write_csv_float2d.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A077BC217DE3A4800CA7332 /* write_csv_float2d.c */; };
+		4A0F063017DA2DA900AD2006 /* write_raster_float.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0F062F17DA2DA900AD2006 /* write_raster_float.c */; };
+		4A0F063217DA36ED00AD2006 /* write_raster_int.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0F063117DA36ED00AD2006 /* write_raster_int.c */; };
+		4A0F063617DA7D5700AD2006 /* write_text_int.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0F063517DA7D5700AD2006 /* write_text_int.c */; };
+		4A0F063817DA80E000AD2006 /* write_text_char.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0F063717DA80E000AD2006 /* write_text_char.c */; };
+		4A0F063A17DA9A4500AD2006 /* write_csv_float3d.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0F063917DA9A4500AD2006 /* write_csv_float3d.c */; };
+		4A1E045C17DFAA9600950691 /* read_land_area_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A1E045B17DFAA9600950691 /* read_land_area_sage.c */; };
+		4A1E046517DFAD5100950691 /* read_aez_new.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AD414A4173C64B90069CF14 /* read_aez_new.c */; };
+		4A1E05FA17E0D7BA00950691 /* write_raster_short.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A1E05F917E0D7BA00950691 /* write_raster_short.c */; };
+		4A20317C18C7F741004FEB8D /* read_prodprice_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC2D917AB2BA90073DBE9 /* read_prodprice_fao.c */; };
+		4A20317D18C7F75A004FEB8D /* calc_rent_ag_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A0A9349183E9DF600FBFFD6 /* calc_rent_ag_use_aez.c */; };
+		4A21657C1C7FD95E001AE00D /* read_water_footprint.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A21657B1C7FD95E001AE00D /* read_water_footprint.c */; };
+		4A21657E1C7FE57D001AE00D /* proc_water_footprint.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A21657D1C7FE57D001AE00D /* proc_water_footprint.c */; };
+		4A2E0A471BCD7DCD000E2330 /* read_aez_new_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A2E0A461BCD7DCD000E2330 /* read_aez_new_info.c */; };
+		4A3E4CD51C46D9A500F50230 /* proc_land_type_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A3E4CD41C46D9A400F50230 /* proc_land_type_area.c */; };
+		4A4A47171C443E4400ECD505 /* read_mirca.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4A47161C443E4400ECD505 /* read_mirca.c */; };
+		4A4A47191C446FC200ECD505 /* proc_mirca.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4A47181C446FC200ECD505 /* proc_mirca.c */; };
+		4A4A471D1C4591FF00ECD505 /* read_protected.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4A471C1C4591FF00ECD505 /* read_protected.c */; };
+		4A4A47211C45C9A100ECD505 /* read_lu_hyde.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4A47201C45C9A100ECD505 /* read_lu_hyde.c */; };
+		4A4BF50517D7BB4B00013C59 /* get_aez_val.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4BF50417D7BB4B00013C59 /* get_aez_val.c */; };
+		4A4BF52917D7EE5500013C59 /* read_sage_crop.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4BF52817D7EE5500013C59 /* read_sage_crop.c */; };
+		4A4DB6D11C5BE43200AC5B8E /* copy_to_destpath.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4DB6D01C5BE43200AC5B8E /* copy_to_destpath.c */; };
+		4A7E054F19A697E7001DCF80 /* write_rent_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7E054D19A6951F001DCF80 /* write_rent_use_aez.c */; };
+		4A7E05CB19AC09A1001DCF80 /* write_gcam_lut.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A20FE9017FEFF0E0021FDDC /* write_gcam_lut.c */; };
+		4A7EC25117A88C710073DBE9 /* read_country87_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC25017A88C710073DBE9 /* read_country87_info.c */; };
+		4A7EC26D17A984AA0073DBE9 /* read_use_info_gtap.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC26C17A984AA0073DBE9 /* read_use_info_gtap.c */; };
+		4A7EC26F17A9A9180073DBE9 /* read_lt_info_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC26E17A9A9180073DBE9 /* read_lt_info_sage.c */; };
+		4A7EC27117A9AE7F0073DBE9 /* read_country_info_all.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC27017A9AE7F0073DBE9 /* read_country_info_all.c */; };
+		4A7EC27517A9B7450073DBE9 /* read_crop_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC27417A9B7450073DBE9 /* read_crop_info.c */; };
+		4A7EC2AC17AB2AB70073DBE9 /* read_production_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC2AB17AB2AB70073DBE9 /* read_production_fao.c */; };
+		4A7EC2AE17AB2B3D0073DBE9 /* read_yield_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC2AD17AB2B3D0073DBE9 /* read_yield_fao.c */; };
+		4A7EC2B017AB2B680073DBE9 /* read_harvestarea_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A7EC2AF17AB2B680073DBE9 /* read_harvestarea_fao.c */; };
+		4A88D38F174298220051B61B /* get_cell_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D38E174298220051B61B /* get_cell_area.c */; };
+		4A88D3971742FF200051B61B /* read_land_area_hyde.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D3961742FF200051B61B /* read_land_area_hyde.c */; };
+		4A88D399174302050051B61B /* read_aez_orig.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D398174302050051B61B /* read_aez_orig.c */; };
+		4A88D3A1174487E70051B61B /* read_potveg.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D3A0174487E70051B61B /* read_potveg.c */; };
+		4A88D3A3174488F00051B61B /* calc_potveg_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D3A2174488F00051B61B /* calc_potveg_area.c */; };
+		4A88D3A5174545210051B61B /* get_land_cells.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D3A4174545210051B61B /* get_land_cells.c */; };
+		4A88D3A9174EB26C0051B61B /* read_country_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A88D3A8174EB26C0051B61B /* read_country_fao.c */; };
+		4AA8D01717E3880900307031 /* aggregate_crop2gcam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AA8D01617E3880900307031 /* aggregate_crop2gcam.c */; };
+		4AA8D02317E3C64A00307031 /* read_region_info_gcam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AA8D02217E3C64A00307031 /* read_region_info_gcam.c */; };
+		4AB37E30195CAFE000D5AA80 /* calc_rent_frs_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AB37E2F195CAFE000D5AA80 /* calc_rent_frs_use_aez.c */; };
+		4AB7990E17D691A6009DA43D /* calc_harvarea_prod_out_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AB7990D17D691A6009DA43D /* calc_harvarea_prod_out_crop_aez.c */; };
+		4AD414091738285E0069CF14 /* lds_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AD414081738285E0069CF14 /* lds_main.c */; };
+		4AD83C671760EE9E007818C4 /* read_rent_orig.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AD83C661760EE9E007818C4 /* read_rent_orig.c */; };
+		4AD83C69176114E2007818C4 /* parse_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AD83C68176114E2007818C4 /* parse_utils.c */; };
+		4AE77CBD194670720048EF05 /* aggregate_use2gcam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A37A3AD1843DC91006A8CDC /* aggregate_use2gcam.c */; };
+		4AF2F5E417D8DBA9002633DA /* init_lds.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AF2F5E317D8DBA9002633DA /* init_lds.c */; };
+		4AF2F5E717D8E02A002633DA /* get_systime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AF2F5E617D8E02A002633DA /* get_systime.c */; };
+		4AF2F5E917D8EF0F002633DA /* get_in_args.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AF2F5E817D8EF0F002633DA /* get_in_args.c */; };
+		4AF2F5F217D93796002633DA /* write_harvestarea_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AF2F5F117D93796002633DA /* write_harvestarea_crop_aez.c */; };
+		4AF2F5FA17D94960002633DA /* write_production_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AF2F5F917D94960002633DA /* write_production_crop_aez.c */; };
+		4AFC46A71C485443009C020C /* read_soil_carbon.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AFC46A61C485443009C020C /* read_soil_carbon.c */; };
+		4AFC46A91C485B1C009C020C /* read_veg_carbon.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AFC46A81C485B1C009C020C /* read_veg_carbon.c */; };
+		4AFC46AB1C486B22009C020C /* proc_potveg_carbon.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AFC46AA1C486B22009C020C /* proc_potveg_carbon.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76FAF0486AB0100D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4A077BC217DE3A4800CA7332 /* write_csv_float2d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_csv_float2d.c; sourceTree = "<group>"; };
+		4A0A9349183E9DF600FBFFD6 /* calc_rent_ag_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_rent_ag_use_aez.c; sourceTree = "<group>"; };
+		4A0F062F17DA2DA900AD2006 /* write_raster_float.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_raster_float.c; sourceTree = "<group>"; };
+		4A0F063117DA36ED00AD2006 /* write_raster_int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_raster_int.c; sourceTree = "<group>"; };
+		4A0F063517DA7D5700AD2006 /* write_text_int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_int.c; sourceTree = "<group>"; };
+		4A0F063717DA80E000AD2006 /* write_text_char.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_char.c; sourceTree = "<group>"; };
+		4A0F063917DA9A4500AD2006 /* write_csv_float3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_csv_float3d.c; sourceTree = "<group>"; };
+		4A1E045B17DFAA9600950691 /* read_land_area_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_land_area_sage.c; sourceTree = "<group>"; };
+		4A1E05F917E0D7BA00950691 /* write_raster_short.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_raster_short.c; sourceTree = "<group>"; };
+		4A1E64EB1FBCDEC60009D173 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		4A20FE9017FEFF0E0021FDDC /* write_gcam_lut.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_gcam_lut.c; sourceTree = "<group>"; };
+		4A21657B1C7FD95E001AE00D /* read_water_footprint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_water_footprint.c; sourceTree = "<group>"; };
+		4A21657D1C7FE57D001AE00D /* proc_water_footprint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_water_footprint.c; sourceTree = "<group>"; };
+		4A2E0A461BCD7DCD000E2330 /* read_aez_new_info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_aez_new_info.c; sourceTree = "<group>"; };
+		4A37A3AD1843DC91006A8CDC /* aggregate_use2gcam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aggregate_use2gcam.c; sourceTree = "<group>"; };
+		4A3E4CD41C46D9A400F50230 /* proc_land_type_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_land_type_area.c; sourceTree = "<group>"; };
+		4A4A47161C443E4400ECD505 /* read_mirca.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_mirca.c; sourceTree = "<group>"; };
+		4A4A47181C446FC200ECD505 /* proc_mirca.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_mirca.c; sourceTree = "<group>"; };
+		4A4A471A1C458E8C00ECD505 /* read_nfert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_nfert.c; sourceTree = "<group>"; };
+		4A4A471C1C4591FF00ECD505 /* read_protected.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_protected.c; sourceTree = "<group>"; };
+		4A4A471E1C459AFB00ECD505 /* proc_nfert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_nfert.c; sourceTree = "<group>"; };
+		4A4A47201C45C9A100ECD505 /* read_lu_hyde.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lu_hyde.c; sourceTree = "<group>"; };
+		4A4BF50417D7BB4B00013C59 /* get_aez_val.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_aez_val.c; sourceTree = "<group>"; };
+		4A4BF52817D7EE5500013C59 /* read_sage_crop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_sage_crop.c; sourceTree = "<group>"; };
+		4A4DB6D01C5BE43200AC5B8E /* copy_to_destpath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = copy_to_destpath.c; sourceTree = "<group>"; };
+		4A7C92191FBCD6E0004F4734 /* usr_gd_fig_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = usr_gd_fig_1.png; path = docs/usr_gd_fig_1.png; sourceTree = "<group>"; };
+		4A7C921A1FBCD6E0004F4734 /* usr_gd_fig_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = usr_gd_fig_2.png; path = docs/usr_gd_fig_2.png; sourceTree = "<group>"; };
+		4A7E054D19A6951F001DCF80 /* write_rent_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_rent_use_aez.c; sourceTree = "<group>"; };
+		4A7EC25017A88C710073DBE9 /* read_country87_info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_country87_info.c; sourceTree = "<group>"; };
+		4A7EC26C17A984AA0073DBE9 /* read_use_info_gtap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_use_info_gtap.c; sourceTree = "<group>"; };
+		4A7EC26E17A9A9180073DBE9 /* read_lt_info_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lt_info_sage.c; sourceTree = "<group>"; };
+		4A7EC27017A9AE7F0073DBE9 /* read_country_info_all.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_country_info_all.c; sourceTree = "<group>"; };
+		4A7EC27417A9B7450073DBE9 /* read_crop_info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_crop_info.c; sourceTree = "<group>"; };
+		4A7EC2AB17AB2AB70073DBE9 /* read_production_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_production_fao.c; sourceTree = "<group>"; };
+		4A7EC2AD17AB2B3D0073DBE9 /* read_yield_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_yield_fao.c; sourceTree = "<group>"; };
+		4A7EC2AF17AB2B680073DBE9 /* read_harvestarea_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_harvestarea_fao.c; sourceTree = "<group>"; };
+		4A7EC2D917AB2BA90073DBE9 /* read_prodprice_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_prodprice_fao.c; sourceTree = "<group>"; };
+		4A88D38E174298220051B61B /* get_cell_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_cell_area.c; sourceTree = "<group>"; };
+		4A88D3961742FF200051B61B /* read_land_area_hyde.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_land_area_hyde.c; sourceTree = "<group>"; };
+		4A88D398174302050051B61B /* read_aez_orig.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_aez_orig.c; sourceTree = "<group>"; };
+		4A88D3A0174487E70051B61B /* read_potveg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_potveg.c; sourceTree = "<group>"; };
+		4A88D3A2174488F00051B61B /* calc_potveg_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = calc_potveg_area.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
+		4A88D3A4174545210051B61B /* get_land_cells.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_land_cells.c; sourceTree = "<group>"; };
+		4A88D3A8174EB26C0051B61B /* read_country_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_country_fao.c; sourceTree = "<group>"; };
+		4A8E21B81C8E3DE5007DBF74 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
+		4A8E21BC1C90C08B007DBF74 /* LDS_USER_GUIDE.docx */ = {isa = PBXFileReference; lastKnownFileType = file; name = LDS_USER_GUIDE.docx; path = docs/LDS_USER_GUIDE.docx; sourceTree = "<group>"; };
+		4A98F1181BB31FBA005E7B9D /* indata */ = {isa = PBXFileReference; lastKnownFileType = folder; path = indata; sourceTree = "<group>"; };
+		4AA8D01617E3880900307031 /* aggregate_crop2gcam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aggregate_crop2gcam.c; sourceTree = "<group>"; };
+		4AA8D02217E3C64A00307031 /* read_region_info_gcam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_region_info_gcam.c; sourceTree = "<group>"; };
+		4AB37E2F195CAFE000D5AA80 /* calc_rent_frs_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_rent_frs_use_aez.c; sourceTree = "<group>"; };
+		4AB7990D17D691A6009DA43D /* calc_harvarea_prod_out_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_harvarea_prod_out_crop_aez.c; sourceTree = "<group>"; };
+		4AD41407173820CA0069CF14 /* lds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = lds.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4AD414081738285E0069CF14 /* lds_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lds_main.c; sourceTree = "<group>"; };
+		4AD414A4173C64B90069CF14 /* read_aez_new.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_aez_new.c; sourceTree = "<group>"; };
+		4AD83C661760EE9E007818C4 /* read_rent_orig.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_rent_orig.c; sourceTree = "<group>"; };
+		4AD83C68176114E2007818C4 /* parse_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parse_utils.c; sourceTree = "<group>"; };
+		4AF2F5E317D8DBA9002633DA /* init_lds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init_lds.c; sourceTree = "<group>"; };
+		4AF2F5E617D8E02A002633DA /* get_systime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_systime.c; sourceTree = "<group>"; };
+		4AF2F5E817D8EF0F002633DA /* get_in_args.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_in_args.c; sourceTree = "<group>"; };
+		4AF2F5EE17D8FC20002633DA /* lds_input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lds_input.txt; sourceTree = "<group>"; };
+		4AF2F5F117D93796002633DA /* write_harvestarea_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_harvestarea_crop_aez.c; sourceTree = "<group>"; };
+		4AF2F5F917D94960002633DA /* write_production_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_production_crop_aez.c; sourceTree = "<group>"; };
+		4AFC46A61C485443009C020C /* read_soil_carbon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_soil_carbon.c; sourceTree = "<group>"; };
+		4AFC46A81C485B1C009C020C /* read_veg_carbon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_veg_carbon.c; sourceTree = "<group>"; };
+		4AFC46AA1C486B22009C020C /* proc_potveg_carbon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_potveg_carbon.c; sourceTree = "<group>"; };
+		8DD76FB20486AB0100D96B5E /* lds */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lds; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76FAD0486AB0100D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* genaez */ = {
+			isa = PBXGroup;
+			children = (
+				4A7C92191FBCD6E0004F4734 /* usr_gd_fig_1.png */,
+				4A7C921A1FBCD6E0004F4734 /* usr_gd_fig_2.png */,
+				1AB674ADFE9D54B511CA2CBB /* lds */,
+				4A8E21BC1C90C08B007DBF74 /* LDS_USER_GUIDE.docx */,
+				4A8E21B81C8E3DE5007DBF74 /* makefile */,
+				4AD41407173820CA0069CF14 /* lds.h */,
+				4AD414081738285E0069CF14 /* lds_main.c */,
+				4AF2F5E317D8DBA9002633DA /* init_lds.c */,
+				4AF2F5E817D8EF0F002633DA /* get_in_args.c */,
+				4A1E64EB1FBCDEC60009D173 /* README.md */,
+				4AF2F5E617D8E02A002633DA /* get_systime.c */,
+				4AD83C68176114E2007818C4 /* parse_utils.c */,
+				4A7EC27017A9AE7F0073DBE9 /* read_country_info_all.c */,
+				4A7EC25017A88C710073DBE9 /* read_country87_info.c */,
+				4AA8D02217E3C64A00307031 /* read_region_info_gcam.c */,
+				4A2E0A461BCD7DCD000E2330 /* read_aez_new_info.c */,
+				4A7EC26C17A984AA0073DBE9 /* read_use_info_gtap.c */,
+				4A7EC26E17A9A9180073DBE9 /* read_lt_info_sage.c */,
+				4A7EC27417A9B7450073DBE9 /* read_crop_info.c */,
+				4A88D38E174298220051B61B /* get_cell_area.c */,
+				4A1E045B17DFAA9600950691 /* read_land_area_sage.c */,
+				4A88D3961742FF200051B61B /* read_land_area_hyde.c */,
+				4AD414A4173C64B90069CF14 /* read_aez_new.c */,
+				4A88D398174302050051B61B /* read_aez_orig.c */,
+				4A88D3A0174487E70051B61B /* read_potveg.c */,
+				4A88D3A8174EB26C0051B61B /* read_country_fao.c */,
+				4A88D3A4174545210051B61B /* get_land_cells.c */,
+				4A88D3A2174488F00051B61B /* calc_potveg_area.c */,
+				4A20FE9017FEFF0E0021FDDC /* write_gcam_lut.c */,
+				4A4A47161C443E4400ECD505 /* read_mirca.c */,
+				4A4A47181C446FC200ECD505 /* proc_mirca.c */,
+				4A4A471C1C4591FF00ECD505 /* read_protected.c */,
+				4A4A471A1C458E8C00ECD505 /* read_nfert.c */,
+				4A4A471E1C459AFB00ECD505 /* proc_nfert.c */,
+				4A4A47201C45C9A100ECD505 /* read_lu_hyde.c */,
+				4A3E4CD41C46D9A400F50230 /* proc_land_type_area.c */,
+				4AFC46A61C485443009C020C /* read_soil_carbon.c */,
+				4AFC46A81C485B1C009C020C /* read_veg_carbon.c */,
+				4AFC46AA1C486B22009C020C /* proc_potveg_carbon.c */,
+				4A21657B1C7FD95E001AE00D /* read_water_footprint.c */,
+				4A21657D1C7FE57D001AE00D /* proc_water_footprint.c */,
+				4A7EC2AD17AB2B3D0073DBE9 /* read_yield_fao.c */,
+				4A7EC2AF17AB2B680073DBE9 /* read_harvestarea_fao.c */,
+				4A7EC2AB17AB2AB70073DBE9 /* read_production_fao.c */,
+				4A4BF52817D7EE5500013C59 /* read_sage_crop.c */,
+				4A4BF50417D7BB4B00013C59 /* get_aez_val.c */,
+				4AB7990D17D691A6009DA43D /* calc_harvarea_prod_out_crop_aez.c */,
+				4AA8D01617E3880900307031 /* aggregate_crop2gcam.c */,
+				4AF2F5F117D93796002633DA /* write_harvestarea_crop_aez.c */,
+				4AF2F5F917D94960002633DA /* write_production_crop_aez.c */,
+				4AD83C661760EE9E007818C4 /* read_rent_orig.c */,
+				4A7EC2D917AB2BA90073DBE9 /* read_prodprice_fao.c */,
+				4A0A9349183E9DF600FBFFD6 /* calc_rent_ag_use_aez.c */,
+				4AB37E2F195CAFE000D5AA80 /* calc_rent_frs_use_aez.c */,
+				4A7E054D19A6951F001DCF80 /* write_rent_use_aez.c */,
+				4A37A3AD1843DC91006A8CDC /* aggregate_use2gcam.c */,
+				4A4DB6D01C5BE43200AC5B8E /* copy_to_destpath.c */,
+				4A1E05F917E0D7BA00950691 /* write_raster_short.c */,
+				4A0F063117DA36ED00AD2006 /* write_raster_int.c */,
+				4A0F062F17DA2DA900AD2006 /* write_raster_float.c */,
+				4A0F063517DA7D5700AD2006 /* write_text_int.c */,
+				4A0F063717DA80E000AD2006 /* write_text_char.c */,
+				4A0F063917DA9A4500AD2006 /* write_csv_float3d.c */,
+				4A077BC217DE3A4800CA7332 /* write_csv_float2d.c */,
+				4AF2F5EE17D8FC20002633DA /* lds_input.txt */,
+				4A98F1181BB31FBA005E7B9D /* indata */,
+			);
+			name = genaez;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* lds */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FB20486AB0100D96B5E /* lds */,
+			);
+			name = lds;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76FA90486AB0100D96B5E /* lds */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "lds" */;
+			buildPhases = (
+				8DD76FAB0486AB0100D96B5E /* Sources */,
+				8DD76FAD0486AB0100D96B5E /* Frameworks */,
+				8DD76FAF0486AB0100D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = lds;
+			productInstallPath = "$(HOME)/bin";
+			productName = genaez;
+			productReference = 8DD76FB20486AB0100D96B5E /* lds */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lds" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* genaez */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76FA90486AB0100D96B5E /* lds */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76FAB0486AB0100D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AD414091738285E0069CF14 /* lds_main.c in Sources */,
+				4A88D38F174298220051B61B /* get_cell_area.c in Sources */,
+				4AFC46A91C485B1C009C020C /* read_veg_carbon.c in Sources */,
+				4A4A47211C45C9A100ECD505 /* read_lu_hyde.c in Sources */,
+				4A88D3971742FF200051B61B /* read_land_area_hyde.c in Sources */,
+				4A88D399174302050051B61B /* read_aez_orig.c in Sources */,
+				4A4A47191C446FC200ECD505 /* proc_mirca.c in Sources */,
+				4AFC46AB1C486B22009C020C /* proc_potveg_carbon.c in Sources */,
+				4A2E0A471BCD7DCD000E2330 /* read_aez_new_info.c in Sources */,
+				4A88D3A1174487E70051B61B /* read_potveg.c in Sources */,
+				4A88D3A3174488F00051B61B /* calc_potveg_area.c in Sources */,
+				4A88D3A5174545210051B61B /* get_land_cells.c in Sources */,
+				4A88D3A9174EB26C0051B61B /* read_country_fao.c in Sources */,
+				4A21657C1C7FD95E001AE00D /* read_water_footprint.c in Sources */,
+				4AD83C671760EE9E007818C4 /* read_rent_orig.c in Sources */,
+				4AD83C69176114E2007818C4 /* parse_utils.c in Sources */,
+				4A7EC25117A88C710073DBE9 /* read_country87_info.c in Sources */,
+				4A7EC26D17A984AA0073DBE9 /* read_use_info_gtap.c in Sources */,
+				4A7EC26F17A9A9180073DBE9 /* read_lt_info_sage.c in Sources */,
+				4A7EC27117A9AE7F0073DBE9 /* read_country_info_all.c in Sources */,
+				4A7EC27517A9B7450073DBE9 /* read_crop_info.c in Sources */,
+				4A7EC2AC17AB2AB70073DBE9 /* read_production_fao.c in Sources */,
+				4A4A47171C443E4400ECD505 /* read_mirca.c in Sources */,
+				4A7EC2AE17AB2B3D0073DBE9 /* read_yield_fao.c in Sources */,
+				4A7EC2B017AB2B680073DBE9 /* read_harvestarea_fao.c in Sources */,
+				4AB7990E17D691A6009DA43D /* calc_harvarea_prod_out_crop_aez.c in Sources */,
+				4A3E4CD51C46D9A500F50230 /* proc_land_type_area.c in Sources */,
+				4A4BF50517D7BB4B00013C59 /* get_aez_val.c in Sources */,
+				4A4BF52917D7EE5500013C59 /* read_sage_crop.c in Sources */,
+				4AF2F5E417D8DBA9002633DA /* init_lds.c in Sources */,
+				4AF2F5E717D8E02A002633DA /* get_systime.c in Sources */,
+				4AFC46A71C485443009C020C /* read_soil_carbon.c in Sources */,
+				4AF2F5E917D8EF0F002633DA /* get_in_args.c in Sources */,
+				4AF2F5F217D93796002633DA /* write_harvestarea_crop_aez.c in Sources */,
+				4AF2F5FA17D94960002633DA /* write_production_crop_aez.c in Sources */,
+				4A0F063017DA2DA900AD2006 /* write_raster_float.c in Sources */,
+				4A0F063217DA36ED00AD2006 /* write_raster_int.c in Sources */,
+				4A4DB6D11C5BE43200AC5B8E /* copy_to_destpath.c in Sources */,
+				4A0F063617DA7D5700AD2006 /* write_text_int.c in Sources */,
+				4A0F063817DA80E000AD2006 /* write_text_char.c in Sources */,
+				4A0F063A17DA9A4500AD2006 /* write_csv_float3d.c in Sources */,
+				4A077BC317DE3A4800CA7332 /* write_csv_float2d.c in Sources */,
+				4A1E045C17DFAA9600950691 /* read_land_area_sage.c in Sources */,
+				4A1E046517DFAD5100950691 /* read_aez_new.c in Sources */,
+				4A1E05FA17E0D7BA00950691 /* write_raster_short.c in Sources */,
+				4AA8D01717E3880900307031 /* aggregate_crop2gcam.c in Sources */,
+				4AA8D02317E3C64A00307031 /* read_region_info_gcam.c in Sources */,
+				4A20317C18C7F741004FEB8D /* read_prodprice_fao.c in Sources */,
+				4A20317D18C7F75A004FEB8D /* calc_rent_ag_use_aez.c in Sources */,
+				4AE77CBD194670720048EF05 /* aggregate_use2gcam.c in Sources */,
+				4AB37E30195CAFE000D5AA80 /* calc_rent_frs_use_aez.c in Sources */,
+				4A21657E1C7FE57D001AE00D /* proc_water_footprint.c in Sources */,
+				4A7E054F19A697E7001DCF80 /* write_rent_use_aez.c in Sources */,
+				4A4A471D1C4591FF00ECD505 /* read_protected.c in Sources */,
+				4A7E05CB19AC09A1001DCF80 /* write_gcam_lut.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB928608733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INPUT_FILETYPE = sourcecode.c.c;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_PEDANTIC = YES;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "\"/usr/local/lib\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-L/usr/local/include",
+					"-lnetcdf",
+					"-lm",
+				);
+				PRODUCT_NAME = lds;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = /usr/local/include;
+				WARNING_CFLAGS = "-Wall";
+			};
+			name = Debug;
+		};
+		1DEB928708733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_PEDANTIC = YES;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "\"/usr/local/lib\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-L/usr/local/include",
+					"-lnetcdf",
+					"-lm",
+				);
+				PRODUCT_NAME = lds;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = /usr/local/include;
+				WARNING_CFLAGS = "-Wall";
+			};
+			name = Release;
+		};
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "lds" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928608733DD80010E9CD /* Debug */,
+				1DEB928708733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lds" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

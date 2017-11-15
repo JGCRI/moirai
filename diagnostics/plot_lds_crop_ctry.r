@@ -2,16 +2,16 @@
 # plot_lds_crop_ctry.r
 #
 # modified 19 may 2015 to add a couple of grayscale plots for the paper
-# modified from plot_crop_ctry.r oct 2015 to accommodate LDS2 outputs
+# modified from plot_crop_ctry.r oct 2015 to accommodate LDS outputs
 # addtional modification through jan 2016
 #
-# calc stats and make plots of the country level production and harvested area outputs from lds2
+# calc stats and make plots of the country level production and harvested area outputs from lds
 #	harvested area is in ha (LDS_ag_HA_ha.csv)
 #	production is in metric tonnes (LDS_ag_prod_t.csv)
 # 		
 #	these inputs are rounded to the integer
 #	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds2/outputs/
+#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
 #
 # compare the LDS country data with original (either GTAP or GENAEZECON data) and FAO data
 # FAO data need to be averaged over the years 1997 - 2003
@@ -52,8 +52,8 @@ cat("started plot_lds_crop_ctry.r at ",date(), "\n")
 setwd("./")
 
 # compare against gtap or genaezecon ouput
-# when comparing against genaezecon output the results should not be identical because the lds2 and genaezecon countries are different
-# comparing to another lds2 output should be identical because the outputs are aggregated to country
+# when comparing against genaezecon output the results should not be identical because the lds and genaezecon countries are different
+# comparing to another lds output should be identical because the outputs are aggregated to country
 #	 not set up for this at the moment
 gtap = FALSE
 
@@ -75,7 +75,7 @@ num_aez = 235
 # input data files
 
 if(gtap) {
-	# use lds2 original aez output for the 'new' aezs
+	# use lds original aez output for the 'new' aezs
 	prodname = paste(basedir, newdir,"LDS_ag_prod_t.csv", sep="")
 	areaname = paste(basedir, newdir,"LDS_ag_HA_ha.csv", sep="")
 	prodname_fao = paste(basedir, newdir,"production_fao.csv", sep="")
@@ -84,7 +84,7 @@ if(gtap) {
 	prodname_orig = "../indata/maybe/GTAP_ag_prod_t.csv"
 	areaname_orig = "../indata/maybe/GTAP_ag_HA_ha.csv"
 } else {
-	# use lds2 output for new aezs and genaezecon output for original aezs
+	# use lds output for new aezs and genaezecon output for original aezs
 	# for the moment read the 1d diagnostic output arrays from lds, which have no header lines
     #prodname = paste(basedir, newdir,"production_crop_aez.csv", sep="")
     #areaname = paste(basedir, newdir,"harvestarea_crop_aez.csv", sep="")

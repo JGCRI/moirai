@@ -7,7 +7,7 @@
 #
 #	these inputs are rounded to the integer
 #	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds2/outputs/
+#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
 #
 # compare the LDS original raez data with GENAEZECON original raez data and reigonalized GTAP data
 #  
@@ -76,9 +76,9 @@ country_gtap_fname = "../indata/maybe/GTAP_ctry_GCAM_ctry87.csv"
 # read ctry2regioncodes.txt for gcam regions in lds input iso order
 # this file must correspond with the REG32 flag above (region number must match!)
 # no header line, 1 column
-#lds2gcamregion_fname = "./AEZ_orig_lds_14reg_2015/ctry2regioncodes_gcam.txt"
-#lds2gcamregion_fname = "./AEZ_orig_lds_32reg_2015/ctry2regioncodes_gcam.txt"
-lds2gcamregion_fname = "./basins235_32reg_test/ctry2regioncodes_gcam.txt"
+#ldsgcamregion_fname = "./AEZ_orig_lds_14reg_2015/ctry2regioncodes_gcam.txt"
+#ldsgcamregion_fname = "./AEZ_orig_lds_32reg_2015/ctry2regioncodes_gcam.txt"
+ldsgcamregion_fname = "./basins235_32reg_test/ctry2regioncodes_gcam.txt"
 
 # the crop names are here, fourth column, one header line
 cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
@@ -222,7 +222,7 @@ if (GTAP) {
     region_codes = as.integer(unlist(temp[1]))
     region_names = unlist(temp[2])
     # get the full list of lds input country to gcam region codes
-    temp<-scan(lds2gcamregion_fname, what=as.list(character(1)), skip=0, sep = ",", quote = "\"")
+    temp<-scan(ldsgcamregion_fname, what=as.list(character(1)), skip=0, sep = ",", quote = "\"")
     regioncode_gcam = as.integer(unlist(temp[1]))
 }
 

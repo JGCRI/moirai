@@ -8,7 +8,7 @@
 # Need to do this in USD to make the plotting easier for now
 #
 #	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds2/outputs/
+#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
 #
 # also plot the raez level for both 14 and 32 regions
 #
