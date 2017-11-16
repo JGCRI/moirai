@@ -8,3 +8,9 @@
 bin/
 obj/
 outputs/
+Build/
+bin/
+obj/
+
+# exclude output dirs
+examples/outputs
