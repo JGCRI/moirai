@@ -80,7 +80,6 @@
 		4A1E64EB1FBCDEC60009D173 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4A710E3E1FBD090500BB91B4 /* diagnostics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = diagnostics; sourceTree = "<group>"; };
 		4A710E401FBD0A3400BB91B4 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
-		4A710E411FBD0B5500BB91B4 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		4A8E21B81C8E3DE5007DBF74 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
 		4A98F1181BB31FBA005E7B9D /* indata */ = {isa = PBXFileReference; lastKnownFileType = folder; path = indata; sourceTree = "<group>"; };
 		4AC95D3B1FBD119300ABE415 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
@@ -141,6 +140,7 @@
 		4AC95E5B1FBD165D00ABE415 /* write_rent_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_rent_use_aez.c; sourceTree = "<group>"; };
 		4AC95E5C1FBD165D00ABE415 /* write_text_char.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_char.c; sourceTree = "<group>"; };
 		4AC95E5D1FBD165D00ABE415 /* write_text_int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_int.c; sourceTree = "<group>"; };
+		4AE9B6FF1FBE338700C9BE8B /* input_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = input_files; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* lds */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lds; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -160,9 +160,9 @@
 			children = (
 				4A710E3E1FBD090500BB91B4 /* diagnostics */,
 				4A710E401FBD0A3400BB91B4 /* docs */,
-				4A710E411FBD0B5500BB91B4 /* examples */,
 				4AC95D3B1FBD119300ABE415 /* include */,
 				4A98F1181BB31FBA005E7B9D /* indata */,
+				4AE9B6FF1FBE338700C9BE8B /* input_files */,
 				1AB674ADFE9D54B511CA2CBB /* lds */,
 				4A8E21B81C8E3DE5007DBF74 /* makefile */,
 				4A1E64EB1FBCDEC60009D173 /* README.md */,

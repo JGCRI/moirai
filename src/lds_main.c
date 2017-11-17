@@ -7,7 +7,13 @@
  Modified in Fall 2015 by Alan Di Vittorio to accommodate GCAM 235 water basins as GLUs
  Now an arbitrary set of GLUs can be input
  
- This code is now based on the updated gcam-data-system, as downloaded on 23 sep 2015
+ Modified from Fall 2017 to ??? by Alan Di Vittorio to update the GLU data and use new historical land use/cover data
+ 	Chris Vernon provided new 235 water basin data and set up the git repository
+ 	Shijie Shu and Atul Jain provided a new land use/cover historical data series based on HYDE3.2
+ 
+ This version will interface with the refactored gcam data system
+ The previous version was based on the gcam-data-system, as downloaded on 23 sep 2015
+ 
  The  land units for aggregation are now called Geographic Land Units (GLUs)
  Each new GLU is a unique area on the globe - this is different from the original climate AEZs
     All outputs have been updated to glu terminology, as appropriate (original aez diags still have aez)
@@ -72,7 +78,7 @@
 
  
  Note: New GLU boundaries can be defined in any manner, and are input as a 4 byte signed integer raster file, 5 arcmin
-    but they need to be numbered 1-numaezs
+    but they need to be numbered 1-numaezs, with nodata = -9999
     and each one is a unique area on the globe
  
  Note: The read functions for the data below need to be modular so they can be swapped easily
@@ -107,9 +113,9 @@
  original GTAP AEZ boundaries as a raster file (with an R raster header file)
  This is needed to redistribute the forest land rent
 	AEZ18 id number ranges from 1-18
-	single-band binary file, nodata=-32768, 4-byte signed integer
+	single-band binary file, nodata=-9999, 4-byte signed integer
 	5 arcmin resolution, 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
- AEZ_orig.gri: the original AEZ18 ids corrected for the patch of australia in africa
+ AEZ_orig_lds.gri: the original AEZ18 ids corrected for the patch of australia in africa
  
  FAO country code raster file
 	single-band binary file (BIL), nodata=-9999,4-byte integer

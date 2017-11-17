@@ -6,8 +6,8 @@
 #	production is in metric tonnes: LDS_ag_prod_t.csv
 #
 #	these inputs are rounded to the integer
-#	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
+#	the working directory should be:
+#	 .../lds/diagnostics/
 #
 # compare the LDS original raez data with GENAEZECON original raez data and reigonalized GTAP data
 #  
@@ -44,41 +44,39 @@ cat("started plot_lds_crop_raez.r at ",date(), "\n")
 
 setwd("./")
 
+# this determines the grouping of the comparison
 GTAP = TRUE
 REG32 = TRUE
 
 papergray = FALSE
 
-# put different region sets in different folders
-#outdir = "./AEZ_orig_lds_14reg_2015_stats_raez/"
-#outdir = "./AEZ_orig_lds_32reg_2015_stats_raez/"
-outdir = "./basins235_32reg_test_stats_raez/"
+# this is the new data directory
+newdir = "../outputs/basins235/"
+
+# recommended outdir is in diagnostics because these are comparisons between cases
+outdir = paste("./basins235_stats_raez/", sep="")
+dir.create(outdir, recursive = TRUE)
 
 # input data files
 
-#prodname = "./AEZ_orig_lds_14reg_2015/LDS_ag_prod_t.csv"
-#areaname = "./AEZ_orig_lds_14reg_2015/LDS_ag_HA_ha.csv"
-#prodname = "./AEZ_orig_lds_32reg_2015/LDS_ag_prod_t.csv"
-#areaname = "./AEZ_orig_lds_32reg_2015/LDS_ag_HA_ha.csv"
-prodname = "./basins235_32reg_test/LDS_ag_prod_t.csv"
-areaname = "./basins235_32reg_test/LDS_ag_HA_ha.csv"
-prodname_orig = "./AEZ_orig_newanlr_2015/GENAEZECON_ag_prod_t.csv"
-areaname_orig = "./AEZ_orig_newanlr_2015/GENAEZECON_ag_HA_ha.csv"
-prodname_gtap = "../indata/maybe/GTAP_ag_prod_t.csv"
-areaname_gtap = "../indata/maybe/GTAP_ag_HA_ha.csv"
+prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
+areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+prodname_orig = "./GENAEZECON_ag_prod_t.csv"
+areaname_orig = "./GENAEZECON_ag_HA_ha.csv"
+prodname_gtap = "./GTAP_ag_prod_t.csv"
+areaname_gtap = "./GTAP_ag_HA_ha.csv"
 
 # input mapping files
 
 # five columns, one header line:
 # this has the code, the abbreviation, the name, and the GCAM ctry87 code and the abbr.
-country_gtap_fname = "../indata/maybe/GTAP_ctry_GCAM_ctry87.csv"
+country_gtap_fname = "./GTAP_ctry_GCAM_ctry87.csv"
 
 # read ctry2regioncodes.txt for gcam regions in lds input iso order
+# this is a diagnostic lds output
 # this file must correspond with the REG32 flag above (region number must match!)
 # no header line, 1 column
-#ldsgcamregion_fname = "./AEZ_orig_lds_14reg_2015/ctry2regioncodes_gcam.txt"
-#ldsgcamregion_fname = "./AEZ_orig_lds_32reg_2015/ctry2regioncodes_gcam.txt"
-ldsgcamregion_fname = "./basins235_32reg_test/ctry2regioncodes_gcam.txt"
+ldsgcamregion_fname = paste0(newdir, "ctry2regioncodes_gcam.txt")
 
 # the crop names are here, fourth column, one header line
 cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"

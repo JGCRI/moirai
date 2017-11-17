@@ -3,8 +3,9 @@
 #
 # invoke by issuing command "make" from this directory
 #
-# manually create the EXEDIR and OBJDIR before running make
-#   for some reason I couldn't get the mkdir command to work within this script
+# the EXEDIR is <project direcotry>/bin by default
+#	so lds must either be called from the project directory
+#	or the paths must be updated in the input file to reflect the calling/working directory
 #
 # NetCDF library and header locations:
 #   the defaults are: /usr/local/lib and /usr/local/include

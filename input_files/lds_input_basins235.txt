@@ -2,6 +2,7 @@
 # the comment character is "#"
 # blank lines and lines starting with "#" are ignored
 # input values must be in this order
+# the working directory is the main project directory (which contains the examples directory)
 
 # flags
 0			# recalibrate: 0 = no, 1 = yes; this is hardcoded to zero because it is not working properly
@@ -9,21 +10,19 @@
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./examples/outputs/basins235_32reg_test/                       # outpath: path to output files
-#./examples/outputs/aez_orig_lds/                       # outpath: path to output files
+./outputs/basins235/                					# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
-./indata/Mirca2000CropIrrRfdHarvArea/                 # mircapath: path to mirca files
-./indata/WaterFootprint/Report47-App-IV-RasterMaps/   # wfpath: path to water footprint files
-./examples/outputs/basins235_32reg_test/aglu-data/                                  # ldsdestpath: destination path for the gcam data system input files
-./examples/outputs/basins235_32reg_test/aglu-data/                             # mapdestpath: destination path for the gcam data system mapping files
+./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
+./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
+./outputs/basins235/aglu-data/LDS/     					# ldsdestpath: destination path for the gcam data system input files
+./outputs/basins235/aglu-data/mappings/    				# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
 sage_land_frac.bil			# land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
 hyde_land_plus.bil          # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
-Global235_CLM_5arcmin.bil     # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ) --updated 30Sep2017
-#AEZ_orig_lds.gri			# aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_ORIG_AEZ)
-AEZ_orig.gri				# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
+Global235_CLM_5arcmin.bil   # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ) --updated 30Sep2017
+AEZ_orig_lds.gri			# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
 potveg_plus.bil				# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
 fao_ctry_rast.bil			# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
 ProArea_0408_ENVI.img       # protected_fname: protected pixels (thematic)
@@ -37,10 +36,7 @@ GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
 GTAP_GCAM_ctry87.csv		# country87_gtap_fname: GTAP 87 country list, in GCAM order (alphabetical by iso)
 FAO_ctry_GCAM_ctry87.csv	# country87map_fao_fname: FAO country to 87 country mapping list
 FAO_iso_VMAP0_ctry.csv		# country_all_fname: FAO/VMAP0 and iso
-Global235_CLM_5arcmin.csv     # aez_new_info_fname: the new aez list of integer codes and names --updated 30Sep2017
-#AEZ_orig_lds.csv           # aez_new_info_fname: the new aez list of integer codes and names
-#iso_GCAM_regID_14reg.csv	# countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
-#GCAM_region_names_14reg.csv        # regionlist_gcam_fname: GCAM region list
+Global235_CLM_5arcmin.csv   # aez_new_info_fname: the new aez list of integer codes and names --updated 30Sep2017
 iso_GCAM_regID_32reg.csv	# countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
 GCAM_region_names_32reg.csv	# regionlist_gcam_fname: GCAM region list
 GTAP_use.csv				# use_gtap_fname: GTAP product use categories
@@ -53,46 +49,9 @@ FAO_ag_an_prodprice_USD_t_PRICESTAT_11yrs.csv	# prodprice_fao_fname: FA0 product
 convert_to_2001usd.csv		# convert_usd_fname: divisors for converting USD from one year to another
 veg_carbon.csv              # vegc_csv_fname: potential vegetation carbon table (kg/m^2)
 soil_carbon.csv             # soilc_csv_fname: soil carbon table (kg/m^2)
-hyde_cell_plus.bil                  # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
-sage_land_frac.bil			            # land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
-hyde_land_plus.bil                  # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
-Global235_CLM_0125_dissolve.gri     # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ)
-#AEZ_orig_lds.gri			              # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_ORIG_AEZ)
-#AEZ_echam_2100_lds.gri             # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_ORIG_AEZ)
-AEZ_orig.gri				                # aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
-potveg_plus.bil				              # potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
-fao_ctry_rast.bil			              # country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
-ProArea_0408_ENVI.img               # protected_fname: protected pixels (thematic)
-Nfert_0083d.img                     # nfert_rast_fname: nitrogen application rate (kg/ha)
-crop_BSQ_33_float.img               # hist_crop_rast_name: HYDE historical crop area (km^2)
-grass_BSQ_33_float.img              # hist_pasture_rast_name: HYDE historical pasture area (km^2)
-urban_BSQ_33_float.img              # hist_urban_rast_name: HYDE historical urban area (km^2)
-
-# input csv file names (without path)
-GTAP_value_milUSD.csv		                 # rent_orig_fname: original GTAP LU2.1 land rent data
-GTAP_GCAM_ctry87.csv		                 # country87_gtap_fname: GTAP 87 country list, in GCAM order (alphabetical by iso)
-FAO_ctry_GCAM_ctry87.csv	               # country87map_fao_fname: FAO country to 87 country mapping list
-FAO_iso_VMAP0_ctry.csv		               # country_all_fname: FAO/VMAP0 and iso
-Global235_CLM_0125_dissolve.csv          # aez_new_info_fname: the new aez list of integer codes and names
-#AEZ_orig_lds.csv                        # aez_new_info_fname: the new aez list of integer codes and names
-#AEZ_echam_2100_lds.csv                  # aez_new_info_fname: the new aez list of integer codes and names
-#iso_GCAM_regID_14reg.csv	               # countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
-#GCAM_region_names_14reg.csv             # regionlist_gcam_fname: GCAM region list
-iso_GCAM_regID_32reg.csv	               # countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
-GCAM_region_names_32reg.csv	             # regionlist_gcam_fname: GCAM region list
-GTAP_use.csv				                     # use_gtap_fname: GTAP product use categories
-SAGE_PVLT.csv				                     # lt_sage_fname: SAGE land cover types for potential vegetation
-SAGE_gtap_fao_crop2use.csv	             # crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
-FAO_ag_prod_t_PRODSTAT_11yrs.csv				 # production_fao_fname: FAO production data
-FAO_ag_yield_hg_ha_PRODSTAT_11yrs.csv		 # yield_fao_fname: FAO yield data
-FAO_ag_HA_ha_PRODSTAT_11yrs.csv					          # harvestarea_fao_fname: FAO harvest area data
-FAO_ag_an_prodprice_USD_t_PRICESTAT_11yrs.csv	    # prodprice_fao_fname: FA0 production price data
-convert_to_2001usd.csv		                        # convert_usd_fname: divisors for converting USD from one year to another
-veg_carbon.csv                                    # vegc_csv_fname: potential vegetation carbon table (kg/m^2)
-soil_carbon.csv                                   # soilc_csv_fname: soil carbon table (kg/m^2)
 
 # output file names (without path)
-lds_log.txt                     # lds_logname: log file name for runtime output
+lds_log_basins235.txt          	# lds_logname: log file name for runtime output
 LDS_ag_HA_ha.csv                # harvestarea_fname: file name for harvested area output
 LDS_ag_prod_t.csv               # production_fname:	file name for production output
 LDS_value_milUSD.csv            # rent_fname: file name for rent output

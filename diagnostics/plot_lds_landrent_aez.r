@@ -8,7 +8,7 @@
 # Need to do this in USD to make the plotting easier for now
 #
 #	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
+#	 .../lds/diagnostics/
 #
 # also plot the raez level for both 14 and 32 regions
 #
@@ -65,18 +65,16 @@ REG32 = FALSE
 
 papergray = FALSE
 
-#outdir = "./AEZ_orig_lds_14reg_2015_stats_landrent/"
-#outdir = "./basins235_14reg_test_stats_landrent/"
-outdir = "./basins235_32reg_test_stats_landrent/"
+# recommended outdir is in diagnostics because these are comparisons between cases
+outdir = paste("./basins235_stats_area/", sep="")
+dir.create(outdir, recursive = TRUE)
 
 # input data files
 
 # use lds output for new aezs
-#lrname = "./AEZ_orig_lds_14reg_2015/LDS_value_milUSD.csv"
-#lrname = "./basins235_14reg_test/LDS_value_milUSD.csv"
 lrname = "./basins235_32reg_test/LDS_value_milUSD.csv"
 # and compare with the genaez orignal aez output
-lrname_orig = "./AEZ_orig_newanlr_2015/GENAEZECON_value_milUSD.csv"
+lrname_orig = "./GENAEZECON_value_milUSD.csv"
 # and compare with the gtap data
 lrname_gtap = "../indata/GTAP_value_milUSD.csv"
 
@@ -89,7 +87,7 @@ num_aez = 235
 # this is the order of the ctry87 in the land rent output files
 # this includes both 32 (columns 4 and 5) and 14 (columns 6 and 7) region mappings; code first, then name
 # seven columns, one header line
-countryname_gtap = "../indata/maybe/GTAP_GCAM_ctry87_32reg.csv"
+countryname_gtap = "./GTAP_GCAM_ctry87_32reg.csv"
 
 # number of regions and output names
 if (AGGREGATE) {

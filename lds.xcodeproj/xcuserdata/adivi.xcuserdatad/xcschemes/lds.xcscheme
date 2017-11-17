@@ -64,7 +64,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "$PROJECT_DIR/lds_input.txt"
+            argument = "$PROJECT_DIR/examples/lds_input_basins235.txt"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

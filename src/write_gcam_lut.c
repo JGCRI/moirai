@@ -3,7 +3,7 @@
  
  to do: change the name of this file/routine to: get_glu_mappings
     for glu = geographic land unit (or come up with a better name)
-    need to distinguish the input land unit (no longer aez) from the gcam land use region (physical land unit X geopolitical region)
+    need to distinguish the input glu (no longer aez) from the gcam land use region (geographic land unit X geopolitical region)
  
  Store the GLU codes for each fao country in int **ctry_aez_list
  Store the number of GLUs for each fao country in int *ctry_aez_num
@@ -38,7 +38,7 @@
 		A_biocrops_R_AEZ.csv (depends on aez numbers in regions)
 	only seven regions are in this bioenergy crop mapping file
  
- to do: check for gridded new AEZs:
+ This currently assumes that new AEZs are regions rather than individual grid cells:
  If AEZs are not from a grid, also write a country+aez and a gcamregion+aez image file for diagnostics:
  Then the GCAM AEZ_ID is:
 	country*10000 + AEZ value (with no data value = -9999) (country is replaced with gcam region id for the other image)
@@ -90,7 +90,7 @@ int write_gcam_lut(args_struct in_args, rinfo_struct raster_info) {
     FILE *fpout2;					// file 2 pointer
     FILE *fpout3;					// file 2 pointer
 	
-    char *lult_names[NUM_LU_CATS] = {"Unmanaged","Cropland","Pasture","Urbanland"};
+    char *lult_names[NUM_LU_CATS] = {"Unmanaged","Cropland","Pasture","UrbanLand"};
     char *protected_names[NUM_PROTECTED] = {"Protected","Non-protected"};
     
     int *ctryaez_raster;    // store the ctry+aez values as a raster file

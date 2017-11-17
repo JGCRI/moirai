@@ -10,8 +10,8 @@
 #	production is in metric tonnes (LDS_ag_prod_t.csv)
 # 		
 #	these inputs are rounded to the integer
-#	the base directory is:
-#	 lds-workspace/input/gcam-data-system/aglu-processing-code/lds/outputs/
+#	the bworking directory is expected to be:
+#	 .../lds/diagnostics/
 #
 # compare the LDS country data with original (either GTAP or GENAEZECON data) and FAO data
 # FAO data need to be averaged over the years 1997 - 2003
@@ -49,83 +49,67 @@ library(stringr)
 
 cat("started plot_lds_crop_ctry.r at ",date(), "\n")
 
+# make sure that the working directory is .../lds/diagnostics
 setwd("./")
 
-# compare against gtap or genaezecon ouput
-# when comparing against genaezecon output the results should not be identical because the lds and genaezecon countries are different
+# compare against gtap or older genaezecon output output
 # comparing to another lds output should be identical because the outputs are aggregated to country
-#	 not set up for this at the moment
-gtap = FALSE
+gtap = TRUE
 
 # plot the paper figures in grayscale
 papergray = FALSE
 
-basedir = "./"
-#newdir = "AEZ_orig_lds_14reg_2015/"
-#newdir = "basins235_14reg_test/"
-newdir = "basins235_32reg_test/"
+# this is the new data directory
+newdir = "../outputs/basins235/"
 
-#outdir = paste(basedir, "AEZ_orig_lds_14reg_2015_stats_ctry/", sep="")
-#outdir = paste(basedir, "basins235_14reg_test_stats_ctry/", sep="")
-outdir = paste(basedir, "basins235_32reg_test_stats_ctry/", sep="")
-
-#num_aez = 18
-num_aez = 235
-
-# input data files
-
-if(gtap) {
-	# use lds original aez output for the 'new' aezs
-	prodname = paste(basedir, newdir,"LDS_ag_prod_t.csv", sep="")
-	areaname = paste(basedir, newdir,"LDS_ag_HA_ha.csv", sep="")
-	prodname_fao = paste(basedir, newdir,"production_fao.csv", sep="")
-	areaname_fao = paste(basedir, newdir,"harvestarea_fao.csv", sep="")
-	# and compare with the gtap data
-	prodname_orig = "../indata/maybe/GTAP_ag_prod_t.csv"
-	areaname_orig = "../indata/maybe/GTAP_ag_HA_ha.csv"
-} else {
-	# use lds output for new aezs and genaezecon output for original aezs
-	# for the moment read the 1d diagnostic output arrays from lds, which have no header lines
-    #prodname = paste(basedir, newdir,"production_crop_aez.csv", sep="")
-    #areaname = paste(basedir, newdir,"harvestarea_crop_aez.csv", sep="")
-	prodname = paste(basedir, newdir,"LDS_ag_prod_t.csv", sep="")
-	areaname = paste(basedir, newdir,"LDS_ag_HA_ha.csv", sep="")
-	prodname_fao = paste(basedir, newdir,"production_fao.csv", sep="")
-	areaname_fao = paste(basedir, newdir,"harvestarea_fao.csv", sep="")
-	# and compare with the genaez orignal aez output
-	prodname_orig = paste(basedir, "AEZ_orig_newanlr_2015/GENAEZECON_ag_prod_t.csv", sep="")
-	areaname_orig = paste(basedir, "AEZ_orig_newanlr_2015/GENAEZECON_ag_HA_ha.csv", sep="")
-}
-
-# input mapping files
-# five columns, one header line
-countryfname_gtap = "../indata/maybe/GTAP_ctry_GCAM_ctry87.csv"
-# five columns, one header line
-# now use the 235 country fao/vmap0 file used by the lds because this determines the fao diagnostic output
-countrymapfname = "../indata/FAO_iso_VMAP0_ctry.csv"
-# seven columns, one header line
-# this has 246 country records, but ten of them are not used here because they are not used in the lds (they were included in genaezecon, but not in gtap)
-#countrymapname = "../indata/maybe/FAO_gtap_gcam_ctry.csv"
-# five columns, one header line
-# this file determines which countries are in the LDS output file
-countryfname_lds = "../indata/FAO_ctry_GCAM_ctry87.csv"
-# the crop names are here, fourth column, one header line
-cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
-
-
+# recommended outdir is in diagnostics because these are comparisons between cases
+outdir = paste("./basins235_stats_ctry_gtap/", sep="")
+dir.create(outdir, recursive = TRUE)
 
 # output names
 ptag_ctry = "_ctry.pdf"
 ctag_ctry = "_ctry.csv"
 
-num_ctry = 231			# number of countries output by lds
-num_ctry_gtap = 226
-num_ctry_fao = 235		# number of countries in fao diagnostic output from lds
-#num_ctry_fao = 246		# this is the number of fao/vmap0 countries listed in the older, genaez fao country map file above
-num_crop = 175
+# number of GLUs in current lds output
+num_aez = 235
+# number of gtap AEZs
 num_aez_gtap = 18
+# country counts
+num_ctry = 231			# number of countries output by lds
+num_ctry_fao = 235		# number of countries in fao diagnostic output from lds
+num_ctry_gtap = 226		# number of gtap/genaezecon countries
+
+# input data files
+# the fao files are diagnostic lds outputs
+
+if(gtap) {
+	# use lds "new" data
+	prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
+	areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+	prodname_fao = paste(newdir,"production_fao.csv", sep="")
+	areaname_fao = paste(newdir,"harvestarea_fao.csv", sep="")
+	# and compare with the gtap data
+	prodname_orig = "./GTAP_ag_prod_t.csv"
+	areaname_orig = "./GTAP_ag_HA_ha.csv"
+	num_aez_ref = num_aez_gtap
+	num_ctry_ref = num_ctry_gtap
+} else {
+	# use "new" lds output for new aezs and a reference lds output for original aezs
+	prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
+	areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+	prodname_fao = paste(newdir,"production_fao.csv", sep="")
+	areaname_fao = paste(newdir,"harvestarea_fao.csv", sep="")
+	# and compare with the reference lds output
+	prodname_orig = paste("./GENAEZECON_ag_prod_t.csv", sep="")
+	areaname_orig = paste("./GENAEZECON_ag_HA_ha.csv", sep="")
+	num_aez_ref = num_aez_gtap
+	num_ctry_ref = num_aez_gtap
+}
+
+# more counts
+num_crop = 175
 num_recs = num_ctry * num_crop
-num_recs_gtap = num_ctry_gtap * num_crop
+num_recs_gtap = num_ctry_ref * num_crop
 num_colskip = 2
 lds_colskip = 3
 num_faoyears = 11
@@ -134,9 +118,22 @@ fao_startavg = 1
 #num_faoavg = 5
 #fao_startavg = 7
 
+# input mapping files
+# five columns, one header line
+countryfname_gtap = "./GTAP_ctry_GCAM_ctry87.csv"
+# five columns, one header line
+# now use the 235 country fao/vmap0 file used by the lds because this determines the fao diagnostic output
+countrymapfname = "../indata/FAO_iso_VMAP0_ctry.csv"
+
+# five columns, one header line
+# this file determines which countries are in the LDS output file
+countryfname_lds = "../indata/FAO_ctry_GCAM_ctry87.csv"
+# the crop names are here, fourth column, one header line
+cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
+
 #intype = as.list(character(1 + lds_colskip))
 nhead_lds = 5
-intype_gtap = as.list(character(num_aez_gtap + num_colskip))
+intype_gtap = as.list(character(num_aez_ref + num_colskip))
 nhead = 6
 intype_fao = as.list(character(13))
 nhead_fao = 0
@@ -149,8 +146,8 @@ min_crop_n = 20
 # 3d array for in values
 prod = array(dim=c(num_ctry, num_crop, num_aez))
 area = array(dim=c(num_ctry, num_crop, num_aez))
-prod_orig = array(dim=c(num_ctry, num_crop, num_aez_gtap))
-area_orig = array(dim=c(num_ctry, num_crop, num_aez_gtap))
+prod_orig = array(dim=c(num_ctry, num_crop, num_aez_ref))
+area_orig = array(dim=c(num_ctry, num_crop, num_aez_ref))
 prod_fao = array(dim=c(num_ctry, num_crop, num_faoyears))
 area_fao = array(dim=c(num_ctry, num_crop, num_faoyears))
 prev_flag_area = array(dim=c(num_faoyears, num_ctry, num_crop))
@@ -312,10 +309,10 @@ for(j in 1:num_ctry) {
 }	# end for j loop over number of countries
 
 cat("filling genaezecon/orig 3d arrays\n")
-for(i in 1:num_aez_gtap) {
+for(i in 1:num_aez_ref) {
 	prod_col_orig = as.double(unlist(prod_in_orig[i+num_colskip]))
 	area_col_orig = as.double(unlist(area_in_orig[i+num_colskip]))
-	for(j in 1:num_ctry_gtap) {
+	for(j in 1:num_ctry_ref) {
 		# get the lds index and process only if it is in the lds list (which it should be)
 		lds_index = 0
 		for(k in 1:num_ctry) {

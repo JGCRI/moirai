@@ -52,24 +52,24 @@ library(ggplot2)
 
 cat("started plot_lds_land_type_area.r at ",date(), "\n")
 
+# make sure working directory is .../lds/diagnostics/
 setwd("./")
 
 # flag to denote whether this is 18 aez or 235 water basin lds output
 AEZ = FALSE
 
-basedir = "./"
-ldsdir = "basins235_32reg_test/"
-outdir = paste(basedir, "basins235_32reg_test_stats_area/", sep="")
-#ldsdir = "AEZ_orig_lds_test_GIS/"
-#outdir = paste(basedir, "AEZ_orig_lds_test_GIS_stats_area/", sep="")
+# recommended outdir is in diagnostics because these are comparisons between cases
+outdir = paste("./basins235_stats_area/", sep="")
+dir.create(outdir, recursive = TRUE)
 
 # input files
-gis_fname = paste(ldsdir, "Sage_Hyde15_Area.csv", sep="")
-lds_fname = paste(ldsdir, "Land_type_area_ha_h31.csv", sep="")
+# some of these are lds diagnostic outputs
+gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")
+lds_fname = paste("./Land_type_area_ha_h31.csv", sep="")
 lds_new_fname = paste(ldsdir, "Land_type_area_ha.csv", sep="")
 land_types_fname = paste(ldsdir, "LDS_land_types.csv", sep="")
-gis_ctry_map_fname = paste(basedir, "../indata/maybe/", "FAO_gtap_gcam_ctry.csv", sep="")
-fao_iso_map_fname = paste(basedir, "../indata/", "FAO_iso_VMAP0_ctry.csv", sep="")
+gis_ctry_map_fname = paste("./FAO_gtap_gcam_ctry.csv", sep="")
+fao_iso_map_fname = paste("../indata/FAO_iso_VMAP0_ctry.csv", sep="")
 
 num_gis_glu = 18
 if(AEZ) {

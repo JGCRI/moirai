@@ -10,12 +10,12 @@
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./examples/outputs/aez_orig/                       		# outpath: path to output files
+./outputs/aez_orig/                       				# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./examples/outputs/aez_orig/aglu-data/      			# ldsdestpath: destination path for the gcam data system input files
-./examples/outputs/aez_orig/aglu-data/      			# mapdestpath: destination path for the gcam data system mapping files
+./outputs/aez_orig/aglu-data/LDS/     					# ldsdestpath: destination path for the gcam data system input files
+./outputs/aez_orig/aglu-data/mappings/     				# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)

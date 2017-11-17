@@ -32,7 +32,7 @@ int read_aez_orig(args_struct in_args, rinfo_struct *raster_info) {
 	int nrows = 2160;				// num input lats
 	int ncols = 4320;				// num input lons
 	int ncells = nrows * ncols;		// number of input grid cells
-	int nodata = -32768;			// nodata value
+	int nodata = -9999;			// nodata value
 	int insize = 4;					// 4 byte integers for input
 	double res = 5.0 / 60.0;		// resolution
 	double xmin = -180.0;			// longitude min grid boundary
