@@ -27,7 +27,7 @@
 #include "/usr/local/include/netcdf.h"
 
 #define CODENAME								"lds"				// name of the compiled program
-#define VERSION         				"2.beta4"           // current version
+#define VERSION         				"2.0"           			// current version
 #define MAXCHAR									1000						// maximum string length
 #define MAXRECSIZE							10000						// maximum record (csv line) length in characters
 
@@ -42,7 +42,7 @@
 // counts of useful variables
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 #define NUM_FAO_YRS							11							// number of years in FAOSTAT production, yield, havested area, and price files
-#define NUM_IN_ARGS							49							// number of input variables in the input file
+#define NUM_IN_ARGS							50							// number of input variables in the input file
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
@@ -158,6 +158,7 @@ float *harvestarea_in;                  // input harvest area (km^2), reused by 
 float *yield_in;                        // input yield (metric tonnes / km^2), reused by each individual crop
 int *aez_bounds_new;                    // new aez boundaries (integers 1 to NUM_NEW_AEZ)
 int *aez_bounds_orig;                   // original aez boundaries (integers 1 to NUM_ORIG_AEZ)
+float *cropland_area_sage;              // sage cropland area for normalizing sage crop data (km^2)
 float *cropland_area;                   // cropland area for pot veg area calc for forest land rent (km^2)
 float *pasture_area;                    // pasture area for pot veg area calc and animal land rent calc (km^2)
 float *urban_area;                      // urban area for pot veg area calc for forest land rent calc (km^2)
@@ -181,7 +182,7 @@ int *land_mask_hyde;                    // 1=land; 0=no land
 int *land_mask_fao;                     // 1=land; 0=no land
 int *land_mask_potveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
-short *protected_thematic;                // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
+short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
 
 // indices of land cells within the raster data; these are the only cells processed
 // these are allocated and free dynamically as needed in lds_main.c
@@ -314,6 +315,17 @@ typedef struct {
 	double aez_orig_ymin;		// input latitude min grid boundary
 	double aez_orig_ymax;		// input latitude max grid boundary
 
+	// sage cropland area for normalizing sgae crop data
+	int cropland_sage_nrows;			// input number of rows
+	int cropland_sage_ncols;			// input number of columns
+	int cropland_sage_ncells;		// input number of grid cells
+	float cropland_sage_nodata;		// input nodata value
+	double cropland_sage_res;		// input resolution, decimal degrees
+	double cropland_sage_xmin;		// input longitude min grid boundary
+	double cropland_sage_xmax;		// input longitude max grid boundary
+	double cropland_sage_ymin;		// input latitude min grid boundary
+	double cropland_sage_ymax;		// input latitude max grid boundary
+	
 	// cropland area for pot veg calc
 	int cropland_nrows;			// input number of rows
 	int cropland_ncols;			// input number of columns
@@ -410,6 +422,7 @@ typedef struct {
     char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
     char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
     char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
+	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
 
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
@@ -453,6 +466,7 @@ int read_land_area_sage(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info);
 int read_aez_new(args_struct in_args, rinfo_struct *raster_info);
 int read_aez_orig(args_struct in_args, rinfo_struct *raster_info);
+int read_cropland_sage(args_struct in_args, rinfo_struct *raster_info);
 int read_cropland(args_struct in_args, rinfo_struct *raster_info);
 int read_pasture(args_struct in_args, rinfo_struct *raster_info);
 int read_potveg(args_struct in_args, rinfo_struct *raster_info);
@@ -460,14 +474,11 @@ int read_urban(args_struct in_args, rinfo_struct *raster_info);
 int read_country_fao(args_struct in_args, rinfo_struct *raster_info);
 int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
-//int read_sage_crop(char *fname, rinfo_struct raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
 int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
-
-int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
 
 // read csv file functions
 int read_rent_orig(args_struct in_args);
@@ -484,6 +495,7 @@ int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
 int read_veg_carbon(char *fname, float *veg_carbon_sage);
 int read_water_footprint(char *fname, float *wf_grid);
+int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
 
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);

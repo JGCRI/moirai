@@ -139,8 +139,8 @@ int read_harvestarea_fao(args_struct in_args) {
 				}
 			}
 			if(ctry_ind == NOMATCH) {
-				fprintf(fplog, "Extra FAO country code %i in %s: read_harvestarea_fao(); record=%li\n",
-						temp_ctry, fname, count_recs);
+				//fprintf(fplog, "Extra FAO country code %i in %s: read_harvestarea_fao(); record=%li\n",
+						//temp_ctry, fname, count_recs);
 				continue;
 			}
 			crop_ind = NOMATCH;
@@ -151,8 +151,8 @@ int read_harvestarea_fao(args_struct in_args) {
 				}
 			}
 			if(crop_ind == NOMATCH) {
-				fprintf(fplog, "Extra FAO crop code %i in %s: read_harvestarea_fao(); record=%li\n",
-						temp_crop, fname, count_recs);
+				//fprintf(fplog, "Extra FAO crop code %i in %s: read_harvestarea_fao(); record=%li\n",
+						//temp_crop, fname, count_recs);
 				continue;
 			}
 			

@@ -102,7 +102,9 @@ int aggregate_crop2gcam(args_struct in_args) {
 	for (ctry_index = 0; ctry_index < NUM_FAO_CTRY; ctry_index++) {
 		
         if (ctry2regioncodes_gcam[ctry_index] == NOMATCH) {
-            fprintf(fplog,"Warning: FAO country %i not in economic region; aggregate_crop2gcam()\n", countrycodes_fao[ctry_index]);
+			if (in_args.diagnostics){
+            	fprintf(fplog,"Warning: FAO country %i not in economic region; aggregate_crop2gcam()\n", countrycodes_fao[ctry_index]);
+			}
             continue;
         }else {
             // get gcam region index; have already checked for NOMATCH

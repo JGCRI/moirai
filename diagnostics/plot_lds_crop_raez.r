@@ -9,7 +9,7 @@
 #	the working directory should be:
 #	 .../lds/diagnostics/
 #
-# compare the LDS original raez data with GENAEZECON original raez data and reigonalized GTAP data
+# compare the LDS raez level data with GENAEZECON original raez data and reigonalized GTAP data
 #  
 # all files should not have any missing or NA values
 # input zeros represent no data
@@ -28,15 +28,15 @@
 
 # NOTE:
 #  ks tests and difference stats are invalid when the aez numbers do not match
-#  there are somewhat useful when looking at small shifts between the same number and numbering scheme of AEZs
+#  these are somewhat useful when looking at small shifts between the same number and numbering scheme of AEZs
 
 # LDS is dependent on the gcam region set for some diagnostics, including the region mapping file used here
 
 # modified oct 2015 to read in LDS output as new aezs
 # modified 19 may 2015 to generate some grayscale plots for the paper
 
-# this script takes about 20 minutes to run for 32reg and 10 minutes to run for 14 regions, with 18 aezs
-# with 235 basins it took about 4 hours for 32 regions
+# ?this script takes about 20 minutes to run for 32reg and 10 minutes to run for 14 regions, with 18 aezs?
+# with 235 basins it took about 24 hours for 32 regions
 
 library(stringr)
 

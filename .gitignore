@@ -3,6 +3,9 @@
 
 # exclude .idea dir
 .idea
+# exclude the unzipped sage175crop files
+indata/HarvestedAreaYield175Crops_NetCDF/*.png
+indata/HarvestedAreaYield175Crops_NetCDF/*.nc
 
 # exclude build dirs
 bin/

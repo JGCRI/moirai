@@ -120,87 +120,90 @@ int get_in_args(const char *fname, args_struct *in_args) {
                     strcpy(in_args->hist_urban_rast_name, fld_str);
                     break;
 				case 22:
-					strcpy(in_args->rent_orig_fname, fld_str);
+					strcpy(in_args->cropland_sage_fname, fld_str);
 					break;
 				case 23:
-					strcpy(in_args->country87_gtap_fname, fld_str);
+					strcpy(in_args->rent_orig_fname, fld_str);
 					break;
 				case 24:
-					strcpy(in_args->country87map_fao_fname, fld_str);
+					strcpy(in_args->country87_gtap_fname, fld_str);
 					break;
 				case 25:
+					strcpy(in_args->country87map_fao_fname, fld_str);
+					break;
+				case 26:
 					strcpy(in_args->country_all_fname, fld_str);
 					break;
-                case 26:
+                case 27:
                     strcpy(in_args->aez_new_info_fname, fld_str);
                     break;
-                case 27:
+                case 28:
 					strcpy(in_args->countrymap_iso_gcam_region_fname, fld_str);
 					break;
-				case 28:
+				case 29:
 					strcpy(in_args->regionlist_gcam_fname, fld_str);
 					break;
-				case 29:
+				case 30:
 					strcpy(in_args->use_gtap_fname, fld_str);
 					break;
-				case 30:
+				case 31:
 					strcpy(in_args->lt_sage_fname, fld_str);
 					break;
-				case 31:
+				case 32:
 					strcpy(in_args->crop_fname, fld_str);
 					break;
-				case 32:
+				case 33:
 					strcpy(in_args->production_fao_fname, fld_str);
 					break;
-				case 33:
+				case 34:
 					strcpy(in_args->yield_fao_fname, fld_str);
 					break;
-				case 34:
+				case 35:
 					strcpy(in_args->harvestarea_fao_fname, fld_str);
 					break;
-				case 35:
+				case 36:
 					strcpy(in_args->prodprice_fao_fname, fld_str);
 					break;
-				case 36:
+				case 37:
 					strcpy(in_args->convert_usd_fname, fld_str);
 					break;
-                case 37:
+                case 38:
                     strcpy(in_args->vegc_csv_fname, fld_str);
                     break;
-				case 38:
+				case 39:
 					strcpy(in_args->soilc_csv_fname, fld_str);
 					break;
-                case 39:
+                case 40:
                     strcpy(in_args->lds_logname, fld_str);
                     break;
-				case 40:
+				case 41:
 					strcpy(in_args->harvestarea_fname, fld_str);
 					break;
-				case 41:
+				case 42:
 					strcpy(in_args->production_fname, fld_str);
 					break;
-				case 42:
+				case 43:
 					strcpy(in_args->rent_fname, fld_str);
 					break;
-                case 43:
+                case 44:
                     strcpy(in_args->mirca_irr_fname, fld_str);
                     break;
-                case 44:
+                case 45:
                     strcpy(in_args->mirca_rfd_fname, fld_str);
                     break;
-                case 45:
+                case 46:
                     strcpy(in_args->land_type_area_fname, fld_str);
                     break;
-                case 46:
+                case 47:
                     strcpy(in_args->potveg_carbon_fname, fld_str);
                     break;
-                case 47:
+                case 48:
                     strcpy(in_args->wf_fname, fld_str);
                     break;
-                case 48:
+                case 49:
                     strcpy(in_args->iso_map_fname, fld_str);
                     break;
-                case 49:
+                case 50:
                     strcpy(in_args->lt_map_fname, fld_str);
                     break;
                     

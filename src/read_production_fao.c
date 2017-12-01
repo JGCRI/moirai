@@ -145,8 +145,8 @@ int read_production_fao(args_struct in_args) {
 				}
 			}
 			if(ctry_ind == NOMATCH) {
-				fprintf(fplog, "Extra FAO country code %i in %s: read_production_fao(); record=%li\n",
-						temp_ctry, fname, count_recs);
+				//fprintf(fplog, "Extra FAO country code %i in %s: read_production_fao(); record=%li\n",
+						//temp_ctry, fname, count_recs);
 				continue;
 			}
 			crop_ind = NOMATCH;
@@ -157,8 +157,8 @@ int read_production_fao(args_struct in_args) {
 				}
 			}
 			if(crop_ind == NOMATCH) {
-				fprintf(fplog, "Extra FAO crop code %i in %s: read_production_fao(); record=%li\n",
-						temp_crop, fname, count_recs);
+				//fprintf(fplog, "Extra FAO crop code %i in %s: read_production_fao(); record=%li\n",
+						//temp_crop, fname, count_recs);
 				continue;
 			}
 			
@@ -187,12 +187,12 @@ int read_production_fao(args_struct in_args) {
 		tmp_dbl = modf((double) (temp_crop / NUM_FAO_YRS), &dbl_int);
 		crop_ind = (int) dbl_int;
 		if (harvestarea_fao[j] != 0 && production_fao[j] == 0) {
-			fprintf(fplog, "FAO inconsistency for zero production at index %i: read_production_fao(); harvestarea_fao = %f\n\tctry_ind = %i\tcrop_ind = %i\n",
-					j, harvestarea_fao[j], ctry_ind, crop_ind);
+			//fprintf(fplog, "FAO inconsistency for zero production at index %i: read_production_fao(); harvestarea_fao = %f\n\tctry_ind = %i\tcrop_ind = %i\n",
+					//j, harvestarea_fao[j], ctry_ind, crop_ind);
 		}
 		if (harvestarea_fao[j] == 0 && production_fao[j] != 0) {
-			fprintf(fplog, "FAO inconsistency for zero area at index %i: read_production_fao(); production_fao = %f\n\tctry_ind = %i\tcrop_ind = %i\n",
-					j, production_fao[j], ctry_ind, crop_ind);
+			//fprintf(fplog, "FAO inconsistency for zero area at index %i: read_production_fao(); production_fao = %f\n\tctry_ind = %i\tcrop_ind = %i\n",
+					//j, production_fao[j], ctry_ind, crop_ind);
 		}
 	}	
 	

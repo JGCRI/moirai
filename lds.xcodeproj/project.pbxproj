@@ -62,6 +62,7 @@
 		4AC95E941FBD165E00ABE415 /* write_rent_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5B1FBD165D00ABE415 /* write_rent_use_aez.c */; };
 		4AC95E951FBD165E00ABE415 /* write_text_char.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5C1FBD165D00ABE415 /* write_text_char.c */; };
 		4AC95E961FBD165E00ABE415 /* write_text_int.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5D1FBD165D00ABE415 /* write_text_int.c */; };
+		4AE9B7011FBFB9A700C9BE8B /* read_cropland_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -141,6 +142,7 @@
 		4AC95E5C1FBD165D00ABE415 /* write_text_char.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_char.c; sourceTree = "<group>"; };
 		4AC95E5D1FBD165D00ABE415 /* write_text_int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_int.c; sourceTree = "<group>"; };
 		4AE9B6FF1FBE338700C9BE8B /* input_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = input_files; sourceTree = "<group>"; };
+		4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_cropland_sage.c; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* lds */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lds; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -209,6 +211,7 @@
 				4AC95E3D1FBD165D00ABE415 /* read_country_fao.c */,
 				4AC95E3E1FBD165D00ABE415 /* read_country_info_all.c */,
 				4AC95E3F1FBD165D00ABE415 /* read_crop_info.c */,
+				4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */,
 				4AC95E401FBD165D00ABE415 /* read_harvestarea_fao.c */,
 				4AC95E411FBD165D00ABE415 /* read_land_area_hyde.c */,
 				4AC95E421FBD165D00ABE415 /* read_land_area_sage.c */,
@@ -338,6 +341,7 @@
 				4AC95E911FBD165E00ABE415 /* write_raster_float.c in Sources */,
 				4AC95E8B1FBD165E00ABE415 /* read_yield_fao.c in Sources */,
 				4AC95E851FBD165E00ABE415 /* read_rent_orig.c in Sources */,
+				4AE9B7011FBFB9A700C9BE8B /* read_cropland_sage.c in Sources */,
 				4AC95E791FBD165D00ABE415 /* read_harvestarea_fao.c in Sources */,
 				4AC95E8C1FBD165E00ABE415 /* write_csv_float2d.c in Sources */,
 				4AC95E8E1FBD165E00ABE415 /* write_gcam_lut.c in Sources */,

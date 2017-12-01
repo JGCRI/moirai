@@ -9,9 +9,9 @@
  get harvest area in km^2
 
  the file has 4 attribute variables:
-	longitude (4320), latitude (2160), level (4), time (1)
+	longitude (4320), latitude (2160), level (6), time (1)
  the four levels are (float type):
-	harvest area (fraction of land area), yield (t per ha), quality-area, quality-yield
+	harvest area (fraction of land area), yield (t per ha), quality-area, quality-yield, total harvested area (ha), production (t)
  the data variable has four dimensions:
 	cropdata(time, level, latitude, longitude)
 
@@ -153,42 +153,8 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 	// loop over all the data to convert the values to working units
 	//  and to make sure that valid crop values exist for sage land cells
 	for (i = 0; i < ncells; i++) {
-		// convert yield to tonnes per km^2
-		if (yield_in[i] == nodata) {
-			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
-				yield_in[i] = NODATA;
-			} else {
-				yield_in[i] = 0;
-			}
-		} else {
-			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
-				yield_in[i] = NODATA;
-			} else {
-				temp_flt = yield_in[i];
-				if (qual_yield[i] != 0) {
-					yield_in[i] = yield_in[i] / HA2KMSQ;
-					if (qual_yield[i] == nodata && yield_in[i] != 0) {
-						// this condition does not occur
-						fprintf(fplog,"Warning: qual_yield[%i] = nodata and yield_in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, yield_in[i], fname);
-					}
-				} else {
-					if (qual_yield[i] == 0) {
-						// this condition does not occur
-						fprintf(fplog,"Warning: qual_yield[%i] = 0 and yield_in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, yield_in[i], fname);
-					}
-					temp_flt = yield_in[i] / HA2KMSQ;
-					yield_in[i] = 0;
-				}
-
-				// this treshold is  0.1 t / km^2, or 0.001 t / ha, (min fao value is ~0.02 t / ha)
-				// these values are usually on the order of 1e-19, which is unrealistic
-				// remove these abnormal values from processing
-				if (yield_in[i] < 0.1 && yield_in[i] != nodata && yield_in[i] !=0) {
-					//fprintf(fplog,"Warning: yield_in[%i] = %e < 0.1 t / km^2 for crop %s: read_sage_crop()\n", i, yield_in[i], fname);
-					yield_in[i] = 0;
-				}	// end if bad data then remove
-			}	// end if land area nodata else land area data
-		}	// end if yield nodata else valid yield data
+		// do harvested area first to calibrate the sage individual crop data to the sage physical crop area
+		// this applies the sage cropping fraction to the hyde physical cropland area
 		// convert land area fraction to km^2
 		if (harvestarea_in[i] == nodata) {
 			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
@@ -198,32 +164,75 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 			}
 		} else {
 			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
-				harvestarea_in[i] = NODATA;
+				harvestarea_in[i] = 0;
 			} else {
-				temp_flt = harvestarea_in[i];
-				if (qual_harv[i] != 0) {
-					harvestarea_in[i] = harvestarea_in[i] * land_area_sage[i];
-					if (qual_harv[i] == nodata && temp_flt != 0) {
-						// this condition does not occur
-						fprintf(fplog,"Warning: qual_harv[%i] = nodata and fraction _in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, temp_flt, fname);
-					}
-				} else {
-					if (qual_harv[i] == 0) {
-						// the in fraction is always zero where the quality flag is zero
-						//fprintf(fplog,"Warning: qual_harv[%i] = 0 and fraction in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, temp_flt, fname);
-					}
-					temp_flt = harvestarea_in[i];
-					harvestarea_in[i] = 0;
-				}
 				// this threshold is the fraction corresponding to 100 m^2 if a cell has 100 km^2 of land area
 				//  (max sage cell land area is ~86 km^2)
 				// remove these abnormal values from processing
-				if (temp_flt < 1e-6 && temp_flt != nodata && temp_flt !=0) {
-					//fprintf(fplog,"Warning: fraction in[%i] = %e < 1e-6 for crop %s: read_sage_crop()\n", i, temp_flt, fname);
+				if (harvestarea_in[i] < 1e-6 && harvestarea_in[i] != nodata && harvestarea_in[i] !=0) {
+					//fprintf(fplog,"Warning: fraction in[%i] = %e < 1e-6 for crop %s: read_sage_crop()\n", i, harvestarea_in[i], fname);
 					harvestarea_in[i] = 0;
-				}	// end if bad data then remove
-			}	// end if land area nodata else land area data
+					// end if bad data then remove
+				} else if (qual_harv[i] != 0) {
+					if (cropland_area_sage[i] == raster_info.cropland_sage_nodata || cropland_area_sage[i] == 0) {
+						harvestarea_in[i] = 0;
+					} else {
+						// get the original harvestarea_in in km^2
+						temp_flt = harvestarea_in[i]  * land_area_sage[i];
+						// now store adjusted harvestarea in km^2
+						// sage in harvested area fraction * sage land area / sage physical crop area * hyde physical crop area
+						harvestarea_in[i] = harvestarea_in[i]  * land_area_sage[i] / cropland_area_sage[i] * cropland_area[i];
+					}
+					if (qual_harv[i] == nodata && harvestarea_in[i] != 0) {
+						// this condition does not occur
+						fprintf(fplog,"Warning: qual_harv[%i] = nodata and fraction _in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, harvestarea_in[i], fname);
+					}
+				} else { // no valid harvest area
+					harvestarea_in[i] = 0;
+					if (qual_harv[i] == 0) {
+						// the in fraction is always zero where the quality flag is zero
+						//fprintf(fplog,"Warning: qual_harv[%i] = 0 and fraction in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, harvestarea_in[i], fname);
+					}
+				} // end else no valid harvestarea_in found
+			}	// end if land area sage nodata else sage land area data
 		}	// end if harvested area nodata else valid harevested area data
+		
+		// normalize this yield to the sage input production and the normalized harvested area
+		if (yield_in[i] == nodata) {
+			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
+				yield_in[i] = NODATA;
+			} else {
+				yield_in[i] = 0;
+			}
+		} else {
+			if (land_area_sage[i] == raster_info.land_area_sage_nodata || harvestarea_in[i] == nodata || harvestarea_in[i] == 0 || harvestarea_in[i] == NODATA) {
+				yield_in[i] = 0;
+			} else {
+				// this treshold is  0.1 t / km^2, or 0.001 t / ha, (min fao value is ~0.02 t / ha)
+				// these values are usually on the order of 1e-19, which is unrealistic
+				// remove these abnormal values from processing
+				if (yield_in[i] < 0.1 && yield_in[i] != nodata && yield_in[i] !=0) {
+					//fprintf(fplog,"Warning: yield_in[%i] = %e < 0.1 t / km^2 for crop %s: read_sage_crop()\n", i, yield_in[i], fname);
+					yield_in[i] = 0;
+					// end if bad data then remove
+				} else if (qual_yield[i] != 0) {
+					// convert yield to tonnes per km^2, calculate original production, then calculate normalized yield
+					yield_in[i] = yield_in[i] / HA2KMSQ * temp_flt / harvestarea_in[i];
+					if (qual_yield[i] == nodata && yield_in[i] != 0) {
+						// this condition does not occur
+						fprintf(fplog,"Warning: qual_yield[%i] = nodata and yield_in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, yield_in[i], fname);
+					}
+				} else { // no valid yield
+					yield_in[i] = 0;
+					if (qual_yield[i] == 0 && yield_in[i] != 0) {
+						// qual == 0 and yield == 0 does occur
+						// but qual ==0 and yield != 0 does not occur
+						fprintf(fplog,"Warning: qual_yield[%i] = 0 and yield_in[%i] = %e for crop %s:  read_sage_crop()\n", i, i, yield_in[i], fname);
+					}
+				} // end else no valid yield
+			}	// end if land area nodata else land area data
+		}	// end if yield nodata else valid yield data
+		
 	}	// end for i loop over all grid cells
 
 	nc_close(ncid);

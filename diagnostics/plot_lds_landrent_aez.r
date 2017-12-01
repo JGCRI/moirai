@@ -60,19 +60,19 @@ cat("started plot_lds_landrent_aez.r at ",date(), "\n")
 setwd("./")
 
 # three levels of aggregation: none, 14 region, 32 region
-AGGREGATE = FALSE
-REG32 = FALSE
+AGGREGATE = TRUE
+REG32 = TRUE
 
 papergray = FALSE
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_stats_area/", sep="")
+outdir = paste("./basins235_stats_landrent/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # input data files
 
 # use lds output for new aezs
-lrname = "./basins235_32reg_test/LDS_value_milUSD.csv"
+lrname = "../outputs/basins235/LDS_value_milUSD.csv"
 # and compare with the genaez orignal aez output
 lrname_orig = "./GENAEZECON_value_milUSD.csv"
 # and compare with the gtap data

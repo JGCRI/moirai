@@ -189,7 +189,9 @@ int calc_rent_ag_use_aez(args_struct in_args, rinfo_struct raster_info) {
             
             // skip this fao country because it is not part of an economic region and thus not processed for output
             if(reglr_ind == NOMATCH) {
-                fprintf(fplog,"Warning: Failed to find land rent region index for fao country %i:  calc_rent_ag_use_aez()\n", countrycodes_fao[ctry_ind]);
+				if (in_args.diagnostics){
+                	fprintf(fplog,"Warning: Failed to find land rent region index for fao country %i:  calc_rent_ag_use_aez()\n", countrycodes_fao[ctry_ind]);
+				}
                 continue;
             }
             
@@ -207,7 +209,7 @@ int calc_rent_ag_use_aez(args_struct in_args, rinfo_struct raster_info) {
                 
                 // this should not happen
                 if(aez_ind_reglr == NOMATCH) {
-                    fprintf(fplog,"Warning: Failed to find aez index for land rent region %i, country %i:  calc_rent_ag_use_aez()\n", country87codes_gtap[reglr_ind], countrycodes_fao[ctry_ind]);
+					fprintf(fplog,"Error: Failed to find aez index for land rent region %i, country %i:  calc_rent_ag_use_aez()\n", country87codes_gtap[reglr_ind], countrycodes_fao[ctry_ind]);
                     return ERROR_IND;
                 }
                 

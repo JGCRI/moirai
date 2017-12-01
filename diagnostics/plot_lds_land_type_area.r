@@ -62,6 +62,9 @@ AEZ = FALSE
 outdir = paste("./basins235_stats_area/", sep="")
 dir.create(outdir, recursive = TRUE)
 
+# location of the lds output files
+ldsdir = "../outputs/basins235/"
+
 # input files
 # some of these are lds diagnostic outputs
 gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")

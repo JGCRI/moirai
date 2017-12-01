@@ -50,6 +50,7 @@ int init_lds(args_struct *in_args) {
     memset(in_args->hist_crop_rast_name, '\0', MAXCHAR);
     memset(in_args->hist_pasture_rast_name, '\0', MAXCHAR);
     memset(in_args->hist_urban_rast_name, '\0', MAXCHAR);
+	memset(in_args->cropland_sage_fname, '\0', MAXCHAR);
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
 	memset(in_args->country87map_fao_fname, '\0', MAXCHAR);

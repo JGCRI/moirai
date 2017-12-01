@@ -30,6 +30,7 @@ Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha
 crop_BSQ_33_float.img       # hist_crop_rast_name: HYDE historical crop area (km^2)
 grass_BSQ_33_float.img      # hist_pasture_rast_name: HYDE historical pasture area (km^2)
 urban_BSQ_33_float.img      # hist_urban_rast_name: HYDE historical urban area (km^2)
+Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
 
 # input csv file names (without path)
 GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data

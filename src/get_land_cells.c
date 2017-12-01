@@ -263,7 +263,8 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
                     return ERROR_IND;
                 }
 			} else {
-				fprintf(fplog, "Warning: No FAO country exists for this hyde land cell: get_land_cells(); cellind = %i\n", i);
+				// this area lost is summed in fao_hyde_area_lost above
+				//fprintf(fplog, "Warning: No FAO country exists for this hyde land cell: get_land_cells(); cellind = %i\n", i);
 				continue;	// no country associated with these data so don't use this cell and go to the next one
 			}	// end if fao country else if gcam gis country else no country
 			

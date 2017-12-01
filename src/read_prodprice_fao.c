@@ -332,12 +332,17 @@ int read_prodprice_fao(args_struct in_args) {
 					}
 					
 				}else {
-					fprintf(fplog, "Warning: processing file %s: read_prodprice_fao(); record=%li, no sage crop match\n",
+					// there are a fair amount of these
+					if (in_args.diagnostics){
+						fprintf(fplog, "Warning: processing file %s: read_prodprice_fao(); record=%li, no sage crop match\n",
 							fname, count_recs);
+					}
 				}	// end if sage crop match else don't process record
 			}else {
-				fprintf(fplog, "Warning: processing file %s: read_prodprice_fao(); record=%li, no fao country code match\n",
+				if (in_args.diagnostics){
+					fprintf(fplog, "Warning: processing file %s: read_prodprice_fao(); record=%li, no fao country code match\n",
 						fname, count_recs);
+				}
 			}	// end if fao country match else don't process record
 		}	// end if process record
 		
@@ -361,7 +366,9 @@ int read_prodprice_fao(args_struct in_args) {
             // aggregate if fao country has an economic region
             temp_ctry = ctry2ctry87codes_gtap[ctry_ind];
             if (temp_ctry == NOMATCH) {
-                fprintf(fplog, "Warning: FAO country %i has no economic region: read_prodprice_fao()\n", countrycodes_fao[ctry_ind]);
+				if (in_args.diagnostics){
+                	fprintf(fplog, "Warning: FAO country %i has no economic region: read_prodprice_fao()\n", countrycodes_fao[ctry_ind]);
+				}
                 continue;
             }else {
                 for (i = 0; i < NUM_GTAP_CTRY87; i++) {

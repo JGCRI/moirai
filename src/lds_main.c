@@ -314,8 +314,20 @@ int main(int argc, const char * argv[]) {
 		return ERROR_FILE;
 	}
 	
-	fprintf(fplog, "\nProgram %s started at %s\n", CODENAME, get_systime());
+	// create the paths for copying outputs to
+	// data files
+	strcpy(mkoutputpathcmd, "\nmkdir -p ");
+	strcat(mkoutputpathcmd, in_args.ldsdestpath);
+	printf("%s",mkoutputpathcmd);
+	system(mkoutputpathcmd);
+	// mapping files
+	strcpy(mkoutputpathcmd, "\nmkdir -p ");
+	strcat(mkoutputpathcmd, in_args.mapdestpath);
+	printf("%s",mkoutputpathcmd);
+	system(mkoutputpathcmd);
 	
+	fprintf(fplog, "\nProgram %s started at %s\n", CODENAME, get_systime());
+
     //////////
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
@@ -600,7 +612,6 @@ int main(int argc, const char * argv[]) {
 	}	
 
     // free some raster arrays
-    free(cropland_area);
     free(urban_area);
     free(region_gcam);
     free(cell_area);
@@ -788,9 +799,24 @@ int main(int argc, const char * argv[]) {
             return ERROR_MEM;
         }
     } // end for i loop over fao country
-    
+	
+	////
+	// get the sage physical cropland area for normalizing the crop inputs
+	// allocate the raster array
+	cropland_area_sage = calloc(NUM_CELLS, sizeof(float));
+	if(cropland_area_sage == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for cropland_area_sage: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	if((error_code = read_cropland_sage(in_args, &raster_info))) {
+		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		return error_code;
+	}
+	
 	// calculate harvested area and production for SAGE_crop from FAO-calibrated SAGE crop data
 	//		read in data and perform calcs one crop at a time
+	//			these crop data are normalized to sage physical crop area then applied to hyde physical crop area
+	//				so that the input production is represented on a potentially different land base
 	//		if desired, calibrate SAGE crop harvested area to FAO PRODSTAT crop harvested area for a different reference year
 	//		if desired, calibrate SAGE crop yield to FAO PRODSTAT national production for a different reference year
 	//			original GTAP reference year is the same as the SAGE data (ca. 2000 as average of 1997-2003)
@@ -811,6 +837,8 @@ int main(int argc, const char * argv[]) {
     free(land_area_sage);
     free(land_mask_ctryaez);
     free(land_cells_sage);
+	free(cropland_area);
+	free(cropland_area_sage);
     
 	// aggregate harvest area and production to gcam land units
 	if((error_code = aggregate_crop2gcam(in_args))) {

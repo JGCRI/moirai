@@ -2,6 +2,7 @@
  write_harvestarea_crop_aez.c
  
  write the harvest area (ha) for the new glus in the GCAM input format
+ write values only if both harvested area and production are > 0
  
  csv file
  there are 6 header lines
@@ -78,19 +79,21 @@ int write_harvestarea_crop_aez(args_struct in_args) {
                     //outval = harvestarea_crop_aez[ctry_index][aez_index][crop_index];
                     // output only positive values
                     if (outval > 0) {
-                        // check the production for zero values
-                        if ((float) floor((double) 0.5 + production_crop_aez[ctry_index][aez_index][crop_index]) == 0) {
-                            fprintf(fplog, "Warning: ha = %.0f and prod = 0: write_harvestarea_crop_aez(); ctrycode=%i,aezcode=%i, cropcode=%i\n", outval, countrycodes_fao[ctry_index], ctry_aez_list[ctry_index][aez_index],
+                        // check the production for zero and negative values, and write only if positive
+						// this doesn not occur
+                        if ((float) floor((double) 0.5 + production_crop_aez[ctry_index][aez_index][crop_index]) <= 0) {
+                            fprintf(fplog, "Discard harvested area due to no production: ha = %.0f and prod = 0: write_harvestarea_crop_aez(); ctrycode=%i,aezcode=%i, cropcode=%i\n", outval, countrycodes_fao[ctry_index], ctry_aez_list[ctry_index][aez_index],
                                     cropcodes_sage[crop_index]);
-                        }
-                        
-                        // check this before deleting it (delete)
+						} else {
+							fprintf(fpout,"\n%s,%i,%s,%.0f", countryabbrs_iso[ctry_index], ctry_aez_list[ctry_index][aez_index],
+									cropnames_gtap[crop_index], outval);
+							nrecords++;
+						}
+						
+                        // double check this before deleting it (delete)
                         // does not happen for non-calibrated output
                         // i think it is for recalibration debugging
                         //if(outval > 30000000) { outval = NODATA; }
-                        fprintf(fpout,"\n%s,%i,%s,%.0f", countryabbrs_iso[ctry_index], ctry_aez_list[ctry_index][aez_index],
-                                cropnames_gtap[crop_index], outval);
-                        nrecords++;
                     } // end if positive value
                 } // end for crop_index loop
             } // end for aez_index loop
