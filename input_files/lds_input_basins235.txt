@@ -6,7 +6,7 @@
 
 # flags
 0			# recalibrate: 0 = no, 1 = yes; this is hardcoded to zero because it is not working properly
-1			# diagnostics: 0 = no, 1 = yes
+0			# diagnostics: 0 = no, 1 = yes
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
