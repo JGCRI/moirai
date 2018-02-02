@@ -59,16 +59,16 @@ setwd("./")
 AEZ = FALSE
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_stats_area/", sep="")
+outdir = paste("./basins235_test_stats_area/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # location of the lds output files
-ldsdir = "../outputs/basins235/"
+ldsdir = "../outputs/basins235_test/"
 
 # input files
 # some of these are lds diagnostic outputs
 gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")
-lds_fname = paste("./Land_type_area_ha_h31.csv", sep="")
+lds_fname = paste("./Land_type_area_ha_h31new.csv", sep="")
 lds_new_fname = paste(ldsdir, "Land_type_area_ha.csv", sep="")
 land_types_fname = paste(ldsdir, "LDS_land_types.csv", sep="")
 gis_ctry_map_fname = paste("./FAO_gtap_gcam_ctry.csv", sep="")

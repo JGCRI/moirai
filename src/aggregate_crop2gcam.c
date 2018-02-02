@@ -126,7 +126,7 @@ int aggregate_crop2gcam(args_struct in_args) {
                     }
                 }
                 if (reg_aez_index == NOMATCH) {
-                    // this shouldn't happen because the gcam region list was made from the country list (see write_gcam_lut())
+                    // this shouldn't happen because the gcam region list was made from the country list (see write_glu_mapping())
                     fprintf(fplog,"Error finding gcam region index: aggregate_crop2gcam(); country=%i region=%i aez=%i\n",
                             countrycodes_fao[ctry_index], regioncodes_gcam[reg_index], ctry_aez_list[ctry_index][aez_index]);
                     return ERROR_FILE;

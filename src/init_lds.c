@@ -34,6 +34,8 @@ int init_lds(args_struct *in_args) {
 	memset(in_args->inpath, '\0', MAXCHAR);
 	memset(in_args->outpath, '\0', MAXCHAR);
 	memset(in_args->sagepath, '\0', MAXCHAR);
+	memset(in_args->hydepath, '\0', MAXCHAR);
+	memset(in_args->lulcpath, '\0', MAXCHAR);
     memset(in_args->mircapath, '\0', MAXCHAR);
     memset(in_args->wfpath, '\0', MAXCHAR);
     memset(in_args->ldsdestpath, '\0', MAXCHAR);
@@ -47,9 +49,6 @@ int init_lds(args_struct *in_args) {
 	memset(in_args->country_fao_fname, '\0', MAXCHAR);
     memset(in_args->protected_fname, '\0', MAXCHAR);
     memset(in_args->nfert_rast_fname, '\0', MAXCHAR);
-    memset(in_args->hist_crop_rast_name, '\0', MAXCHAR);
-    memset(in_args->hist_pasture_rast_name, '\0', MAXCHAR);
-    memset(in_args->hist_urban_rast_name, '\0', MAXCHAR);
 	memset(in_args->cropland_sage_fname, '\0', MAXCHAR);
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
@@ -60,6 +59,8 @@ int init_lds(args_struct *in_args) {
     memset(in_args->regionlist_gcam_fname, '\0', MAXCHAR);
 	memset(in_args->use_gtap_fname, '\0', MAXCHAR);
 	memset(in_args->lt_sage_fname, '\0', MAXCHAR);
+	memset(in_args->lu_hyde_fname, '\0', MAXCHAR);
+	memset(in_args->lulc_fname, '\0', MAXCHAR);
 	memset(in_args->crop_fname, '\0', MAXCHAR);
 	memset(in_args->production_fao_fname, '\0', MAXCHAR);
 	memset(in_args->yield_fao_fname, '\0', MAXCHAR);

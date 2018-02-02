@@ -6,16 +6,18 @@
 
 # flags
 0			# recalibrate: 0 = no, 1 = yes; this is hardcoded to zero because it is not working properly
-0			# diagnostics: 0 = no, 1 = yes
+1			# diagnostics: 0 = no, 1 = yes
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./outputs/basins235/                					# outpath: path to output files
+./outputs/basins235_test/                					# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
+/Volumes/glabrata/geodata/hyde32/000/baseline/zip/		# hydepath: path to hyde land use files (unzipped)
+/Volumes/glabrata/geodata/isam_lulcc/ISAM_LC/			# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./outputs/basins235/aglu-data/LDS/     					# ldsdestpath: destination path for the gcam data system input files
-./outputs/basins235/aglu-data/mappings/    				# mapdestpath: destination path for the gcam data system mapping files
+./outputs/basins235_test/aglu-data/LDS/     					# ldsdestpath: destination path for the gcam data system input files
+./outputs/basins235_test/aglu-data/mappings/    				# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
@@ -26,10 +28,10 @@ AEZ_orig_lds.gri			# aez_orig_fname: original climate AEZs for reference (themat
 potveg_plus.bil				# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
 fao_ctry_rast.bil			# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
 ProArea_0408_ENVI.img       # protected_fname: protected pixels (thematic)
-Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha)
-crop_BSQ_33_float.img       # hist_crop_rast_name: HYDE historical crop area (km^2)
-grass_BSQ_33_float.img      # hist_pasture_rast_name: HYDE historical pasture area (km^2)
-urban_BSQ_33_float.img      # hist_urban_rast_name: HYDE historical urban area (km^2)
+Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
+#crop_BSQ_33_float.img       # hist_crop_rast_name: HYDE historical crop area (km^2)
+#grass_BSQ_33_float.img      # hist_pasture_rast_name: HYDE historical pasture area (km^2)
+#urban_BSQ_33_float.img      # hist_urban_rast_name: HYDE historical urban area (km^2)
 Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
 
 # input csv file names (without path)
@@ -42,6 +44,8 @@ iso_GCAM_regID_32reg.csv	# countrymap_iso_gcam_region_fname: iso countries to gc
 GCAM_region_names_32reg.csv	# regionlist_gcam_fname: GCAM region list
 GTAP_use.csv				# use_gtap_fname: GTAP product use categories
 SAGE_PVLT.csv				# lt_sage_fname: SAGE land cover types for potential vegetation
+hyde32_lu.csv				# lu_hyde_fname: HYDE land use types
+isam_2_sage_hyde_mapping.csv	# lulc_fname: LULC types and mapping to sage and hyde
 SAGE_gtap_fao_crop2use.csv	# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
 FAO_ag_prod_t_PRODSTAT_11yrs.csv				# production_fao_fname: FAO production data
 FAO_ag_yield_hg_ha_PRODSTAT_11yrs.csv			# yield_fao_fname: FAO yield data
@@ -59,7 +63,7 @@ LDS_value_milUSD.csv            # rent_fname: file name for rent output
 MIRCA_irrHA_ha.csv              # mirca_irr_fname: file name for mirca irrigated harvested area output
 MIRCA_rfdHA_ha.csv              # mirca_rfd_fname: file name for mirca rainfed harvested area output
 Land_type_area_ha.csv           # land_type_area_fname: file name for land type area output
-Pot_veg_carbon_Mg_per_ha.csv    # potveg_carbon_fname: file name for potential veg carbon and soil carbon
+Ref_veg_carbon_Mg_per_ha.csv    # potveg_carbon_fname: file name for potential veg carbon and soil carbon
 Water_footprint_m3.csv          # wf_fname: file name for water footprint output
 LDS_ctry_GLU.csv                # iso_map_fname: maps the raaster fao country codes to iso
 LDS_land_types.csv              # lt_map_fname: maps the land type category codes to descriptions

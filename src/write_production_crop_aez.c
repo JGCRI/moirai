@@ -3,6 +3,7 @@
  
  write the production (metric tonnes) for the new glus in the GCAM input format
  write values only if both harvested area and production are > 0
+ write values only if country is in economic region (if mapped to ctry87)
  
  csv file
  there are 6 header lines
@@ -69,7 +70,7 @@ int write_production_crop_aez(args_struct in_args) {
 	for (ctry_index = 0; ctry_index < NUM_FAO_CTRY; ctry_index++) {
         
         // do not write this country if not assocaited with an economic region
-        if (ctry2regioncodes_gcam[ctry_index] == NOMATCH) {
+        if (ctry2ctry87codes_gtap[ctry_index] == NOMATCH) {
             count_skip++;
         } else {
             for (aez_index = 0; aez_index < ctry_aez_num[ctry_index]; aez_index++) {

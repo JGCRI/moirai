@@ -8,19 +8,21 @@
     into land_cells_hyde[num_land_cells_hyde] (based on hyde land area, which is an effecive hyde land mask)
     the hyde grid cell area matches the land area as a land mask
  
- also store the indies of SAGE forest potential vegetation, for the land rent processing forest_cells[num_forest_cells]
+ NOTE: the overall output land mask is determined by the intersection of hyde land, fao country, glu, and ctry87 (which determines whether an fao country is included in the output as an economic region)
+ 	So all the outputs are restricted to this overall mask, either spatially or thematically (the sage data are processed on the sage land base, then thematically assigned to the hyde land base)
+ 	The diagnostic raster outputs are based on their original land masks
+ 	The gcam region, ctry87, and gcam region/glu raster outputs represent the overall land mask
  
  also store the land cells of the new aez data in land_cells_aez_new[num_land_cells_aez_new]
  
  land cells are those that do not contain a nodata value
  
  NOTE: since harvested area can exceed physical area due to multiple cropping,
-    it can be dealt with separately from the land type areas based on hyde
-    resolution of the harvested area with the physical cropland area happens in the gcam data processing system
+    it is dealt with separately from the land type areas based on hyde
+    however, sage harvested area is normalized to hyde cropland area based on the multi-cropping ratio
+ 	further multi-cropping resolution happens in the gcam data processing system
     so the main land area base is from HYDE
     but calculations using the SAGE crop data will be based on the sage land cells
- 
- generate gcam region raster image based on iso mapping and fao raster file and hyde land - for visualization only
  
  generate land masks for diagnostics
 
@@ -54,6 +56,12 @@
     In conjunction with allowing arbitrary AEZs as input
  
  Updated jan 2016 to keep track of hyde land cells for the working grid
+ 
+ Modified 2018 by Alan Di Vittorio
+ 	adding new lulc dataset
+ 	determining the overall valid land cells (identified with a country/region) for:
+ 		sage processing
+ 		overall output
  
  **********/
 
@@ -91,9 +99,33 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
     double fao_hyde_area_lost = 0;          // hyde cells not covered by fao country data
     double fao_new_aez_hyde_area_lost = 0;  // hyde cells not covered by fao country data or new aez data
     
-	char out_name_ctry87[] = "country87_gtap.bil";	// diagnostic output name for found gtap country87 map
-	char out_name_region[] = "region_gcam.bil";	// output name for new gcam region raster map
-        
+	char out_name_ctry87[] = "country87_out.bil";	// output name for new country87 map
+	char out_name_region[] = "region_gcam_out.bil";	// output name for new gcam region raster map
+	char out_name_ctry_out[] = "country_out.bil";	// output name for new country raster map
+	char out_name_ctryglu[] = "ctryglu_raster.bil"; // output name for new country/glu raster map
+	char out_name_regionglu[] = "regionglu_raster.bil"; // output name for new region/glu raster map
+	
+	int *ctryaez_raster;    // store the ctry+aez values as a raster file
+	int *regionaez_raster;    // store the gcam region+aez values as a raster file
+	int *country_out;    // store the output country codes as a raster file
+	
+	// allocate the raster arrays
+	ctryaez_raster = calloc(NUM_CELLS, sizeof(int));
+	if(ctryaez_raster == NULL) {
+		fprintf(fplog,"Failed to allocate memory for ctryaez_raster:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	regionaez_raster = calloc(NUM_CELLS, sizeof(int));
+	if(regionaez_raster == NULL) {
+		fprintf(fplog,"Failed to allocate memory for regionaez_raster:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	country_out = calloc(NUM_CELLS, sizeof(int));
+	if(country_out == NULL) {
+		fprintf(fplog,"Failed to allocate memory for country_out:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	
 	// loop over the all grid cells
 	for (i = 0; i < NUM_CELLS; i++) {
 		// initialize the land masks and country maps
@@ -109,6 +141,9 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 		country87_gtap[i] = NODATA;
         glacier_water_area_hyde[i] = NODATA;
         region_gcam[i] = NODATA;
+		ctryaez_raster[i] = NODATA;
+		regionaez_raster[i] = NODATA;
+		country_out[i] = NODATA;
 		
 		// if valid original aez id value, then add cell index to land_mask_aez_orig
 		if (aez_bounds_orig[i] != raster_info.aez_orig_nodata) {
@@ -139,46 +174,14 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
         // and update gcam region image, only if a hyde land cell
         // valid fao/vmap0 territories with no iso3 or gcam region or gtap ctry87 will have values == NOMATCH for ctry87 and gcam regions
         // serbia and montenegro are also not assigned to a gcam region by the ctry87 file, but they need to be counted here
+		//		they are, however, assigned to a region based on the iso to gcam region file
         // so leave the NOMATCH regions as the NODATA value in the gcam region image
 		if ((int) country_fao[i] != raster_info.country_fao_nodata) {
 			land_mask_fao[i] = 1;
-            if (land_mask_hyde[i] == 1) {
-                // need to find the fao index
-                for (j = 0; j < NUM_FAO_CTRY; j++) {
-                    if (countrycodes_fao[j] == country_fao[i]) {
-                        if (ctry2regioncodes_gcam[j] != NOMATCH) {
-                            region_gcam[i] = ctry2regioncodes_gcam[j];
-                        } else {
-                            // check for serbia and montenegro
-                            if (countrycodes_fao[j] == srb_code || countrycodes_fao[j] == mne_code) {
-                                scg_index = NOMATCH;
-                                for (k = 0; k < NUM_FAO_CTRY; k++) {
-                                    if (countrycodes_fao[k] == scg_code) {
-                                        scg_index = k;
-                                        break;
-                                    }
-                                }
-                                region_gcam[i] = ctry2regioncodes_gcam[scg_index];
-                            } // end if serbia or montenegro
-                        } // end else check for srb and mne
-                        break;
-                    } // end if this raster country is found in the fao/iso list
-                } // end for j loop to find the gcam region for this cell
-                if (j == NUM_FAO_CTRY) {
-                    // this should not happen
-                    fprintf(fplog, "Error determining fao country index for region_gcam: get_land_cells(); cellind = %i\n", i);
-                    return ERROR_IND;
-                }
-            } // end if hyde land cell
 		} // end if valid country fao
 		// if sage pot veg, then add cell index to land_mask_potveg
 		if (potveg_thematic[i] != raster_info.potveg_nodata) {
 			land_mask_potveg[i] = 1;
-			// store the indices of the forest cells
-			if (potveg_thematic[i] <= MAX_SAGE_FOREST_CODE && potveg_thematic[i] >= MIN_SAGE_FOREST_CODE) {
-				forest_cells[num_forest_cells++] = i;
-				land_mask_forest[i] = 1;
-			}
 		}
 		
         // track some area differences
@@ -239,16 +242,20 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 		cropland_area[i] = NODATA;
 		pasture_area[i] = NODATA;
 		urban_area[i] = NODATA;
-		potveg_area[i] = NODATA;
+		refveg_area[i] = NODATA;
 		sage_minus_hyde_land_area[i] = NODATA;
+		for (k = 0; k < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; k++) {
+			lu_detail_area[k][i] = NODATA;
+		}
 		
 		// initialize the aez value diagnostic array
 		missing_aez_mask[i] = 0;
 
-		// get the ctry87 codes to store raster maps
-		// only if this is a hyde land cell
+		// get the ctry87 codes and gcam region codes to store raster maps
+		// only if this is a hyde land cell, valid glu, valid country, valid ctry87
         // valid fao/vmap0 territories with no iso3 or gcam region or gtap ctry87 will have values == NOMATCH for ctry87 and gcam region
-		if (land_mask_hyde[i] == 1) {
+		// serbia and montenegro are also not assigned to a gcam region by the ctry87 file, but they need to be counted here
+		if (land_mask_hyde[i] == 1 && land_mask_aez_new[i] == 1) {
 			// fao country index
 			if ((int) country_fao[i] != raster_info.country_fao_nodata) {
 				fao_index = NOMATCH;
@@ -268,20 +275,73 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 				continue;	// no country associated with these data so don't use this cell and go to the next one
 			}	// end if fao country else if gcam gis country else no country
 			
-            // store the ctry87 code in a raster
+            // store the ctry87 code and gcam region code and country out code in a raster
+			// also store the country code, the country/glu, and the region/glu
             // leave the NOMATCH regions as the NODATA value
+			// the gcam region codes have already been restricted to valid ctry87 codes, but leave the check anyway
             if (ctry2ctry87codes_gtap[fao_index] != NOMATCH) {
                 country87_gtap[i] = ctry2ctry87codes_gtap[fao_index];
-            }
-		}	// end if sage land cell (if working land cell)
+				if (ctry2regioncodes_gcam[fao_index] != NOMATCH) {
+					region_gcam[i] = ctry2regioncodes_gcam[fao_index];
+				}
+				country_out[i] = country_fao[i];
+				// fill the ctry+aez image here
+				ctryaez_raster[i] = (int) country_fao[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+				// fill the region+aez image here
+				regionaez_raster[i] = ctry2regioncodes_gcam[fao_index] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+            } else {
+				// check for serbia and montenegro
+				if (countrycodes_fao[fao_index] == srb_code || countrycodes_fao[fao_index] == mne_code) {
+					scg_index = NOMATCH;
+					for (k = 0; k < NUM_FAO_CTRY; k++) {
+						if (countrycodes_fao[k] == scg_code) {
+							scg_index = k;
+							break;
+						}
+					}
+					country87_gtap[i] = ctry2ctry87codes_gtap[scg_index];
+					region_gcam[i] = ctry2regioncodes_gcam[scg_index];
+					country_out[i] = scg_code;
+					// fill the ctry+aez image here
+					ctryaez_raster[i] = country_out[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+					// fill the region+aez image here
+					regionaez_raster[i] = region_gcam[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+				} // end if serbia or montenegro
+			} // end else check for serbia or montenegro
+
+		}	// end if hyde land cell (if working land cell)
+
 	}	// end for i loop over all cells
+	
+	// write the relevant maps with the overall land mask constraints
 	
     // write the new gcam region raster map
     if ((err = write_raster_int(region_gcam, NUM_CELLS, out_name_region, in_args))) {
         fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_region);
         return err;
     }
-    
+	// this is the map of found gtap 87 countries
+	if ((err = write_raster_int(country87_gtap, NUM_CELLS, out_name_ctry87, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry87);
+		return err;
+	}
+	// this is the country map
+	if ((err = write_raster_int(country_out, NUM_CELLS, out_name_ctry_out, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry_out);
+		return err;
+	}
+	
+	// country+aez raster file
+	if ((err = write_raster_int(ctryaez_raster, NUM_CELLS, out_name_ctryglu, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctryglu);
+		return err;
+	}
+	// region+aez raster file
+	if ((err = write_raster_int(regionaez_raster, NUM_CELLS, out_name_regionglu, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_regionglu);
+		return err;
+	}
+	
     // write the global area tracking values to the log file
     fprintf(fplog, "\nGlobal land area tracking (km^2): get_land_cells():\n");
     fprintf(fplog, "total_sage_land_area = %f\n", total_sage_land_area);
@@ -340,17 +400,16 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
             fprintf(fplog, "Error writing file %s: get_land_cells()\n", "residual_ice_wat_area_hyde.bil");
             return err;
         }
-		// this is the map of found gtap 87 countries
-		if ((err = write_raster_int(country87_gtap, NUM_CELLS, out_name_ctry87, in_args))) {
-			fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry87);
-			return err;
-		}
         // sage minus hyde cell area
         if ((err = write_raster_float(sage_minus_hyde_land_area, NUM_CELLS, "sage_minus_hyde_land_area.bil", in_args))) {
             fprintf(fplog, "Error writing file %s: get_land_cells()\n", "sage_minus_hyde_land_area.bil");
             return err;
         }
 	}	// end if diagnostics
+	
+	free(ctryaez_raster);
+	free(regionaez_raster);
+	free(country_out);
 	
 	return OK;
 }

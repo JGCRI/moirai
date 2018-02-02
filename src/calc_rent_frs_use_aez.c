@@ -127,7 +127,7 @@ int calc_rent_frs_use_aez(args_struct in_args, rinfo_struct raster_info) {
             aez_ind_orig = aez_val - 1;
             
 			fa_ind = reglr_ind * NUM_ORIG_AEZ + aez_ind_orig; // index of the 2d forest_area array
-			forest_area[fa_ind] = forest_area[fa_ind] + potveg_area[forest_cells[forest_cell_ind]];
+			forest_area[fa_ind] = forest_area[fa_ind] + refveg_area[forest_cells[forest_cell_ind]];
 			
 			// grow the dim2 as needed, per orig aez and ctry87
 			for (i = 0; i < num_forest_indices[fa_ind]; i++) {
@@ -199,11 +199,11 @@ int calc_rent_frs_use_aez(args_struct in_args, rinfo_struct raster_info) {
                     }
 
                     rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] = rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] +
-						rent_orig_per_area[fa_ind] * potveg_area[forest_indices[fa_ind][i]];
+						rent_orig_per_area[fa_ind] * refveg_area[forest_indices[fa_ind][i]];
                     
 					// for diagnostic output in USD, new in the first dim
 					newvorigrent87[reglr_ind * 2] = newvorigrent87[reglr_ind * 2] +
-						MIL2ONE * rent_orig_per_area[fa_ind] * potveg_area[forest_indices[fa_ind][i]];
+						MIL2ONE * rent_orig_per_area[fa_ind] * refveg_area[forest_indices[fa_ind][i]];
 				} // end if valid new aez value
 			}	// end for i loop over forest_indices to calc rent_use_aez
 			

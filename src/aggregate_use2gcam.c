@@ -117,7 +117,7 @@ int aggregate_use2gcam(args_struct in_args) {
             } // end j loop over gcam regions for this land rent region to find gcam aez index
             
             if (reggcam_aez_index == NOMATCH) {
-                // this shouldn't happen because the gcam region list was made from the country list (see write_gcam_lut())
+                // this shouldn't happen because the gcam region list was made from the country list (see write_glu_mapping())
                 fprintf(fplog,"Error finding gcam region aez index: aggregate_use2gcam(); lr region=%i lr reg aez=%i\n",
                         country87codes_gtap[reglr_index], reglr_aez_list[reglr_index][reglr_aez_index]);
                 return ERROR_FILE;

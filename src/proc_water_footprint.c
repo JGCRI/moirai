@@ -208,10 +208,6 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
                     }
                 } // end for i loop to get ctry index
                 
-                if (ctry_ind == NOMATCH) {
-                    continue;
-                }
-                
                 // merge serbia and montenegro for scg record
                 if (ctry_code == mne_code || ctry_code == srb_code) {
                     ctry_code = scg_code;
@@ -228,7 +224,11 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
                         return ERROR_IND;
                     }
                 } // end if serbia or montenegro
-                
+				
+				if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
+					continue;
+				}
+				
                 // get the glu index within the country glu list
                 glu_ind = NOMATCH;
                 for (i = 0; i < ctry_aez_num[ctry_ind]; i++) {

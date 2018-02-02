@@ -16,13 +16,13 @@
  2) Japan's pfb sector land rent is zero in the input gtap original land rent file
  
  note: hong kong and taiwan are still treated specially (they use vietnam shares) because that was the original method
- hong kong needs to be reated specially because it does not have production values and harvested area values
+ hong kong needs to be treated specially because it does not have production values and harvested area values
  actually, check this now
-	there are taiwan production values and harvested are values, so taiwan could be calculated on its own
+	there are taiwan production values and harvested area values, so taiwan could be calculated on its own
  
  13 march 2015
  fixed the livestock land rent calc
- the only changes in the genaez outputs were too the 3 livestock sector land rents
+ the only changes in the genaez outputs were to the 3 livestock sector land rents
 	it improved the reproduction of GTAP data a bit
  this did not change the presented GCAM outputs except for small changes in global luc emissions on the order of 1/100 of a percent in 2100 and slightly larger changes in regional emissions (for 14 and 32 regions)
  

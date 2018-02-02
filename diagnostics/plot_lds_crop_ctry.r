@@ -53,17 +53,17 @@ cat("started plot_lds_crop_ctry.r at ",date(), "\n")
 setwd("./")
 
 # compare against gtap or older genaezecon output output
-# comparing to another lds output should be identical because the outputs are aggregated to country
+# comparing to another lds output should be identical because the outputs are aggregated to country (unless a new source data set is used)
 gtap = TRUE
 
 # plot the paper figures in grayscale
 papergray = FALSE
 
 # this is the new data directory
-newdir = "../outputs/basins235/"
+newdir = "../outputs/basins235_test/"
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_stats_ctry_gtap/", sep="")
+outdir = paste("./basins235_test_stats_ctry_gtap/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # output names

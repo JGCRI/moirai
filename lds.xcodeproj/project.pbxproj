@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4A01C4C41FE09FCE00FF5A15 /* read_lulc_land.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A01C4C31FE09FCE00FF5A15 /* read_lulc_land.c */; };
+		4A958FFF201135FC003EA702 /* proc_lulc_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A958FFE201135FB003EA702 /* proc_lulc_area.c */; };
 		4AC95E5E1FBD165D00ABE415 /* aggregate_crop2gcam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E251FBD165D00ABE415 /* aggregate_crop2gcam.c */; };
 		4AC95E5F1FBD165D00ABE415 /* aggregate_use2gcam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E261FBD165D00ABE415 /* aggregate_use2gcam.c */; };
 		4AC95E601FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E271FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c */; };
-		4AC95E611FBD165D00ABE415 /* calc_potveg_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E281FBD165D00ABE415 /* calc_potveg_area.c */; };
+		4AC95E611FBD165D00ABE415 /* calc_refveg_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E281FBD165D00ABE415 /* calc_refveg_area.c */; };
 		4AC95E621FBD165D00ABE415 /* calc_rent_ag_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E291FBD165D00ABE415 /* calc_rent_ag_use_aez.c */; };
 		4AC95E631FBD165D00ABE415 /* calc_rent_frs_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E2A1FBD165D00ABE415 /* calc_rent_frs_use_aez.c */; };
 		4AC95E641FBD165D00ABE415 /* copy_to_destpath.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E2B1FBD165D00ABE415 /* copy_to_destpath.c */; };
@@ -24,7 +26,7 @@
 		4AC95E6C1FBD165D00ABE415 /* parse_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E331FBD165D00ABE415 /* parse_utils.c */; };
 		4AC95E6D1FBD165D00ABE415 /* proc_land_type_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */; };
 		4AC95E6E1FBD165D00ABE415 /* proc_mirca.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E351FBD165D00ABE415 /* proc_mirca.c */; };
-		4AC95E701FBD165D00ABE415 /* proc_potveg_carbon.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E371FBD165D00ABE415 /* proc_potveg_carbon.c */; };
+		4AC95E701FBD165D00ABE415 /* proc_refveg_carbon.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E371FBD165D00ABE415 /* proc_refveg_carbon.c */; };
 		4AC95E711FBD165D00ABE415 /* proc_water_footprint.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E381FBD165D00ABE415 /* proc_water_footprint.c */; };
 		4AC95E721FBD165D00ABE415 /* read_aez_new.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E391FBD165D00ABE415 /* read_aez_new.c */; };
 		4AC95E731FBD165D00ABE415 /* read_aez_new_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E3A1FBD165D00ABE415 /* read_aez_new_info.c */; };
@@ -36,8 +38,7 @@
 		4AC95E791FBD165D00ABE415 /* read_harvestarea_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E401FBD165D00ABE415 /* read_harvestarea_fao.c */; };
 		4AC95E7A1FBD165D00ABE415 /* read_land_area_hyde.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E411FBD165D00ABE415 /* read_land_area_hyde.c */; };
 		4AC95E7B1FBD165D00ABE415 /* read_land_area_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E421FBD165D00ABE415 /* read_land_area_sage.c */; };
-		4AC95E7C1FBD165D00ABE415 /* read_lt_info_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E431FBD165D00ABE415 /* read_lt_info_sage.c */; };
-		4AC95E7D1FBD165D00ABE415 /* read_lu_hyde.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E441FBD165D00ABE415 /* read_lu_hyde.c */; };
+		4AC95E7C1FBD165D00ABE415 /* read_lulc_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E431FBD165D00ABE415 /* read_lulc_info.c */; };
 		4AC95E7E1FBD165D00ABE415 /* read_mirca.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E451FBD165D00ABE415 /* read_mirca.c */; };
 		4AC95E801FBD165D00ABE415 /* read_potveg.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E471FBD165D00ABE415 /* read_potveg.c */; };
 		4AC95E811FBD165D00ABE415 /* read_prodprice_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E481FBD165D00ABE415 /* read_prodprice_fao.c */; };
@@ -53,7 +54,7 @@
 		4AC95E8B1FBD165E00ABE415 /* read_yield_fao.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E521FBD165D00ABE415 /* read_yield_fao.c */; };
 		4AC95E8C1FBD165E00ABE415 /* write_csv_float2d.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E531FBD165D00ABE415 /* write_csv_float2d.c */; };
 		4AC95E8D1FBD165E00ABE415 /* write_csv_float3d.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E541FBD165D00ABE415 /* write_csv_float3d.c */; };
-		4AC95E8E1FBD165E00ABE415 /* write_gcam_lut.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E551FBD165D00ABE415 /* write_gcam_lut.c */; };
+		4AC95E8E1FBD165E00ABE415 /* write_glu_mapping.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E551FBD165D00ABE415 /* write_glu_mapping.c */; };
 		4AC95E8F1FBD165E00ABE415 /* write_harvestarea_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E561FBD165D00ABE415 /* write_harvestarea_crop_aez.c */; };
 		4AC95E901FBD165E00ABE415 /* write_production_crop_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E571FBD165D00ABE415 /* write_production_crop_aez.c */; };
 		4AC95E911FBD165E00ABE415 /* write_raster_float.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E581FBD165D00ABE415 /* write_raster_float.c */; };
@@ -62,7 +63,9 @@
 		4AC95E941FBD165E00ABE415 /* write_rent_use_aez.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5B1FBD165D00ABE415 /* write_rent_use_aez.c */; };
 		4AC95E951FBD165E00ABE415 /* write_text_char.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5C1FBD165D00ABE415 /* write_text_char.c */; };
 		4AC95E961FBD165E00ABE415 /* write_text_int.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E5D1FBD165D00ABE415 /* write_text_int.c */; };
+		4AD93A711FDF277E00F0C0EC /* read_lulc_isam.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AD93A701FDF277E00F0C0EC /* read_lulc_isam.c */; };
 		4AE9B7011FBFB9A700C9BE8B /* read_cropland_sage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */; };
+		4AEBD105200E72DD00A55995 /* read_hyde32.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AEBD104200E72DD00A55995 /* read_hyde32.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,16 +81,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4A01C4C31FE09FCE00FF5A15 /* read_lulc_land.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lulc_land.c; sourceTree = "<group>"; };
 		4A1E64EB1FBCDEC60009D173 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4A710E3E1FBD090500BB91B4 /* diagnostics */ = {isa = PBXFileReference; lastKnownFileType = folder; path = diagnostics; sourceTree = "<group>"; };
 		4A710E401FBD0A3400BB91B4 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
 		4A8E21B81C8E3DE5007DBF74 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
+		4A958FFE201135FB003EA702 /* proc_lulc_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_lulc_area.c; sourceTree = "<group>"; };
 		4A98F1181BB31FBA005E7B9D /* indata */ = {isa = PBXFileReference; lastKnownFileType = folder; path = indata; sourceTree = "<group>"; };
 		4AC95D3B1FBD119300ABE415 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
 		4AC95E251FBD165D00ABE415 /* aggregate_crop2gcam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aggregate_crop2gcam.c; sourceTree = "<group>"; };
 		4AC95E261FBD165D00ABE415 /* aggregate_use2gcam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aggregate_use2gcam.c; sourceTree = "<group>"; };
 		4AC95E271FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_harvarea_prod_out_crop_aez.c; sourceTree = "<group>"; };
-		4AC95E281FBD165D00ABE415 /* calc_potveg_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_potveg_area.c; sourceTree = "<group>"; };
+		4AC95E281FBD165D00ABE415 /* calc_refveg_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_refveg_area.c; sourceTree = "<group>"; };
 		4AC95E291FBD165D00ABE415 /* calc_rent_ag_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_rent_ag_use_aez.c; sourceTree = "<group>"; };
 		4AC95E2A1FBD165D00ABE415 /* calc_rent_frs_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc_rent_frs_use_aez.c; sourceTree = "<group>"; };
 		4AC95E2B1FBD165D00ABE415 /* copy_to_destpath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = copy_to_destpath.c; sourceTree = "<group>"; };
@@ -102,7 +107,7 @@
 		4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_land_type_area.c; sourceTree = "<group>"; };
 		4AC95E351FBD165D00ABE415 /* proc_mirca.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_mirca.c; sourceTree = "<group>"; };
 		4AC95E361FBD165D00ABE415 /* proc_nfert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_nfert.c; sourceTree = "<group>"; };
-		4AC95E371FBD165D00ABE415 /* proc_potveg_carbon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_potveg_carbon.c; sourceTree = "<group>"; };
+		4AC95E371FBD165D00ABE415 /* proc_refveg_carbon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_refveg_carbon.c; sourceTree = "<group>"; };
 		4AC95E381FBD165D00ABE415 /* proc_water_footprint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_water_footprint.c; sourceTree = "<group>"; };
 		4AC95E391FBD165D00ABE415 /* read_aez_new.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_aez_new.c; sourceTree = "<group>"; };
 		4AC95E3A1FBD165D00ABE415 /* read_aez_new_info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_aez_new_info.c; sourceTree = "<group>"; };
@@ -114,7 +119,7 @@
 		4AC95E401FBD165D00ABE415 /* read_harvestarea_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_harvestarea_fao.c; sourceTree = "<group>"; };
 		4AC95E411FBD165D00ABE415 /* read_land_area_hyde.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_land_area_hyde.c; sourceTree = "<group>"; };
 		4AC95E421FBD165D00ABE415 /* read_land_area_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_land_area_sage.c; sourceTree = "<group>"; };
-		4AC95E431FBD165D00ABE415 /* read_lt_info_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lt_info_sage.c; sourceTree = "<group>"; };
+		4AC95E431FBD165D00ABE415 /* read_lulc_info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lulc_info.c; sourceTree = "<group>"; };
 		4AC95E441FBD165D00ABE415 /* read_lu_hyde.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lu_hyde.c; sourceTree = "<group>"; };
 		4AC95E451FBD165D00ABE415 /* read_mirca.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_mirca.c; sourceTree = "<group>"; };
 		4AC95E461FBD165D00ABE415 /* read_nfert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_nfert.c; sourceTree = "<group>"; };
@@ -132,7 +137,7 @@
 		4AC95E521FBD165D00ABE415 /* read_yield_fao.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_yield_fao.c; sourceTree = "<group>"; };
 		4AC95E531FBD165D00ABE415 /* write_csv_float2d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_csv_float2d.c; sourceTree = "<group>"; };
 		4AC95E541FBD165D00ABE415 /* write_csv_float3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_csv_float3d.c; sourceTree = "<group>"; };
-		4AC95E551FBD165D00ABE415 /* write_gcam_lut.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_gcam_lut.c; sourceTree = "<group>"; };
+		4AC95E551FBD165D00ABE415 /* write_glu_mapping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_glu_mapping.c; sourceTree = "<group>"; };
 		4AC95E561FBD165D00ABE415 /* write_harvestarea_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_harvestarea_crop_aez.c; sourceTree = "<group>"; };
 		4AC95E571FBD165D00ABE415 /* write_production_crop_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_production_crop_aez.c; sourceTree = "<group>"; };
 		4AC95E581FBD165D00ABE415 /* write_raster_float.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_raster_float.c; sourceTree = "<group>"; };
@@ -141,8 +146,10 @@
 		4AC95E5B1FBD165D00ABE415 /* write_rent_use_aez.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_rent_use_aez.c; sourceTree = "<group>"; };
 		4AC95E5C1FBD165D00ABE415 /* write_text_char.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_char.c; sourceTree = "<group>"; };
 		4AC95E5D1FBD165D00ABE415 /* write_text_int.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = write_text_int.c; sourceTree = "<group>"; };
+		4AD93A701FDF277E00F0C0EC /* read_lulc_isam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_lulc_isam.c; sourceTree = "<group>"; };
 		4AE9B6FF1FBE338700C9BE8B /* input_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = input_files; sourceTree = "<group>"; };
 		4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_cropland_sage.c; sourceTree = "<group>"; };
+		4AEBD104200E72DD00A55995 /* read_hyde32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_hyde32.c; sourceTree = "<group>"; };
 		8DD76FB20486AB0100D96B5E /* lds */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lds; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -187,7 +194,7 @@
 				4AC95E251FBD165D00ABE415 /* aggregate_crop2gcam.c */,
 				4AC95E261FBD165D00ABE415 /* aggregate_use2gcam.c */,
 				4AC95E271FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c */,
-				4AC95E281FBD165D00ABE415 /* calc_potveg_area.c */,
+				4AC95E281FBD165D00ABE415 /* calc_refveg_area.c */,
 				4AC95E291FBD165D00ABE415 /* calc_rent_ag_use_aez.c */,
 				4AC95E2A1FBD165D00ABE415 /* calc_rent_frs_use_aez.c */,
 				4AC95E2B1FBD165D00ABE415 /* copy_to_destpath.c */,
@@ -200,9 +207,10 @@
 				4AC95E321FBD165D00ABE415 /* lds_main.c */,
 				4AC95E331FBD165D00ABE415 /* parse_utils.c */,
 				4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */,
+				4A958FFE201135FB003EA702 /* proc_lulc_area.c */,
 				4AC95E351FBD165D00ABE415 /* proc_mirca.c */,
 				4AC95E361FBD165D00ABE415 /* proc_nfert.c */,
-				4AC95E371FBD165D00ABE415 /* proc_potveg_carbon.c */,
+				4AC95E371FBD165D00ABE415 /* proc_refveg_carbon.c */,
 				4AC95E381FBD165D00ABE415 /* proc_water_footprint.c */,
 				4AC95E391FBD165D00ABE415 /* read_aez_new.c */,
 				4AC95E3A1FBD165D00ABE415 /* read_aez_new_info.c */,
@@ -213,10 +221,13 @@
 				4AC95E3F1FBD165D00ABE415 /* read_crop_info.c */,
 				4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */,
 				4AC95E401FBD165D00ABE415 /* read_harvestarea_fao.c */,
+				4AEBD104200E72DD00A55995 /* read_hyde32.c */,
 				4AC95E411FBD165D00ABE415 /* read_land_area_hyde.c */,
 				4AC95E421FBD165D00ABE415 /* read_land_area_sage.c */,
-				4AC95E431FBD165D00ABE415 /* read_lt_info_sage.c */,
 				4AC95E441FBD165D00ABE415 /* read_lu_hyde.c */,
+				4AC95E431FBD165D00ABE415 /* read_lulc_info.c */,
+				4AD93A701FDF277E00F0C0EC /* read_lulc_isam.c */,
+				4A01C4C31FE09FCE00FF5A15 /* read_lulc_land.c */,
 				4AC95E451FBD165D00ABE415 /* read_mirca.c */,
 				4AC95E461FBD165D00ABE415 /* read_nfert.c */,
 				4AC95E471FBD165D00ABE415 /* read_potveg.c */,
@@ -233,7 +244,7 @@
 				4AC95E521FBD165D00ABE415 /* read_yield_fao.c */,
 				4AC95E531FBD165D00ABE415 /* write_csv_float2d.c */,
 				4AC95E541FBD165D00ABE415 /* write_csv_float3d.c */,
-				4AC95E551FBD165D00ABE415 /* write_gcam_lut.c */,
+				4AC95E551FBD165D00ABE415 /* write_glu_mapping.c */,
 				4AC95E561FBD165D00ABE415 /* write_harvestarea_crop_aez.c */,
 				4AC95E571FBD165D00ABE415 /* write_production_crop_aez.c */,
 				4AC95E581FBD165D00ABE415 /* write_raster_float.c */,
@@ -305,7 +316,6 @@
 				4AC95E741FBD165D00ABE415 /* read_aez_orig.c in Sources */,
 				4AC95E8F1FBD165E00ABE415 /* write_harvestarea_crop_aez.c in Sources */,
 				4AC95E761FBD165D00ABE415 /* read_country_fao.c in Sources */,
-				4AC95E7D1FBD165D00ABE415 /* read_lu_hyde.c in Sources */,
 				4AC95E8D1FBD165E00ABE415 /* write_csv_float3d.c in Sources */,
 				4AC95E7A1FBD165D00ABE415 /* read_land_area_hyde.c in Sources */,
 				4AC95E6E1FBD165D00ABE415 /* proc_mirca.c in Sources */,
@@ -322,18 +332,22 @@
 				4AC95E941FBD165E00ABE415 /* write_rent_use_aez.c in Sources */,
 				4AC95E621FBD165D00ABE415 /* calc_rent_ag_use_aez.c in Sources */,
 				4AC95E811FBD165D00ABE415 /* read_prodprice_fao.c in Sources */,
+				4AD93A711FDF277E00F0C0EC /* read_lulc_isam.c in Sources */,
 				4AC95E821FBD165E00ABE415 /* read_production_fao.c in Sources */,
 				4AC95E801FBD165D00ABE415 /* read_potveg.c in Sources */,
 				4AC95E781FBD165D00ABE415 /* read_crop_info.c in Sources */,
 				4AC95E881FBD165E00ABE415 /* read_use_info_gtap.c in Sources */,
+				4A958FFF201135FC003EA702 /* proc_lulc_area.c in Sources */,
 				4AC95E841FBD165E00ABE415 /* read_region_info_gcam.c in Sources */,
 				4AC95E641FBD165D00ABE415 /* copy_to_destpath.c in Sources */,
 				4AC95E951FBD165E00ABE415 /* write_text_char.c in Sources */,
 				4AC95E6B1FBD165D00ABE415 /* lds_main.c in Sources */,
+				4A01C4C41FE09FCE00FF5A15 /* read_lulc_land.c in Sources */,
 				4AC95E731FBD165D00ABE415 /* read_aez_new_info.c in Sources */,
 				4AC95E931FBD165E00ABE415 /* write_raster_short.c in Sources */,
+				4AEBD105200E72DD00A55995 /* read_hyde32.c in Sources */,
 				4AC95E751FBD165D00ABE415 /* read_country87_info.c in Sources */,
-				4AC95E701FBD165D00ABE415 /* proc_potveg_carbon.c in Sources */,
+				4AC95E701FBD165D00ABE415 /* proc_refveg_carbon.c in Sources */,
 				4AC95E871FBD165E00ABE415 /* read_soil_carbon.c in Sources */,
 				4AC95E771FBD165D00ABE415 /* read_country_info_all.c in Sources */,
 				4AC95E5E1FBD165D00ABE415 /* aggregate_crop2gcam.c in Sources */,
@@ -344,15 +358,15 @@
 				4AE9B7011FBFB9A700C9BE8B /* read_cropland_sage.c in Sources */,
 				4AC95E791FBD165D00ABE415 /* read_harvestarea_fao.c in Sources */,
 				4AC95E8C1FBD165E00ABE415 /* write_csv_float2d.c in Sources */,
-				4AC95E8E1FBD165E00ABE415 /* write_gcam_lut.c in Sources */,
+				4AC95E8E1FBD165E00ABE415 /* write_glu_mapping.c in Sources */,
 				4AC95E691FBD165D00ABE415 /* get_systime.c in Sources */,
 				4AC95E831FBD165E00ABE415 /* read_protected.c in Sources */,
 				4AC95E7E1FBD165D00ABE415 /* read_mirca.c in Sources */,
-				4AC95E611FBD165D00ABE415 /* calc_potveg_area.c in Sources */,
+				4AC95E611FBD165D00ABE415 /* calc_refveg_area.c in Sources */,
 				4AC95E601FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c in Sources */,
 				4AC95E651FBD165D00ABE415 /* get_aez_val.c in Sources */,
 				4AC95E6A1FBD165D00ABE415 /* init_lds.c in Sources */,
-				4AC95E7C1FBD165D00ABE415 /* read_lt_info_sage.c in Sources */,
+				4AC95E7C1FBD165D00ABE415 /* read_lulc_info.c in Sources */,
 				4AC95E661FBD165D00ABE415 /* get_cell_area.c in Sources */,
 				4AC95E921FBD165E00ABE415 /* write_raster_int.c in Sources */,
 			);

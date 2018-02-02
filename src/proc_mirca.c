@@ -7,7 +7,7 @@
     no zero value records
     rounded to the nearest integer
     order follows harvest area output, with iso alphabetically, then glu# in order, then crop# in order
-    only countries with glus are written
+    only countries with glus and in ctry87 are processed
  
  source data are the
     MIRCA2000 envi ascii grid files
@@ -164,10 +164,6 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
                     }
                 } // end for i loop to get ctry index
                 
-                if (ctry_ind == NOMATCH) {
-                    continue;
-                }
-                
                 // merge serbia and montenegro for scg record
                 if (ctry_code == mne_code || ctry_code == srb_code) {
                     ctry_code = scg_code;
@@ -184,7 +180,11 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
                         return ERROR_IND;
                     }
                 } // end if serbia or montenegro
-                
+				
+				if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
+					continue;
+				}
+				
                 // get the aez index within the country aez list
                 aez_ind = NOMATCH;
                 for (i = 0; i < ctry_aez_num[ctry_ind]; i++) {

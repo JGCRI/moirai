@@ -35,7 +35,7 @@ int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val
 	double integer_dbl;	// used to capture the integral part of a double
 	
 	// these are for the currently unused search code
-	int toprow, botrow, leftcol, rightcol, topcol, botcol, current_val;
+	int toprow, botrow, leftcol, rightcol, current_val;
 	
 	temp_val = aez_array[index];
 	//if (temp_val == nodata_val) {
@@ -65,7 +65,7 @@ int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val
 				rightcol = ncols - 1;
 			}
 			// loop over rows
-			for (i = topcol; i <= botcol; i++) {
+			for (i = leftcol; i <= rightcol; i++) {
 				if (i == toprow || i == botrow) {
 					// loop over columns if at top or bottom of search ring
 					for (j = icol - count; j <= icol + count; j++) {

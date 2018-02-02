@@ -84,8 +84,8 @@
  Note: The read functions for the data below need to be modular so they can be swapped easily
  to accommodate other data sources
  
- Note: Using Hyde GCP2012best for land area and land use area
-    this is so the HYDE_YEAR data for carbon and land rent are consistent with the historical hyde area data
+ Note: Using Hyde 3.2 for land area and land use area
+    2000 is the REF_YEAR data for carbon and land rent are consistent with the historical hyde area data
     sage land area is used only for sage-based processing:
         175 crop data, mirca2000 data, the deprecated N fert data
  
@@ -286,6 +286,10 @@ int main(int argc, const char * argv[]) {
 	
 	fprintf(stdout, "\nProgram %s started at %s\n", CODENAME, get_systime());
 	
+	// set the rand() seed
+	// want it the same each time the program is run
+	srand(0);
+	
 	// initialize all of the arrays
 	if((error_code = init_lds(&in_args))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
@@ -376,7 +380,7 @@ int main(int argc, const char * argv[]) {
     
     // read SAGE land type info
     // array length and allocation done within read_lt_info_sage()
-    if((error_code = read_lt_info_sage(in_args))) {
+    if((error_code = read_lulc_info(in_args))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
@@ -389,7 +393,7 @@ int main(int argc, const char * argv[]) {
     }
     
 	////////
-	// read the raster data, except the SAGE crop data
+	// read the raster data, except the SAGE crop data, lulc data, and hyde lu data
 	
 	// calculate the total area of each working grid cell (spherical earth): cell_area[NUM_CELLS]
     // and read in cell area of the hyde land cells (also spherical earth): cell_area_hyde[NUM_CELLS]
@@ -421,7 +425,7 @@ int main(int argc, const char * argv[]) {
 		return error_code;
 	}
 	
-	// read the hyde 3.1 land area: land_area_hyde[NUM_CELLS]
+	// read the hyde land area: land_area_hyde[NUM_CELLS]
     // first allocate the arrays
     land_area_hyde = calloc(NUM_CELLS, sizeof(float));
     if(land_area_hyde == NULL) {
@@ -481,6 +485,18 @@ int main(int argc, const char * argv[]) {
 		return error_code;
 	}
 	
+	// read lulc land mask: land_mask_lulc[NUM_CELLS]
+	// first allocate array
+	land_mask_lulc = calloc(NUM_CELLS, sizeof(int));
+	if(land_mask_lulc == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for land_mask_lulc: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	if((error_code = read_lulc_land(in_args, REF_YEAR, &raster_info, land_mask_lulc))) {
+		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		return error_code;
+	}
+	
     /////////
     // reconcile the raster data
 	
@@ -500,9 +516,21 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for urban_area: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    potveg_area = calloc(NUM_CELLS, sizeof(float));
-    if(potveg_area == NULL) {
-        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for potveg_area: main()\n", get_systime(), ERROR_MEM);
+	lu_detail_area = calloc(NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN, sizeof(float*));
+	if(lu_detail_area == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_area: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
+		lu_detail_area[i] = calloc(NUM_CELLS, sizeof(float));
+		if(lu_detail_area[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_area[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    refveg_area = calloc(NUM_CELLS, sizeof(float));
+    if(refveg_area == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
     region_gcam = calloc(NUM_CELLS, sizeof(int));
@@ -565,12 +593,34 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for land_mask_potveg: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+	land_mask_refveg = calloc(NUM_CELLS, sizeof(int));
+	if(land_mask_refveg == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for land_mask_refveg: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
     land_mask_forest = calloc(NUM_CELLS, sizeof(int));
     if(land_mask_forest == NULL) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for land_mask_forest: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    
+	lulc_input_grid = calloc(NUM_LULC_TYPES, sizeof(float*));
+	if(lulc_input_grid == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lulc_input_grid: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	for (i = 0; i < NUM_LULC_TYPES; i++) {
+		lulc_input_grid[i] = calloc(NUM_CELLS_LULC, sizeof(float));
+		if(lulc_input_grid[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lulc_input_grid[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+	refveg_thematic = calloc(NUM_CELLS, sizeof(int));
+	if(refveg_thematic == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	
     // allocate some arrays to keep track of valid raster cells
     land_cells_aez_new = calloc(NUM_CELLS, sizeof(int));
     if(land_cells_aez_new == NULL) {
@@ -605,8 +655,8 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	////
-	// convert the hyde urban and sage cropland, pasture, and potential veg input data to working grid area
-	if((error_code = calc_potveg_area(in_args, &raster_info))) {
+	// convert the hyde land use, lulc, and sage potential veg input data to working grid area
+	if((error_code = calc_refveg_area(in_args, &raster_info))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}	
@@ -614,9 +664,7 @@ int main(int argc, const char * argv[]) {
     // free some raster arrays
     free(urban_area);
     free(region_gcam);
-    free(cell_area);
     free(cell_area_hyde);
-    free(land_area_hyde);
     free(sage_minus_hyde_land_area);
     free(glacier_water_area_hyde);
     free(land_mask_aez_orig);
@@ -625,11 +673,13 @@ int main(int argc, const char * argv[]) {
     free(land_mask_hyde);
     free(land_mask_fao);
     free(land_mask_potveg);
+	free(land_mask_refveg);
     free(land_mask_forest);
+	free(land_mask_lulc);
     
 	// store the country/land rent region + aez lists
-    // the arrays are allocated within write_gcam_lut()
-	if((error_code = write_gcam_lut(in_args, raster_info))) {
+    // the arrays are allocated within write_glu_mapping()
+	if((error_code = write_glu_mapping(in_args, raster_info))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}
@@ -670,7 +720,7 @@ int main(int argc, const char * argv[]) {
     
     // process the potential vegetation carbon data
     //  needed arrays are allocated/freed within proc_potveg_carbon()
-    if((error_code = proc_potveg_carbon(in_args, raster_info))) {
+    if((error_code = proc_refveg_carbon(in_args, raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
@@ -686,9 +736,16 @@ int main(int argc, const char * argv[]) {
     free(lt_cats);
     
     // free some rasters
+	free(cell_area);
+	free(land_area_hyde);
     free(land_cells_aez_new);
     free(protected_thematic);
     free(potveg_thematic);
+	free(refveg_thematic);
+	for (i = 0; i < NUM_LULC_TYPES; i++) {
+		free(lulc_input_grid[i]);
+	}
+	free(lulc_input_grid);
     
     // allocate the arrays for all the fao input data (initialized to zero)
     yield_fao = calloc(NUM_FAO_CTRY * NUM_SAGE_CROP * NUM_FAO_YRS, sizeof(float));
@@ -839,7 +896,11 @@ int main(int argc, const char * argv[]) {
     free(land_cells_sage);
 	free(cropland_area);
 	free(cropland_area_sage);
-    
+	for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
+		free(lu_detail_area[i]);
+	}
+	free(lu_detail_area);
+	
 	// aggregate harvest area and production to gcam land units
 	if((error_code = aggregate_crop2gcam(in_args))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
@@ -916,7 +977,7 @@ int main(int argc, const char * argv[]) {
     // free some raster arrays
     free(aez_bounds_new);
     free(aez_bounds_orig);
-    free(potveg_area);
+    free(refveg_area);
     free(country87_gtap);
     free(forest_cells);
     free(land_cells_hyde);
@@ -1017,7 +1078,19 @@ int main(int argc, const char * argv[]) {
     free(cropdescr_sage);
     free(cropfilebase_sage);
     free(cropnames_sage2fao);
-    
+	
+	free(lutypecodes_hyde);
+	free(lulccodes);
+	free(lulc2sagecodes);
+	free(lulc2hydecodes);
+	for (i = 0; i < NUM_HYDE_TYPES; i++) {
+		free(lutypenames_hyde[i]);
+	}
+	for (i = 0; i < NUM_LULC_TYPES; i++) {
+		free(lulcnames[i]);
+	}
+	free(lulcnames);
+	
     // free the fao input data arrays
     free(yield_fao);
     free(harvestarea_fao);

@@ -51,10 +51,10 @@ REG32 = TRUE
 papergray = FALSE
 
 # this is the new data directory
-newdir = "../outputs/basins235/"
+newdir = "../outputs/basins235_test/"
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_stats_raez/", sep="")
+outdir = paste("./basins235_test_stats_raez/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # input data files

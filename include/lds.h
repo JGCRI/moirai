@@ -13,6 +13,11 @@
     Each AEZ is now a unique area on the globe
     This will ultimately be LDS version 2.0
 
+ December 2017 - Alan Di Vittorio
+ 	starting the modification to use ISAM LULC data in place of just the HYDE data
+ 	these ISAM data use HYDE 3.2 (from spring 2017)
+ 	this will become version 3
+ 
 **********/
 
 #ifndef LDSHDR
@@ -26,13 +31,13 @@
 #include <ctype.h>
 #include "/usr/local/include/netcdf.h"
 
-#define CODENAME								"lds"				// name of the compiled program
-#define VERSION         				"2.0"           			// current version
-#define MAXCHAR									1000						// maximum string length
-#define MAXRECSIZE							10000						// maximum record (csv line) length in characters
+#define CODENAME				"lds"				// name of the compiled program
+#define VERSION         		"3.0.beta1"           			// current version
+#define MAXCHAR					1000						// maximum string length
+#define MAXRECSIZE				10000						// maximum record (csv line) length in characters
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
-#define HYDE_YEAR               2000
+#define REF_YEAR               2000
 
 // the min and max forest codes for the SAGE raster data (see SAGE_PVLT.csv)
 // these assume that the forest codes are all consecutive with no others mixed in the enumeration
@@ -42,15 +47,19 @@
 // counts of useful variables
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 #define NUM_FAO_YRS							11							// number of years in FAOSTAT production, yield, havested area, and price files
-#define NUM_IN_ARGS							50							// number of input variables in the input file
+#define NUM_IN_ARGS							51							// number of input variables in the input file
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define PROTECTED               1               // value assigned to protected pixels for generating land category (this value - 1 is the output array index)
 #define UNPROTECTED             2               // value assigned to unprotected pixels for generating land category (this value - 1 is the output array index)
 #define NUM_PROTECTED           2               // number of protection categories
-#define NUM_HYDE_YEARS          33              // number of years in the hyde lu bsq files
-#define HYDE_START_YEAR         1700            // the first year in the hyde bsq files
+#define LULC_START_YEAR         1800            // the first lulc year
+#define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
+#define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
+#define HYDE_START_YEAR         1700            // the first hyde year
+#define NUM_HYDE_YEARS          47            	// number of available hyde years
+#define NUM_HYDE_POST2000_YEARS 16            	// number of hyde years >= 2001; these are each year
 #define CROP_LT_CODE            10              // used to generate land type category
 #define PASTURE_LT_CODE         20              // used to generate land type category
 #define URBAN_LT_CODE           30              // used to generate land type category
@@ -73,15 +82,23 @@
 // useful flags and values
 #define NOMATCH					-1				// if there isn't a matching country across data sets
 #define NA_TEXT                  "-"            // if there is no iso3 or name for a country/territory
-#define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id
+#define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id; this is also used for the region-glu image
+#define ZERO_THRESH				1/1000000.0		// if a value is less than this, it is zero
 
 // working resolution is 5 arcmin (2160x4320), WGS84 spherical earth, lat-lon projection
+// the origin is the upper left corner at 90 Lat and -180 Lon
+// the lat/lon dimensions need to have an even number of cells
 #define NUM_LAT					2160						// number of lats in working grids
 #define NUM_LON					4320						// number of lons in working grids
 #define NUM_CELLS				NUM_LAT * NUM_LON			// number of grid cells in working grids
 #define GRID_RES				5.0/60.0					// working grid resolution; decimal degree
 #define GRID_RES_SEC			300.0						// workding grid resolution; arc-seconds
 #define NODATA					-9999						// nodata value
+
+// LULC input grid; the origin corner is 0 lon and -90 lat
+#define NUM_LAT_LULC			360							// number of lats in input lulc data
+#define NUM_LON_LULC			720							// number of lons in input lulc
+#define NUM_CELLS_LULC			NUM_LAT_LULC * NUM_LON_LULC			// number of grid cells in input lulc data
 
 // some constants for calculating the area of a grid cell
 #define AVE_ER					6371007.181		// average earth radius; from MODIS land products WGS84 average spherical radius;  meters
@@ -109,6 +126,8 @@ int NUM_NEW_AEZ;						// number of unique global climate AEZs (or other delineat
 int NUM_GTAP_USE;						// number of GTAP uses (GTAP_use) (see GTAP_use.csv)
 int NUM_SAGE_PVLT;						// number of SAGE potential vegetation land types (see SAGE_PVLT.csv)
 int NUM_SAGE_CROP;						// number of SAGE crops (SAGE_crop) (see SAGE_gtap_fao_crop2use.csv)
+int NUM_HYDE_TYPES;						// number of hyde land use types/files; the first 3 describe the total land use state
+int NUM_LULC_TYPES;						// number of input lulc types
 
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
@@ -159,11 +178,13 @@ float *yield_in;                        // input yield (metric tonnes / km^2), r
 int *aez_bounds_new;                    // new aez boundaries (integers 1 to NUM_NEW_AEZ)
 int *aez_bounds_orig;                   // original aez boundaries (integers 1 to NUM_ORIG_AEZ)
 float *cropland_area_sage;              // sage cropland area for normalizing sage crop data (km^2)
-float *cropland_area;                   // cropland area for pot veg area calc for forest land rent (km^2)
-float *pasture_area;                    // pasture area for pot veg area calc and animal land rent calc (km^2)
-float *urban_area;                      // urban area for pot veg area calc for forest land rent calc (km^2)
-float *potveg_area;                     // potential vegetation area for forest land rent calc (km^2)
+float *cropland_area;                   // cropland area for ref veg area calc for forest land rent (km^2)
+float *pasture_area;                    // pasture area for ref veg area calc and animal land rent calc (km^2)
+float *urban_area;                      // urban area for ref veg area calc for forest land rent calc (km^2)
+float **lu_detail_area;					// additional hyde data files with more detailed area (km^2); d1=hyde types
+float *refveg_area;                     // reference vegetation area for forest land rent calc (km^2)
 int *potveg_thematic;                   // potential vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
+int *refveg_thematic;                   // reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 short *country_fao;                     // fao country codes (integer fao code values)
 float *cell_area;                       // total area of grid cell; calculated based on spherical earth (km^2)
 float *cell_area_hyde;                  // total area of hyde land grid cells; from hyde data set (km^2)
@@ -179,10 +200,16 @@ int *land_mask_aez_orig;                // 1=land; 0=no land
 int *land_mask_aez_new;                 // 1=land; 0=no land
 int *land_mask_sage;                    // 1=land; 0=no land
 int *land_mask_hyde;                    // 1=land; 0=no land
+int *land_mask_lulc;                    // 1=land; 0=no land
 int *land_mask_fao;                     // 1=land; 0=no land
 int *land_mask_potveg;                  // 1=land; 0=no land
+int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
 short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
+
+// raster arrays for inputs with different resolution
+// these are also stored starting at upper left corner with lon varying fastest
+float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
 
 // indices of land cells within the raster data; these are the only cells processed
 // these are allocated and free dynamically as needed in lds_main.c
@@ -213,7 +240,7 @@ float *harvestarea_fao;     // harvested area from the FAO file (km^2)
 float *production_fao;      // production from the FAO file (metric tonnes)
 float *prodprice_fao_reglr;	// producer prices from the FAO file (USD / tonne), single year or an average
 
-// GCAM, GTAP, SAGE, and FAO variable lists and codes
+// GCAM, GTAP, SAGE, LULC, and FAO variable lists and codes
 char **countrynames_fao;                                    // FAO country name
 int *countrycodes_fao;                                      // FAO country codes
 char **countryabbrs_iso;                                    // ISO country abbreviations; "-" = no iso3 code
@@ -234,6 +261,10 @@ char **landtypenames_sage;                                  // SAGE land type na
 int *landtypecodes_sage;                                    // SAGE land type codes
 char **aez_names_new;                                       // names of the new AEZs
 int *aez_codes_new;                                         // integer id codes of the new AEZs; corresponds with the input raster
+char **lutypenames_hyde;									// hyde land use type names
+int *lutypecodes_hyde;										// hyde land use type integer codes
+char **lulcnames;											// lulc type names
+int *lulccodes;												// lulc type integer codes
 
 // mapping between some variables
 int *ctry2ctry87codes_gtap;                             // GTAP 87 country codes for each FAO country; -1 = no match
@@ -243,6 +274,8 @@ int *country_gcamiso2regioncodes_gcam;                  // GCAM region codes for
 int *crop_sage2gtap_use;                                // GTAP use codes for each SAGE crop
 int *cropcodes_sage2fao;                                // FAO crop codes for each SAGE crop; -1 = no match
 char **cropnames_sage2fao;                              // FAO crop names for each SAGE crop
+int *lulc2sagecodes;									// isam lulc types to sage pot veg
+int *lulc2hydecodes;									// isam lulc types to hyde32 lu types
 
 // data structure to store information about the input rasters
 typedef struct {
@@ -291,6 +324,17 @@ typedef struct {
 	double land_area_hyde_ymin;		// input latitude min grid boundary
 	double land_area_hyde_ymax;		// input latitude max grid boundary
 
+	// lulc input
+	int lulc_input_nrows;		// input number of rows
+	int lulc_input_ncols;		// input number of columns
+	int lulc_input_ncells;		// input number of grid cells
+	float lulc_input_nodata;	// input nodata value
+	double lulc_input_res;		// input resolution, decimal degrees
+	double lulc_input_xmin;		// input longitude min grid boundary
+	double lulc_input_xmax;		// input longitude max grid boundary
+	double lulc_input_ymin;		// input latitude min grid boundary
+	double lulc_input_ymax;		// input latitude max grid boundary
+	
 	// new aez boundaries file
 	int aez_new_nrows;			// input number of rows
 	int aez_new_ncols;			// input number of columns
@@ -326,27 +370,17 @@ typedef struct {
 	double cropland_sage_ymin;		// input latitude min grid boundary
 	double cropland_sage_ymax;		// input latitude max grid boundary
 	
-	// cropland area for pot veg calc
-	int cropland_nrows;			// input number of rows
-	int cropland_ncols;			// input number of columns
-	int cropland_ncells;		// input number of grid cells
-	float cropland_nodata;		// input nodata value
-	double cropland_res;		// input resolution, decimal degrees
-	double cropland_xmin;		// input longitude min grid boundary
-	double cropland_xmax;		// input longitude max grid boundary
-	double cropland_ymin;		// input latitude min grid boundary
-	double cropland_ymax;		// input latitude max grid boundary
-
-	// pasture area for potveg calc and animal land rent calc
-	int pasture_nrows;			// input number of rows
-	int pasture_ncols;			// input number of columns
-	int pasture_ncells;			// input number of grid cells
-	float pasture_nodata;		// input nodata value
-	double pasture_res;			// input resolution, decimal degrees
-	double pasture_xmin;		// input longitude min grid boundary
-	double pasture_xmax;		// input longitude max grid boundary
-	double pasture_ymin;		// input latitude min grid boundary
-	double pasture_ymax;		// input latitude max grid boundary
+	// lu area for ref veg calc and animal land rent calc
+	// this includes cropland, pasture, urban and any other lu data with the same input parameters
+	int lu_nrows;			// input number of rows
+	int lu_ncols;			// input number of columns
+	int lu_ncells;		// input number of grid cells
+	int lu_nodata;		// input nodata value
+	double lu_res;		// input resolution, decimal degrees
+	double lu_xmin;		// input longitude min grid boundary
+	double lu_xmax;		// input longitude max grid boundary
+	double lu_ymin;		// input latitude min grid boundary
+	double lu_ymax;		// input latitude max grid boundary
 
 	// potveg file
 	int potveg_nrows;			// input number of rows
@@ -358,17 +392,6 @@ typedef struct {
 	double potveg_xmax;			// input longitude max grid boundary
 	double potveg_ymin;			// input latitude min grid boundary
 	double potveg_ymax;			// input latitude max grid boundary
-
-	// urban area for pot veg calc
-	int urban_nrows;		// input number of rows
-	int urban_ncols;		// input number of columns
-	int urban_ncells;		// input number of grid cells
-	float urban_nodata;     // input nodata value
-	double urban_res;		// input resolution, decimal degrees
-	double urban_xmin;		// input longitude min grid boundary
-	double urban_xmax;		// input longitude max grid boundary
-	double urban_ymin;		// input latitude min grid boundary
-	double urban_ymax;		// input latitude max grid boundary
 
 	// fao country codes file (this is 2-byte integer file)
 	int country_fao_nrows;			// input number of rows
@@ -404,7 +427,9 @@ typedef struct {
 	char inpath[MAXCHAR];				// path to the input data directory
 	char outpath[MAXCHAR];				// path to the output data directory
 	char sagepath[MAXCHAR];				// path to the directory containing the SAGE netcdf crop files
-    char mircapath[MAXCHAR];			// path to the directory containing the MIRCA ascii grid files
+	char hydepath[MAXCHAR];				// path to the directory containing the HYDE files
+	char lulcpath[MAXCHAR];				// path to the directory containing the LULC files
+	char mircapath[MAXCHAR];			// path to the directory containing the MIRCA ascii grid files
     char wfpath[MAXCHAR];               // path to the directory containing the water footprint esri grid files
     char ldsdestpath[MAXCHAR];              // destination path for the gcam data system input files
     char mapdestpath[MAXCHAR];              // destination path for the gcam data system mapping files
@@ -419,9 +444,9 @@ typedef struct {
 	char country_fao_fname[MAXCHAR];		// file name only of the fao country code raster file
     char protected_fname[MAXCHAR];          // file name only of the protected pixel raster file
     char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
-    char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
-    char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
-    char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
+    //char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
+    //char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
+    //char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
 	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
 
 	// input csv file names
@@ -434,6 +459,8 @@ typedef struct {
     char regionlist_gcam_fname[MAXCHAR];	// file name only of the GCAM region list
     char use_gtap_fname[MAXCHAR];			// file name only of the GTAP product use categories
 	char lt_sage_fname[MAXCHAR];			// file name only of the SAGE land types, in order
+	char lu_hyde_fname[MAXCHAR];			// file name only of the HDYE land use types, in order
+	char lulc_fname[MAXCHAR];				// file name only of the LULC land types, in order
 	char crop_fname[MAXCHAR];				// file name only of the FAO crop, SAGE crop, GTAP use mapping
 	char production_fao_fname[MAXCHAR];		// file name only of FAO production data
 	char yield_fao_fname[MAXCHAR];			// file name only of FAO yield data
@@ -479,6 +506,9 @@ int read_mirca(char *fname, float *mirca_grid);
 int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
+int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
+int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int *land_mask_lulc);
+int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float* crop_grid, float* pasture_grid, float* urban_grid, float** lu_detail);
 
 // read csv file functions
 int read_rent_orig(args_struct in_args);
@@ -487,7 +517,7 @@ int read_region_info_gcam(args_struct in_args);
 int read_country_info_all(args_struct in_args);
 int read_aez_new_info(args_struct in_args);
 int read_use_info_gtap(args_struct in_args);
-int read_lt_info_sage(args_struct in_args);
+int read_lulc_info(args_struct in_args);
 int read_crop_info(args_struct in_args);
 int read_production_fao(args_struct in_args);
 int read_yield_fao(args_struct in_args);
@@ -499,15 +529,16 @@ int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
 
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);
-int calc_potveg_area(args_struct in_args, rinfo_struct *raster_info);
+int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info);
 int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val, int *value);
 int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
 int proc_nfert(args_struct in_args, rinfo_struct raster_info);
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
-int proc_potveg_carbon(args_struct in_args, rinfo_struct raster_info);
+int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
 
 // text parsing utility functions (parse_utils.c)
 int get_float_field(char *line, const char *delim, int findex, float *fltval);
@@ -529,7 +560,7 @@ int aggregate_use2gcam(args_struct in_args);
 int write_harvestarea_crop_aez(args_struct in_args);
 int write_production_crop_aez(args_struct in_args);
 int write_rent_use_aez(args_struct in_args);
-int write_gcam_lut(args_struct in_args, rinfo_struct raster_info);
+int write_glu_mapping(args_struct in_args, rinfo_struct raster_info);
 
 // diagnostic write functions
 int write_raster_float(float out_array[], int out_length, char *out_name, args_struct in_args);
