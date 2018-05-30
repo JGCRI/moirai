@@ -150,7 +150,7 @@
 		4AE9B6FF1FBE338700C9BE8B /* input_files */ = {isa = PBXFileReference; lastKnownFileType = folder; path = input_files; sourceTree = "<group>"; };
 		4AE9B7001FBFB9A700C9BE8B /* read_cropland_sage.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_cropland_sage.c; sourceTree = "<group>"; };
 		4AEBD104200E72DD00A55995 /* read_hyde32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_hyde32.c; sourceTree = "<group>"; };
-		8DD76FB20486AB0100D96B5E /* lds */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lds; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD76FB20486AB0100D96B5E /* moirai */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = moirai; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,7 +172,7 @@
 				4AC95D3B1FBD119300ABE415 /* include */,
 				4A98F1181BB31FBA005E7B9D /* indata */,
 				4AE9B6FF1FBE338700C9BE8B /* input_files */,
-				1AB674ADFE9D54B511CA2CBB /* lds */,
+				1AB674ADFE9D54B511CA2CBB /* moirai */,
 				4A8E21B81C8E3DE5007DBF74 /* makefile */,
 				4A1E64EB1FBCDEC60009D173 /* README.md */,
 				4AC95E241FBD165D00ABE415 /* src */,
@@ -180,12 +180,12 @@
 			name = genaez;
 			sourceTree = "<group>";
 		};
-		1AB674ADFE9D54B511CA2CBB /* lds */ = {
+		1AB674ADFE9D54B511CA2CBB /* moirai */ = {
 			isa = PBXGroup;
 			children = (
-				8DD76FB20486AB0100D96B5E /* lds */,
+				8DD76FB20486AB0100D96B5E /* moirai */,
 			);
-			name = lds;
+			name = moirai;
 			sourceTree = "<group>";
 		};
 		4AC95E241FBD165D00ABE415 /* src */ = {
@@ -260,9 +260,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8DD76FA90486AB0100D96B5E /* lds */ = {
+		8DD76FA90486AB0100D96B5E /* moirai */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "lds" */;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "moirai" */;
 			buildPhases = (
 				8DD76FAB0486AB0100D96B5E /* Sources */,
 				8DD76FAD0486AB0100D96B5E /* Frameworks */,
@@ -272,10 +272,10 @@
 			);
 			dependencies = (
 			);
-			name = lds;
+			name = moirai;
 			productInstallPath = "$(HOME)/bin";
 			productName = genaez;
-			productReference = 8DD76FB20486AB0100D96B5E /* lds */;
+			productReference = 8DD76FB20486AB0100D96B5E /* moirai */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -286,7 +286,7 @@
 			attributes = {
 				LastUpgradeCheck = 0710;
 			};
-			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lds" */;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "moirai" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -300,7 +300,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8DD76FA90486AB0100D96B5E /* lds */,
+				8DD76FA90486AB0100D96B5E /* moirai */,
 			);
 		};
 /* End PBXProject section */
@@ -398,7 +398,7 @@
 					"-lnetcdf",
 					"-lm",
 				);
-				PRODUCT_NAME = lds;
+				PRODUCT_NAME = moirai;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = /usr/local/include;
@@ -425,7 +425,7 @@
 					"-lnetcdf",
 					"-lm",
 				);
-				PRODUCT_NAME = lds;
+				PRODUCT_NAME = moirai;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = /usr/local/include;
@@ -462,7 +462,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "lds" */ = {
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "moirai" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB928608733DD80010E9CD /* Debug */,
@@ -471,7 +471,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "lds" */ = {
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "moirai" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB928A08733DD80010E9CD /* Debug */,
