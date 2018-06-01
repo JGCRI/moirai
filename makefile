@@ -1,4 +1,4 @@
-# makefile for the Land Data System (LDS)
+# makefile for the Moirai Land Data System (Moirai LDS)
 # command line tool for generating land data for GCAM
 #
 # invoke by issuing command "make" from this directory
@@ -42,7 +42,7 @@ $(info $$LDS_OBJS is [${LDS_OBJS}])
 
 OBJ = ${patsubst %,${OBJDIR}/%,${LDS_OBJS}}
 
-LDS_HDRS = lds.h
+LDS_HDRS = moirai.h
 
 LDS_INCLUDE = ${patsubst %,${HDRDIR}/%,${LDS_HDRS}}
 #$(info $$LDS_INCLUDE is [${LDS_INCLUDE}])

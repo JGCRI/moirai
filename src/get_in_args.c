@@ -22,7 +22,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int get_in_args(const char *fname, args_struct *in_args) {
 	
@@ -198,7 +198,7 @@ int get_in_args(const char *fname, args_struct *in_args) {
                     strcpy(in_args->land_type_area_fname, fld_str);
                     break;
                 case 48:
-                    strcpy(in_args->potveg_carbon_fname, fld_str);
+                    strcpy(in_args->refveg_carbon_fname, fld_str);
                     break;
                 case 49:
                     strcpy(in_args->wf_fname, fld_str);

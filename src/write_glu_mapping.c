@@ -22,7 +22,7 @@
     LDS_land_types.csv
     SAGE potveg cat * 100 + land use code + protected code
         potveg cat: 0 = unknown, 1-15 are sage pot veg cats
-        land use code: 0=unmanaged, 10=cropland, 20=pasture, 30=urbanland (crop, pasture, and urban are set in lds.h)
+        land use code: 0=unmanaged, 10=cropland, 20=pasture, 30=urbanland (crop, pasture, and urban are set in moirai.h)
         protected code: 1 = protected, 2= non-protected
     corresponds with the land type area and potveg carbon output csv files
 
@@ -59,7 +59,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
 	

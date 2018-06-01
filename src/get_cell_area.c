@@ -5,7 +5,7 @@
  
  This is the area of the surface of a sphere delineated by the lat/lon values given
  from integral r^2.cos(lat).dlat.dlon; lat from -pi/2 to pi/2, lon from 0 to 2pi
- Uses the AVE_ER earth radius defined in lds.h
+ Uses the AVE_ER earth radius defined in moirai.h
  assumes that lat and long values are valid: within +-90 and +-180
 	longitude values can also be between 0 and 360
 	it is really the difference that matters, so be careful at the longitude number boundary
@@ -32,7 +32,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int get_cell_area(args_struct in_args, rinfo_struct *raster_info) {
 	

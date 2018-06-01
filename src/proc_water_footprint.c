@@ -45,7 +45,7 @@
  
  ***********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     

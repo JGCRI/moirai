@@ -42,7 +42,7 @@
  
  ***********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     
@@ -253,7 +253,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     // write the output file
     
     strcpy(fname, in_args.outpath);
-    strcat(fname, in_args.potveg_carbon_fname);
+    strcat(fname, in_args.refveg_carbon_fname);
     fpout = fopen(fname,"w"); //float
     if(fpout == NULL)
     {

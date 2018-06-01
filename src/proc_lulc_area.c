@@ -31,7 +31,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells) {
 	

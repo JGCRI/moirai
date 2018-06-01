@@ -11,7 +11,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 char *get_systime() {
 	

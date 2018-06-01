@@ -18,7 +18,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_aez_new(args_struct in_args, rinfo_struct *raster_info) {
 	

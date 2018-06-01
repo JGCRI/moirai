@@ -3,7 +3,7 @@
  
  read one ISAM LULC netcdf file
 	the files are gzipped orignially
-	this function will unzip them if necessary and then leave them unzipped
+	this function will unzip them if necessary and then leave them unzipped (and keep the zipped file)
     these are half-degree files (for now)
     origin is: lower left corner at -90 lat and 0 lon
 
@@ -38,7 +38,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid) {
     

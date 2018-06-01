@@ -36,7 +36,7 @@
 
 ***********************/
  
-#include "lds.h"
+#include "moirai.h"
 
 int read_water_footprint(char *fname, float *wf_grid) {
     

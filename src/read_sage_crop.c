@@ -49,7 +49,7 @@
 
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info) {
 

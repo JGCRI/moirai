@@ -13,7 +13,7 @@
     sage potential vegetation code * 100 + lu_code + proctected_code
     sage potential vegetation values are 0=unknown, and 1-15 in order of SAGE_PVLT.csv
     lu_code is 0 for non-crop, non-pasture, non-urban (i.e. non hyde)
-    land use codes are set in lds.h: crop = 10, pasture = 20, urban = 30
+    land use codes are set in moirai.h: crop = 10, pasture = 20, urban = 30
     protected_code is 1 for protectected and 2 for unprotected
  
  source data are the
@@ -60,7 +60,7 @@
  
  ***********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     

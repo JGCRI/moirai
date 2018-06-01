@@ -29,7 +29,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_mirca(char *fname, float *mirca_grid) {
     

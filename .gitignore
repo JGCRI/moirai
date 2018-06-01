@@ -3,9 +3,16 @@
 
 # exclude .idea dir
 .idea
+
 # exclude the unzipped sage175crop files
 indata/HarvestedAreaYield175Crops_NetCDF/*.png
 indata/HarvestedAreaYield175Crops_NetCDF/*.nc
+
+# exclude the unzipped HYDE32 files
+indata/HYDE32_baseline/*.asc
+
+# exclude the unzipped ISAM files
+indata/ISAM_LC/*.nc
 
 # exclude build dirs
 bin/

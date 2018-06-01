@@ -17,7 +17,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 //int write_text_char(char out_array[][MAXCHAR], int out_length, char *out_name, args_struct in_args) {
 int write_text_char(char **out_array, int out_length, char *out_name, args_struct in_args) {

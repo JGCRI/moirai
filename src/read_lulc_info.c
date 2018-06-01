@@ -11,7 +11,7 @@
  this file is in the order of the integer values in the raster data set
  the first column contains the SAGE raster codes
  the second column is SAGE category names
- the maximum and minimum SAGE raster forest values for use in get_land_cells() ares et in lds.h
+ the maximum and minimum SAGE raster forest values for use in get_land_cells() ares et in moirai.h
  the assumption is that all the forest codes are consecutive with no other types mixed in the enumeration
  currently, the range is 1 to 8, so woodland is not included in forest
  
@@ -48,7 +48,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_lulc_info(args_struct in_args) {
 	

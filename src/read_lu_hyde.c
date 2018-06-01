@@ -1,6 +1,9 @@
 /**********
  read_lu_hyde.c
  
+ this function is no longer used, and has been removed from the target
+ it has been deprecated in favor of read_hyde32.c
+ 
  read one year/band of crop, pasture, and urban data into crop_grid[NUM_CELLS], pasture_grid[NUM_CELLS], and urban_grid[NUM_CELLS]
  area is in km^2
  
@@ -24,7 +27,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_lu_hyde(args_struct in_args, int year, float* crop_grid, float* pasture_grid, float* urban_grid) {
     

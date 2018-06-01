@@ -14,7 +14,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 /********
  int get_float_field(char *line, const char *delim, int findex, float *fltval)

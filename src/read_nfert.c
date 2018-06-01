@@ -4,6 +4,8 @@
  deprecated and removed from lds target
     the original processing ported here was wrong
  
+ the input argument still exists, however, in the event that this gets fixed
+ 
  read the nitrogen application rate (kg/ha) into nfert_grid[NUM_CELLS]
  values range from 0 to ~221
  no nodata value
@@ -25,7 +27,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_nfert(char *fname, float *nfert_grid, args_struct in_args) {
     

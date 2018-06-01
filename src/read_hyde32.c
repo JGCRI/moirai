@@ -30,7 +30,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float* crop_grid, float* pasture_grid, float* urban_grid, float** lu_detail_area) {
 	

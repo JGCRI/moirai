@@ -21,8 +21,8 @@
 		4AC95E671FBD165D00ABE415 /* get_in_args.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E2E1FBD165D00ABE415 /* get_in_args.c */; };
 		4AC95E681FBD165D00ABE415 /* get_land_cells.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E2F1FBD165D00ABE415 /* get_land_cells.c */; };
 		4AC95E691FBD165D00ABE415 /* get_systime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E301FBD165D00ABE415 /* get_systime.c */; };
-		4AC95E6A1FBD165D00ABE415 /* init_lds.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E311FBD165D00ABE415 /* init_lds.c */; };
-		4AC95E6B1FBD165D00ABE415 /* lds_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E321FBD165D00ABE415 /* lds_main.c */; };
+		4AC95E6A1FBD165D00ABE415 /* init_moirai.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E311FBD165D00ABE415 /* init_moirai.c */; };
+		4AC95E6B1FBD165D00ABE415 /* moirai_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E321FBD165D00ABE415 /* moirai_main.c */; };
 		4AC95E6C1FBD165D00ABE415 /* parse_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E331FBD165D00ABE415 /* parse_utils.c */; };
 		4AC95E6D1FBD165D00ABE415 /* proc_land_type_area.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */; };
 		4AC95E6E1FBD165D00ABE415 /* proc_mirca.c in Sources */ = {isa = PBXBuildFile; fileRef = 4AC95E351FBD165D00ABE415 /* proc_mirca.c */; };
@@ -101,8 +101,8 @@
 		4AC95E2E1FBD165D00ABE415 /* get_in_args.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_in_args.c; sourceTree = "<group>"; };
 		4AC95E2F1FBD165D00ABE415 /* get_land_cells.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_land_cells.c; sourceTree = "<group>"; };
 		4AC95E301FBD165D00ABE415 /* get_systime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = get_systime.c; sourceTree = "<group>"; };
-		4AC95E311FBD165D00ABE415 /* init_lds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init_lds.c; sourceTree = "<group>"; };
-		4AC95E321FBD165D00ABE415 /* lds_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lds_main.c; sourceTree = "<group>"; };
+		4AC95E311FBD165D00ABE415 /* init_moirai.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init_moirai.c; sourceTree = "<group>"; };
+		4AC95E321FBD165D00ABE415 /* moirai_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = moirai_main.c; sourceTree = "<group>"; };
 		4AC95E331FBD165D00ABE415 /* parse_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = parse_utils.c; sourceTree = "<group>"; };
 		4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_land_type_area.c; sourceTree = "<group>"; };
 		4AC95E351FBD165D00ABE415 /* proc_mirca.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proc_mirca.c; sourceTree = "<group>"; };
@@ -203,8 +203,8 @@
 				4AC95E2E1FBD165D00ABE415 /* get_in_args.c */,
 				4AC95E2F1FBD165D00ABE415 /* get_land_cells.c */,
 				4AC95E301FBD165D00ABE415 /* get_systime.c */,
-				4AC95E311FBD165D00ABE415 /* init_lds.c */,
-				4AC95E321FBD165D00ABE415 /* lds_main.c */,
+				4AC95E311FBD165D00ABE415 /* init_moirai.c */,
+				4AC95E321FBD165D00ABE415 /* moirai_main.c */,
 				4AC95E331FBD165D00ABE415 /* parse_utils.c */,
 				4AC95E341FBD165D00ABE415 /* proc_land_type_area.c */,
 				4A958FFE201135FB003EA702 /* proc_lulc_area.c */,
@@ -341,7 +341,7 @@
 				4AC95E841FBD165E00ABE415 /* read_region_info_gcam.c in Sources */,
 				4AC95E641FBD165D00ABE415 /* copy_to_destpath.c in Sources */,
 				4AC95E951FBD165E00ABE415 /* write_text_char.c in Sources */,
-				4AC95E6B1FBD165D00ABE415 /* lds_main.c in Sources */,
+				4AC95E6B1FBD165D00ABE415 /* moirai_main.c in Sources */,
 				4A01C4C41FE09FCE00FF5A15 /* read_lulc_land.c in Sources */,
 				4AC95E731FBD165D00ABE415 /* read_aez_new_info.c in Sources */,
 				4AC95E931FBD165E00ABE415 /* write_raster_short.c in Sources */,
@@ -365,7 +365,7 @@
 				4AC95E611FBD165D00ABE415 /* calc_refveg_area.c in Sources */,
 				4AC95E601FBD165D00ABE415 /* calc_harvarea_prod_out_crop_aez.c in Sources */,
 				4AC95E651FBD165D00ABE415 /* get_aez_val.c in Sources */,
-				4AC95E6A1FBD165D00ABE415 /* init_lds.c in Sources */,
+				4AC95E6A1FBD165D00ABE415 /* init_moirai.c in Sources */,
 				4AC95E7C1FBD165D00ABE415 /* read_lulc_info.c in Sources */,
 				4AC95E661FBD165D00ABE415 /* get_cell_area.c in Sources */,
 				4AC95E921FBD165E00ABE415 /* write_raster_int.c in Sources */,

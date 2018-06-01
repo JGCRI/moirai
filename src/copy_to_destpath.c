@@ -26,7 +26,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int copy_to_destpath(args_struct in_args) {
     
@@ -109,9 +109,9 @@ int copy_to_destpath(args_struct in_args) {
         return ERROR_COPY;
     }
     
-    // potential vegetation carbon
+    // reference vegetation carbon
     strcpy(fname, in_args.outpath);
-    strcat(fname, in_args.potveg_carbon_fname);
+    strcat(fname, in_args.refveg_carbon_fname);
     strcpy(sys_string, cp_str);
     strcat(sys_string, fname);
     strcat(sys_string, space_str);

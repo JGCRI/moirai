@@ -28,7 +28,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args) {
     

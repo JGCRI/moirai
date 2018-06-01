@@ -32,7 +32,7 @@
  
  also initialize the land mask arrays to 0
  
- the num_land_cells_#### variables are initialized in init_lds.c
+ the num_land_cells_#### variables are initialized in init_moirai.c
  
  recall that serbia and montenegro have separate raster fao code values but are processed merged
     so need to assign the proper gcam region based on the merged fao code
@@ -65,7 +65,7 @@
  
  **********/
 
-#include "lds.h"
+#include "moirai.h"
 
 int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 	
