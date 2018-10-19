@@ -1,15 +1,15 @@
 ######
-# plot_moirai_crop_raez.r
+# plot_moirai_crop_rglu.r
 #
-# calc stats and make plots of the GCAM raez (aez by region) level production and harvested area outputs from lds and genaez
-#	harvested area is in ha: LDS_ag_HA_ha.csv
-#	production is in metric tonnes: LDS_ag_prod_t.csv
+# calc stats and make plots of the GCAM rglu (glu by region) level production and harvested area outputs from moirai lds and genaez
+#	harvested area is in ha: MOIRAI_ag_HA_ha.csv
+#	production is in metric tonnes: MOIRAI_ag_prod_t.csv
 #
 #	these inputs are rounded to the integer
 #	the working directory should be:
-#	 .../lds/diagnostics/
+#	 .../moirai/diagnostics/
 #
-# compare the LDS raez level data with GENAEZECON original raez data and reigonalized GTAP data
+# compare the Moirai LDS rglu level data with GENAEZECON original rglu data and reigonalized GTAP data
 #  
 # all files should not have any missing or NA values
 # input zeros represent no data
@@ -21,26 +21,28 @@
 # second column is crop name
 # next 18 columns are the climate aezs in order 1-18
 #
-# LDS data format
+# Moirai LDS data format
 # six header lines (the sixth contains the column labels)
 # no zero values
 # four colums: reglr_iso, glu_code, use_sector, value
 
 # NOTE:
-#  ks tests and difference stats are invalid when the aez numbers do not match
-#  these are somewhat useful when looking at small shifts between the same number and numbering scheme of AEZs
+#  ks tests and difference stats are invalid when the glu numbers do not match
+#  these are somewhat useful when looking at small shifts between the same number and numbering scheme of GLUs
 
-# LDS is dependent on the gcam region set for some diagnostics, including the region mapping file used here
+# Moirai LDS is dependent on the gcam region set for some diagnostics, including the region mapping file used here
 
-# modified oct 2015 to read in LDS output as new aezs
+# modified oct 2015 to read in Moirai LDS output as new aezs
 # modified 19 may 2015 to generate some grayscale plots for the paper
 
-# ?this script takes about 20 minutes to run for 32reg and 10 minutes to run for 14 regions, with 18 aezs?
-# with 235 basins it took about 24 hours for 32 regions
+# note that "aez" in this code now more generally means or refers to "glu"
+
+# this takes about 24 hours for gtap countries and 18 glus
+# the outputs make sense only for comparing the original 18 aezs to gtap and the original version of moirai
 
 library(stringr)
 
-cat("started plot_moirai_crop_raez.r at ",date(), "\n")
+cat("started plot_moirai_crop_rglu.r at ",date(), "\n")
 
 setwd("./")
 
@@ -51,16 +53,16 @@ REG32 = TRUE
 papergray = FALSE
 
 # this is the new data directory
-newdir = "../outputs/basins235_test/"
+newdir = "../outputs/aez_orig_sage/"
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_test_stats_raez/", sep="")
+outdir = paste("./aez_orig_sage_stats_rglu/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # input data files
 
-prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
-areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+prodname = paste(newdir,"MOIRAI_ag_prod_t.csv", sep="")
+areaname = paste(newdir,"MOIRAI_ag_HA_ha.csv", sep="")
 prodname_orig = "./GENAEZECON_ag_prod_t.csv"
 areaname_orig = "./GENAEZECON_ag_HA_ha.csv"
 prodname_gtap = "./GTAP_ag_prod_t.csv"
@@ -84,23 +86,23 @@ cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
 if (GTAP) {
     num_region = 226
     # output names
-    ptag_raez = "_raez_gtap.pdf"
-    ctag_raez = "_raez_gtap.csv"
+    ptag_raez = "_rglu_gtap.pdf"
+    ctag_raez = "_rglu_gtap.csv"
 } else {
     if (REG32) {
         num_region = 32
         # 2 columns, 4 header lines:
         region_gcam_fname = "../indata/GCAM_region_names_32reg.csv"
         # output names
-        ptag_raez = "_raez_32reg.pdf"
-        ctag_raez = "_raez_32reg.csv"
+        ptag_raez = "_rglu_32reg.pdf"
+        ctag_raez = "_rglu_32reg.csv"
     } else {
         num_region = 14
         # 2 columns, 4 header lines:
         region_gcam_fname = "../indata/GCAM_region_names_14reg.csv"
         # output names
-        ptag_raez = "_raez_14reg.pdf"
-        ctag_raez = "_raez_14reg.csv"
+        ptag_raez = "_rglu_14reg.pdf"
+        ctag_raez = "_rglu_14reg.csv"
     }
 }
 
@@ -108,7 +110,7 @@ if (GTAP) {
 # this file determines which countries are in the LDS output file
 countryname_lds = "../indata/FAO_ctry_GCAM_ctry87.csv"
 
-num_ctry = 231			# number of countries in the lds outputs
+num_ctry = 231			# number of countries in the moirai lds outputs
 num_ctry_gtap = 226
 num_crop = 175
 num_aez = 235
@@ -183,8 +185,8 @@ countrycode_gtap = as.integer(unlist(temp[1]))
 countryabbr_gtap = unlist(temp[2])
 countryname_gtap = unlist(temp[3])
 
-# lds iso country info
-# not all of the countries in this mapping file are in the lds output
+# moirai lds iso country info
+# not all of the countries in this mapping file are in the moirai lds output
 temp<-scan(countryname_lds, what=as.list(character(5)), skip=1, sep = ",", quote = "\"")
 countrycode_lds_all = as.integer(unlist(temp[1]))
 countryabbr_lds_all = unlist(temp[2])
@@ -202,7 +204,7 @@ ctry_names[] = NA
 if (GTAP) {
     region_codes = countrycode_gtap
     region_names = countryname_gtap
-    # get the full list of lds input country gtap country codes
+    # get the full list of moirai lds input country gtap country codes
     regioncode_gcam = array(dim=length(countrycode_lds_all))
     regioncode_gcam[] = NA
     for (i in 1:length(countrycode_lds_all)) {
@@ -219,7 +221,7 @@ if (GTAP) {
     temp<-scan(region_gcam_fname, what=as.list(character(2)), skip=4, sep = ",", quote = "\"")
     region_codes = as.integer(unlist(temp[1]))
     region_names = unlist(temp[2])
-    # get the full list of lds input country to gcam region codes
+    # get the full list of moirai lds input country to gcam region codes
     temp<-scan(ldsgcamregion_fname, what=as.list(character(1)), skip=0, sep = ",", quote = "\"")
     regioncode_gcam = as.integer(unlist(temp[1]))
 }
@@ -241,7 +243,7 @@ for(i in 1:length(countrycode_lds_all)) {
 
 # put the data in a 3d array
 
-cat("filling lds 3d arrays\n")
+cat("filling moirai lds 3d arrays\n")
 for(j in 1:num_ctry) {
     for(k in 1:num_crop) {
         s = subset(prod_in, ctry_iso == ctry_abbrs[j] & SAGE_crop == crop_names[k])
@@ -263,7 +265,7 @@ for(i in 1:num_aez_gtap) {
 	area_col_gtap = as.double(unlist(area_in_gtap[i+num_colskip]))
 	for(j in 1:num_ctry_gtap) {
 		out_index = 0
-		# get the out lds country index
+		# get the out moirai lds country index
 		for(k in 1:num_ctry) {
 			if(countryabbr_gtap[j] == ctry_abbrs[k]) {
 				out_index = k
@@ -294,8 +296,8 @@ for(j in 1:num_crop) {
 	cat("processing crop", j, crop_names[j], "\n")
 	oname_prod = paste(outdir, crop_names[j], "_prod_t", ctag_raez, sep="")
 	oname_area = paste(outdir, crop_names[j], "_harvarea_ha", ctag_raez, sep="")
-	cat("region,aez,new,orig,gtap,new-orig,new-gtap,orig-gtap,(new-orig)/orig*100,(new-gtap)/gtap*100,(orig-gtap)/gtap*100", sep = "", file = oname_prod)
-	cat("region,aez,new,orig,gtap,new-orig,new-gtap,orig-gtap,(new-orig)/orig,(new-gtap)/gtap,(orig-gtap)/gtap", sep = "", file = oname_area)
+	cat("region,glu,new,orig,gtap,new-orig,new-gtap,orig-gtap,(new-orig)/orig*100,(new-gtap)/gtap*100,(orig-gtap)/gtap*100", sep = "", file = oname_prod)
+	cat("region,glu,new,orig,gtap,new-orig,new-gtap,orig-gtap,(new-orig)/orig,(new-gtap)/gtap,(orig-gtap)/gtap", sep = "", file = oname_area)
 	
 	# initialize arrays to store values for this crop
 	prod_raez[,] = 0.0
@@ -654,7 +656,7 @@ for(j in 1:num_crop) {
 	pdf(file=oname_prod,paper="letter")
 	par(mar = c(6, 4, 4, 2) + 0.1)
 	
-	title = paste(crop_names[j], "LDS")
+	title = paste(crop_names[j], "Moirai")
 	num_vals = length(prod_raez_valid)
 	if(num_vals != 0) {
 		sub = paste("# of valid values", num_vals)
@@ -696,25 +698,25 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 1000):(xmax / 1000)) * 1000
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(prod_diff_raez_orig[prod_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_diff_raez_orig[prod_diff_orig_inds]), digits = 2)
 		stddev = round(sd(prod_diff_raez_orig[prod_diff_orig_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing original values", prod_num_new_no_orig, "; # of missing LDS values", prod_num_orig_no_new)
+			"# of missing original values", prod_num_new_no_orig, "; # of missing Moirai values", prod_num_orig_no_new)
 		prod_diff_raez_orig_valid_hist = hist(prod_diff_raez_orig[prod_diff_orig_inds], main = title, xlab = "Production difference (t)",
 			breaks = breaks)
 		title(sub = sub, line = 5)
 	}
 	
-	title = paste(crop_names[j], "LDS - GTAP")
+	title = paste(crop_names[j], "Moirai - GTAP")
 	num_vals = length(prod_diff_raez_gtap[prod_diff_gtap_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_diff_raez_gtap[prod_diff_gtap_inds]), digits = 2)
 		stddev = round(sd(prod_diff_raez_gtap[prod_diff_gtap_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing gtap values", prod_num_new_no_gtap, "; # of missing LDS values", prod_num_orig_no_new)
+			"# of missing gtap values", prod_num_new_no_gtap, "; # of missing Moirai values", prod_num_orig_no_new)
 		prod_diff_raez_gtap_valid_hist = hist(prod_diff_raez_gtap[prod_diff_gtap_inds], main = title, xlab = "Production difference (t)",
 			breaks = breaks)
 		title(sub = sub, line = 5)
@@ -747,13 +749,13 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(prod_pctdiff_raez_orig[prod_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_pctdiff_raez_orig[prod_diff_orig_inds]), digits = 2)
 		stddev = round(sd(prod_pctdiff_raez_orig[prod_diff_orig_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing original values", prod_num_new_no_orig, "; # of missing LDS values", prod_num_orig_no_new)
+			"# of missing original values", prod_num_new_no_orig, "; # of missing Moirai values", prod_num_orig_no_new)
 		prod_pctdiff_raez_orig_valid_hist = hist(prod_pctdiff_raez_orig[prod_diff_orig_inds], main = title, xlab = "% Production difference",
 			breaks = breaks)
 		title(sub = sub, line = 5)
@@ -774,13 +776,13 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - GTAP")
+	title = paste(crop_names[j], "Moirai - GTAP")
 	num_vals = length(prod_pctdiff_raez_gtap[prod_diff_gtap_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_pctdiff_raez_gtap[prod_diff_gtap_inds]), digits = 2)
 		stddev = round(sd(prod_pctdiff_raez_gtap[prod_diff_gtap_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing gtap values", prod_num_new_no_gtap, "; # of missing LDS values", prod_num_orig_no_new)
+			"# of missing gtap values", prod_num_new_no_gtap, "; # of missing Moirai values", prod_num_orig_no_new)
 		prod_pctdiff_raez_gtap_valid_hist = hist(prod_pctdiff_raez_gtap[prod_diff_gtap_inds], main = title, xlab = "% Production difference",
 			breaks = breaks)
 		title(sub = sub, line = 5)
@@ -816,7 +818,7 @@ for(j in 1:num_crop) {
 	pdf(file=oname_area,paper="letter")
 	par(mar = c(6, 4, 4, 2) + 0.1)
 	
-	title = paste(crop_names[j], "LDS")
+	title = paste(crop_names[j], "Moirai")
 	num_vals = length(area_raez_valid)
 	if(num_vals != 0) {
 		sub = paste("# of valid values", num_vals)
@@ -858,25 +860,25 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 1000):(xmax / 1000)) * 1000
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(area_diff_raez_orig[area_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_diff_raez_orig[area_diff_orig_inds]), digits = 2)
 		stddev = round(sd(area_diff_raez_orig[area_diff_orig_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing original values", area_num_new_no_orig, "; # of missing LDS values", area_num_orig_no_new)
+			"# of missing original values", area_num_new_no_orig, "; # of missing Moirai values", area_num_orig_no_new)
 		area_diff_raez_orig_valid_hist = hist(area_diff_raez_orig[area_diff_orig_inds], main = title, xlab = "Harvested area difference (ha)",
 			breaks = breaks)
 		title(sub = sub, line = 5)
 	}
 	
-	title = paste(crop_names[j], "LDS - GTAP")
+	title = paste(crop_names[j], "Moirai - GTAP")
 	num_vals = length(area_diff_raez_gtap[area_diff_gtap_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_diff_raez_gtap[area_diff_gtap_inds]), digits = 2)
 		stddev = round(sd(area_diff_raez_gtap[area_diff_gtap_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing gtap values", area_num_new_no_gtap, "; # of missing LDS values", area_num_orig_no_new)
+			"# of missing gtap values", area_num_new_no_gtap, "; # of missing Moirai values", area_num_orig_no_new)
 		area_diff_raez_gtap_valid_hist = hist(area_diff_raez_gtap[area_diff_gtap_inds], main = title, xlab = "Harvested area difference (ha)",
 			breaks = breaks)
 			title(sub = sub, line = 5)
@@ -910,13 +912,13 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(area_pctdiff_raez_orig[area_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_pctdiff_raez_orig[area_diff_orig_inds]), digits = 2)
 		stddev = round(sd(area_pctdiff_raez_orig[area_diff_orig_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing original values", area_num_new_no_orig, "; # of missing LDS values", area_num_orig_no_new)
+			"# of missing original values", area_num_new_no_orig, "; # of missing Moirai values", area_num_orig_no_new)
 		area_pctdiff_raez_orig_valid_hist = hist(area_pctdiff_raez_orig[area_diff_orig_inds], main = title, xlab = "% Harvested area difference",
 			breaks = breaks)
 		title(sub = sub, line = 5)
@@ -938,13 +940,13 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - GTAP")
+	title = paste(crop_names[j], "Moirai - GTAP")
 	num_vals = length(area_pctdiff_raez_gtap[area_diff_gtap_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_pctdiff_raez_gtap[area_diff_gtap_inds]), digits = 2)
 		stddev = round(sd(area_pctdiff_raez_gtap[area_diff_gtap_inds]), digits = 2)
 		sub = paste("# of valid values", num_vals, "; mean =", avg, "; stddev =", stddev, "\n",
-			"# of missing gtap values", area_num_new_no_gtap, "; # of missing LDS values", area_num_orig_no_new)
+			"# of missing gtap values", area_num_new_no_gtap, "; # of missing Moirai values", area_num_orig_no_new)
 		area_pctdiff_raez_gtap_valid_hist = hist(area_pctdiff_raez_gtap[area_diff_gtap_inds], main = title, xlab = "% Harvested area difference",
 			breaks = breaks)
 		title(sub = sub, line = 5)
@@ -1005,7 +1007,7 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "black", lwd = 2)
 	lines(gtap_x, gtap_y, lty = 4, col = "blue3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
-	legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Original AEZs", "LDS AEZs"), col = c("blue3", "red3", "black"), lwd = 2)
+	legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Original GLUs", "Moirai GLUs"), col = c("blue3", "red3", "black"), lwd = 2)
 	par(new=FALSE)
 	
 	# plot the above comparison using CDFs
@@ -1041,12 +1043,12 @@ for(j in 1:num_crop) {
 		lines(new_x, new_y, lty = 1, col = "black", lwd = 2)
 		lines(gtap_x, gtap_y, lty = 4, col = "gray60", lwd = 2)
 		lines(orig_x, orig_y, lty = 2, col = "gray30", lwd = 2)
-		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "LDS original AEZs", "LDS AEZs"), col = c("gray60", "gray30", "black"), lwd = 2)
+		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai original GLUs", "Moirai GLUs"), col = c("gray60", "gray30", "black"), lwd = 2)
 	} else {
 		lines(new_x, new_y, lty = 1, col = "black", lwd = 2)
 		lines(gtap_x, gtap_y, lty = 4, col = "blue3", lwd = 2)
 		lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
-		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Original AEZs", "LDS AEZs"), col = c("blue3", "red3", "black"), lwd = 2)
+		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Original GLUs", "Moirai GLUs"), col = c("blue3", "red3", "black"), lwd = 2)
 	}
 	
 	par(new=FALSE)
@@ -1079,7 +1081,7 @@ for(j in 1:num_crop) {
 	#	col = "gray90", space = 0, axes = FALSE, axisnames = FALSE, add = TRUE, legend.text = "New - GTAP")
 	lines(orig_x, orig_y, lty = 2, lwd = 2)
 	lines(new_x, new_y, lty = 1, lwd = 2)
-	legend(x = "topright", lty = c(2, 1), legend = c("Original - GTAP", "LDS - GTAP"), lwd = 2)
+	legend(x = "topright", lty = c(2, 1), legend = c("Original - GTAP", "Moirai - GTAP"), lwd = 2)
 	par(new=FALSE)
 	
 	}	 # end if(FALSE)
@@ -1120,7 +1122,7 @@ for(j in 1:num_crop) {
 	#lines(new_x, new_y, lty = 4, col = "blue", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
 	#legend(x = "topright", lty = c(2, 4, 1), legend = c("Original - GTAP", "New - GTAP", "New - Original"), lwd = 2)
-	legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - GTAP", "LDS AEZs - Original AEZs"), col = c("red3", "black"), lwd = 2)
+	legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - GTAP", "Moirai GLUs - Original GLUs"), col = c("red3", "black"), lwd = 2)
 	par(new=FALSE)
 	
 	dev.off()	# close production histogram comparison file
@@ -1157,7 +1159,7 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "black", lwd = 2)
 	lines(gtap_x, gtap_y, lty = 4, col = "blue3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
-	legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Original AEZs", "LDS AEZs"), col = c("blue3", "red3", "black"), lwd = 2)
+	legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Original GLUs", "Moirai GLUs"), col = c("blue3", "red3", "black"), lwd = 2)
 	par(new=FALSE)
 	
 	# plot the above comparison using CDFs
@@ -1191,7 +1193,7 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "black", lwd = 2)
 	lines(gtap_x, gtap_y, lty = 4, col = "blue3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
-	legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Original AEZs", "LDS AEZs"), col = c("blue3", "red3", "black"), lwd = 2)
+	legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Original GLUs", "Moirai GLUs"), col = c("blue3", "red3", "black"), lwd = 2)
 	par(new=FALSE)
 	
 	#### !!!!!! differences are not valid for raezs because there is not correspondence between the new and old aezs !!!!!!!!!
@@ -1231,7 +1233,7 @@ for(j in 1:num_crop) {
 	lines(orig_x, orig_y, lty = 3, lwd = 2)
 	lines(new_x, new_y, lty = 2, lwd = 2)
 	lines(nod_x, nod_y, lty = 1, lwd = 2)
-	legend(x = "topright", lty = c(3, 2, 1), legend = c("Original - GTAP", "New - GTAP", "LDS - Original"), lwd = 2)
+	legend(x = "topright", lty = c(3, 2, 1), legend = c("Original - GTAP", "New - GTAP", "Moirai - Original"), lwd = 2)
 	par(new=FALSE)
 	
 	# plot the % difference histograms of new-orig and new-gtap and orig-gtap together on linear axes
@@ -1270,11 +1272,11 @@ for(j in 1:num_crop) {
 	#lines(new_x, new_y, lty = 4, col = "blue", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "red3", lwd = 2)
 	#legend(x = "topright", lty = c(2, 4, 1), legend = c("Original - GTAP", "New - GTAP", "New - Original"), lwd = 2)
-	legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - GTAP", "LDS AEZs - Original AEZs"), col = c("red3", "black"), lwd = 2)
+	legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - GTAP", "Moirai GLUs - Original GLUs"), col = c("red3", "black"), lwd = 2)
 	par(new=FALSE)
 	
 	dev.off()	# close harvested area histogram comparison file
 	
 }	# end for j loop over crop
 
-cat("finished plot_moirai_crop_raez.r at ",date(), "\n")
+cat("finished plot_moirai_crop_rglu.r at ",date(), "\n")

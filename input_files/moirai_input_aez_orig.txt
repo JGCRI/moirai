@@ -5,19 +5,24 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-0			# recalibrate: 0 = no, 1 = yes; this is hardcoded to zero because it is not working properly
-0			# diagnostics: 0 = no, 1 = yes
+1			# diagnostics: 0 = no, 1 = yes
+
+# data years for recalibration
+0			# out_year_prod_ha_lr: output year for crop production, harvest area, and land rent
+2000		# in_year_sage_crops: input year of the 175 crop harvest area and yield data
+2001		# out_year_usd: the output US dollar value year for land rent
+2001		# in_year_lr_usd: the US dollar value year for the input land rent data
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./outputs/aez_orig/                       				# outpath: path to output files
+./outputs/aez_orig_sage/                       				# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./outputs/aez_orig/aglu-data/moirai/     					# ldsdestpath: destination path for the gcam data system input files
-./outputs/aez_orig/aglu-data/mappings/     				# mapdestpath: destination path for the gcam data system mapping files
+./outputs/aez_orig_sage/aglu-data/moirai/     					# ldsdestpath: destination path for the gcam data system input files
+./outputs/aez_orig_sage/aglu-data/mappings/     				# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
@@ -44,11 +49,11 @@ SAGE_PVLT.csv				# lt_sage_fname: SAGE land cover types for potential vegetation
 hyde32_lu.csv				# lu_hyde_fname: HYDE land use types
 isam_2_sage_hyde_mapping.csv	# lulc_fname: LULC types and mapping to sage and hyde
 SAGE_gtap_fao_crop2use.csv	# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
-FAO_ag_prod_t_PRODSTAT_11yrs.csv				# production_fao_fname: FAO production data
-FAO_ag_yield_hg_ha_PRODSTAT_11yrs.csv			# yield_fao_fname: FAO yield data
-FAO_ag_HA_ha_PRODSTAT_11yrs.csv					# harvestarea_fao_fname: FAO harvest area data
-FAO_ag_an_prodprice_USD_t_PRICESTAT_11yrs.csv	# prodprice_fao_fname: FA0 production price data
-convert_to_2001usd.csv		# convert_usd_fname: divisors for converting USD from one year to another
+FAO_production_1993_2016.csv	# production_fao_fname: FAO production data
+FAO_yield_1993_2016.csv			# yield_fao_fname: FAO yield data
+FAO_harvarea_1993_2016.csv		# harvestarea_fao_fname: FAO harvest area data
+FAO_producerprice_1993_2016.csv	# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
+cpi_all_1970_2017_bls_june2018_annual.csv		# convert_usd_fname: consumer price index table to convert from one US dollar year to another
 veg_carbon.csv              # vegc_csv_fname: potential vegetation carbon table (kg/m^2)
 soil_carbon.csv             # soilc_csv_fname: soil carbon table (kg/m^2)
 

@@ -112,7 +112,7 @@ int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid) {
     {
         // gunzip this file
         strcpy(lname, "gunzip -k ");
-        strcpy(lname, in_args.lulcpath);
+        strcat(lname, in_args.lulcpath);
         strcat(lname, basename);
 		sprintf(tmp_str, "%i%s", year, ncgztag);
         strcat(lname, tmp_str);

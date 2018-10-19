@@ -1,28 +1,32 @@
 ######
 # plot_moirai_crop_ctry.r
 #
+# note that the Moirai land data system is sometimes labelled as "lds"
+#	and "Original" refers to GENAEZECON, the first version of the land data system, or GTAP,
+#		both of which use only 18 AEZs (the included data are for the original GTAP 18 AEZs)
+#
 # modified 19 may 2015 to add a couple of grayscale plots for the paper
-# modified from plot_crop_ctry.r oct 2015 to accommodate LDS outputs
+# modified from plot_crop_ctry.r oct 2015 to accommodate Moirai LDS outputs
 # addtional modification through jan 2016
 #
-# calc stats and make plots of the country level production and harvested area outputs from lds
-#	harvested area is in ha (LDS_ag_HA_ha.csv)
-#	production is in metric tonnes (LDS_ag_prod_t.csv)
+# calc stats and make plots of the country level production and harvested area outputs from moirai lds
+#	harvested area is in ha (MOIRAI_ag_HA_ha.csv)
+#	production is in metric tonnes (MOIRAI_ag_prod_t.csv)
 # 		
 #	these inputs are rounded to the integer
-#	the bworking directory is expected to be:
-#	 .../lds/diagnostics/
+#	the working directory is expected to be:
+#	 .../moirai/diagnostics/
 #
-# compare the LDS country data with original (either GTAP or GENAEZECON data) and FAO data
+# compare the Moirai LDS country data with Original (either GTAP or GENAEZECON data) and FAO data
 # FAO data need to be averaged over the years 1997 - 2003
-#  these are the lds diagnostic outputs, so the area is in km^2, and are rounded to 2 digits, so need to be rounded here
+#  these fao data are the moirai lds diagnostic outputs, so the area is in km^2, and are rounded to 2 digits, so need to be rounded here
 # all files should not have any missing or NA values
 # zeros represent no data
 #
 # also calculate regressions across the dataset pairs for prodcution and area for each crop
 #  average regression outputs across crops for a summary plot (set a minimum crop regression sample size to use here)
 #
-# LDS data format
+# Moirai LDS data format
 # six header lines (the sixth contains the column labels)
 # no zero values
 # four colums: reglr_iso, glu_code, use_sector, value
@@ -36,56 +40,65 @@
 #
 # FAO data format
 # no header line
-# 235 FAO countries, 175 GTAP crops, 11 years (1997-2007)
+# 235 FAO countries, 175 GTAP crops, 24 years (1993-2016)
 # column 1: country code
 # column 2: crop code
-# columns 3 - 13: values for years 1997 - 2007 in order
+# columns 3 - 26: values for years 1993 - 2016 in order
 
-# this takes about 36 minutes to run
-#	sugar cane takes at least 12 minutes, and that is after I removed two difference plots from sugar cane
-# then i ran the full one with all the sugar cane plots and it took only 17 minutes (same for the 235 aezs)
+# this takes about 25 minutes to run with 235 moirai glus
 
 library(stringr)
 
 cat("started plot_moirai_crop_ctry.r at ",date(), "\n")
 
-# make sure that the working directory is .../lds/diagnostics
-setwd("./")
+# make sure that the working directory is .../moirai/diagnostics
+#setwd("./")
 
 # compare against gtap or older genaezecon output output
-# comparing to another lds output should be identical because the outputs are aggregated to country (unless a new source data set is used)
+# comparing to another moirai lds output should be identical because the outputs are aggregated to country (unless a new source data set is used)
 gtap = TRUE
 
 # plot the paper figures in grayscale
 papergray = FALSE
 
 # this is the new data directory
-newdir = "../outputs/basins235_test/"
+newdir = "../outputs/basins235_sage/"
+#newdir = "../outputs/aez_orig_sage/"
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_test_stats_ctry_gtap/", sep="")
+outdir = paste("./basins235_sage_stats_ctry_gtap/", sep="")
+#outdir = paste("./aez_orig_sage_stats_ctry_gtap/", sep="")
 dir.create(outdir, recursive = TRUE)
+
+# fao info
+fao_avg_year = 2000
+num_faoavg = 7
+fao_start_year = 1993
+fao_end_year= 2016
+num_faoyears = fao_end_year - fao_start_year + 1
+fao_meta_cols = 2
+fao_startavg = (fao_avg_year - num_faoavg %/% 2) - fao_start_year + 1
 
 # output names
 ptag_ctry = "_ctry.pdf"
 ctag_ctry = "_ctry.csv"
 
-# number of GLUs in current lds output
+# number of GLUs in current moirai lds output
 num_aez = 235
 # number of gtap AEZs
 num_aez_gtap = 18
 # country counts
-num_ctry = 231			# number of countries output by lds
-num_ctry_fao = 235		# number of countries in fao diagnostic output from lds
+num_ctry = 231			# number of countries output by moirai lds
+num_ctry_fao = 235		# number of countries in fao diagnostic output from moirai lds
 num_ctry_gtap = 226		# number of gtap/genaezecon countries
 
 # input data files
-# the fao files are diagnostic lds outputs
+# the fao files are diagnostic moirai lds outputs
 
 if(gtap) {
-	# use lds "new" data
-	prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
-	areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+	# use moirai lds "new" data vs gtap and fao
+	prodname = paste(newdir,"MOIRAI_ag_prod_t.csv", sep="")
+	areaname = paste(newdir,"MOIRAI_ag_HA_ha.csv", sep="")
 	prodname_fao = paste(newdir,"production_fao.csv", sep="")
 	areaname_fao = paste(newdir,"harvestarea_fao.csv", sep="")
 	# and compare with the gtap data
@@ -94,9 +107,9 @@ if(gtap) {
 	num_aez_ref = num_aez_gtap
 	num_ctry_ref = num_ctry_gtap
 } else {
-	# use "new" lds output for new aezs and a reference lds output for original aezs
-	prodname = paste(newdir,"LDS_ag_prod_t.csv", sep="")
-	areaname = paste(newdir,"LDS_ag_HA_ha.csv", sep="")
+	# use "new" moirai lds output for new glus and genaecon outputs for original 18 aezs, and also fao
+	prodname = paste(newdir,"MOIRAI_ag_prod_t.csv", sep="")
+	areaname = paste(newdir,"MOIRAI_ag_HA_ha.csv", sep="")
 	prodname_fao = paste(newdir,"production_fao.csv", sep="")
 	areaname_fao = paste(newdir,"harvestarea_fao.csv", sep="")
 	# and compare with the reference lds output
@@ -112,11 +125,6 @@ num_recs = num_ctry * num_crop
 num_recs_gtap = num_ctry_ref * num_crop
 num_colskip = 2
 lds_colskip = 3
-num_faoyears = 11
-num_faoavg = 7
-fao_startavg = 1
-#num_faoavg = 5
-#fao_startavg = 7
 
 # input mapping files
 # five columns, one header line
@@ -126,7 +134,7 @@ countryfname_gtap = "./GTAP_ctry_GCAM_ctry87.csv"
 countrymapfname = "../indata/FAO_iso_VMAP0_ctry.csv"
 
 # five columns, one header line
-# this file determines which countries are in the LDS output file
+# this file determines which countries are in the Moirai LDS output file
 countryfname_lds = "../indata/FAO_ctry_GCAM_ctry87.csv"
 # the crop names are here, fourth column, one header line
 cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
@@ -135,7 +143,7 @@ cropfname = "../indata/SAGE_gtap_fao_crop2use.csv"
 nhead_lds = 5
 intype_gtap = as.list(character(num_aez_ref + num_colskip))
 nhead = 6
-intype_fao = as.list(character(13))
+intype_fao = as.list(character(fao_meta_cols + num_faoyears))
 nhead_fao = 0
 intype_crop = as.list(character(8))
 nhead_crop = 1
@@ -227,7 +235,7 @@ min_faoorig_area = 9000000000
 max_faoorig_area = -9999
 
 # production output
-# the lds diagnostic outputs have no header lines, but are otherwise like the original format,
+# the moirai lds diagnostic outputs have no header lines, but are otherwise like the original format,
 #  but with integer country and crop codes, and without being rounded to integers
 
 # now read in the new format output files as data frames
@@ -263,8 +271,8 @@ countrymapname_gtap = unlist(temp[5])
 countrymapcode_gcam = as.integer(unlist(temp[6]))
 countrymapname_gcam = unlist(temp[7])
 
-# lds iso country info
-# not all of the countries in this mapping file are in the lds output
+# moirai lds iso country info
+# not all of the countries in this mapping file are in the moirai lds output
 temp<-scan(countryfname_lds, what=as.list(character(5)), skip=1, sep = ",", quote = "\"")
 countrycode_lds_all = as.integer(unlist(temp[1]))
 countryabbr_lds_all = unlist(temp[2])
@@ -288,12 +296,12 @@ for(i in 1:length(countrycode_lds_all)) {
 }
 
 if(ctry_index != num_ctry) {
-	cat("Error: did not fill lds ctry info correctly\n")
+	cat("Error: did not fill moirai lds ctry info correctly\n")
 }
 
 # put the data in 3d arrays
 
-cat("filling lds 3d arrays\n")
+cat("filling moirai lds 3d arrays\n")
 
 for(j in 1:num_ctry) {
 	for(k in 1:num_crop) {
@@ -313,7 +321,7 @@ for(i in 1:num_aez_ref) {
 	prod_col_orig = as.double(unlist(prod_in_orig[i+num_colskip]))
 	area_col_orig = as.double(unlist(area_in_orig[i+num_colskip]))
 	for(j in 1:num_ctry_ref) {
-		# get the lds index and process only if it is in the lds list (which it should be)
+		# get the moirai lds index and process only if it is in the moirai lds list (which it should be)
 		lds_index = 0
 		for(k in 1:num_ctry) {
 			if(countryabbr_gtap[j] == ctry_abbrs[k]) {
@@ -343,14 +351,14 @@ for(i in 1:num_faoavg) {
 	prod_col_fao = as.double(unlist(prod_in_fao[(i-1) + fao_startavg+num_colskip]))
 	area_col_fao = as.double(unlist(area_in_fao[(i-1) + fao_startavg+num_colskip])) * 100	# convert from km^2 to ha
 	for(j in 1:num_ctry_fao) {
-		# determine the lds country index, and process fao data if it exists
+		# determine the moirai lds country index, and process fao data if it exists
 		lds_index = 0
 		for(l in 1:num_ctry) {
 			if(countrymapcode_fao[j] == ctry_codes[l]) {
 				lds_index = l
 				break
 			}
-		}	# end for l loop to get lds index
+		}	# end for l loop to get moirai lds index
 		if(lds_index != 0) {
 			for(k in 1:num_crop) {
 				in_index = (j - 1) * num_crop + k
@@ -375,7 +383,7 @@ for(i in 1:num_faoavg) {
 					}
 				}	# end if production for this fao country
 			}	# end for k loop over number of crops
-		}	# end if corresponding lds country exists
+		}	# end if corresponding moirai lds country exists
 	}	# end for j loop over number of fao countries
 	# sum values across years
 	for(j in 1:num_ctry) {
@@ -399,7 +407,7 @@ if(gtap) {
 	cat("crop_harvarea,ds_new_orig,pv_new_orig,ds_new_fao,pv_new_fao,ds_orig_fao,pv_orig_fao", sep = "", file = ksname_area)
 }
 
-# aggregate LDS and GENAEZECON/GTAP to country and calc stats by crop
+# aggregate Moirai LDS and GENAEZECON/GTAP to country and calc stats by crop
 # also finalize fao averages
 for(j in 1:num_crop) {
 	cat("processing crop", j, crop_names[j], "\n")
@@ -748,7 +756,7 @@ for(j in 1:num_crop) {
 	pdf(file=oname_prod,paper="letter")
 	par(mar = c(6, 4, 4, 2) + 0.1)
 	
-	title = paste(crop_names[j], "LDS")
+	title = paste(crop_names[j], "Moirai")
 	num_vals = length(prod_ctry_valid)
 	if(num_vals != 0) {
 		sub = paste("# of valid values", num_vals)
@@ -790,7 +798,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 1000):(xmax / 1000)) * 1000
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(prod_diff_ctry_orig[prod_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_diff_ctry_orig[prod_diff_orig_inds]), digits = 2)
@@ -802,7 +810,7 @@ for(j in 1:num_crop) {
 		title(sub = sub, line = 5)
 	}
 	
-	title = paste(crop_names[j], "LDS - FAO")
+	title = paste(crop_names[j], "Moirai - FAO")
 	num_vals = length(prod_diff_ctry_fao[prod_diff_fao_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_diff_ctry_fao[prod_diff_fao_inds]), digits = 2)
@@ -841,7 +849,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(prod_pctdiff_ctry_orig[prod_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_pctdiff_ctry_orig[prod_diff_orig_inds]), digits = 2)
@@ -868,7 +876,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - FAO")
+	title = paste(crop_names[j], "Moirai - FAO")
 	num_vals = length(prod_pctdiff_ctry_fao[prod_diff_fao_inds])
 	if(num_vals != 0) {
 		avg = round(mean(prod_pctdiff_ctry_fao[prod_diff_fao_inds]), digits = 2)
@@ -910,7 +918,7 @@ for(j in 1:num_crop) {
 	pdf(file=oname_area,paper="letter")
 	par(mar = c(6, 4, 4, 2) + 0.1)
 	
-	title = paste(crop_names[j], "LDS")
+	title = paste(crop_names[j], "Moirai")
 	num_vals = length(area_ctry_valid)
 	if(num_vals != 0) {
 		sub = paste("# of valid values", num_vals)
@@ -952,7 +960,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 1000):(xmax / 1000)) * 1000
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(area_diff_ctry_orig[area_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_diff_ctry_orig[area_diff_orig_inds]), digits = 2)
@@ -964,7 +972,7 @@ for(j in 1:num_crop) {
 		title(sub = sub, line = 5)
 	}
 	
-	title = paste(crop_names[j], "LDS - FAO")
+	title = paste(crop_names[j], "Moirai - FAO")
 	num_vals = length(area_diff_ctry_fao[area_diff_fao_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_diff_ctry_fao[area_diff_fao_inds]), digits = 2)
@@ -1004,7 +1012,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - Original")
+	title = paste(crop_names[j], "Moirai - Original")
 	num_vals = length(area_pctdiff_ctry_orig[area_diff_orig_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_pctdiff_ctry_orig[area_diff_orig_inds]), digits = 2)
@@ -1032,7 +1040,7 @@ for(j in 1:num_crop) {
 		breaks = c((xmin / 2):(xmax / 2)) * 2
 	}
 	
-	title = paste(crop_names[j], "LDS - FAO")
+	title = paste(crop_names[j], "Moirai - FAO")
 	num_vals = length(area_pctdiff_ctry_fao[area_diff_fao_inds])
 	if(num_vals != 0) {
 		avg = round(mean(area_pctdiff_ctry_fao[area_diff_fao_inds]), digits = 2)
@@ -1105,9 +1113,9 @@ for(j in 1:num_crop) {
 	lines(orig_x, orig_y, lty = 4, col = "blue3", lwd = 2)
 	lines(new_x, new_y, lty = 2, col = "red3", lwd = 2)
 	if(gtap) {
-		legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 	} else {
-		legend(x = "topright", lty = c(4, 2, 1), legend = c("Original AEZs", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		legend(x = "topright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 	}
 	par(new=FALSE)
 	
@@ -1145,18 +1153,18 @@ for(j in 1:num_crop) {
 		lines(orig_x, orig_y, lty = 4, col = "gray60", lwd = 2)
 		lines(new_x, new_y, lty = 2, col = "gray30", lwd = 2)
 		if(gtap) {
-			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "LDS AEZs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
 		} else {
-			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original AEZs", "LDS AEZs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
 		}		
 	} else {
 		lines(fao_x, fao_y, lty = 1, col = "black", lwd = 2)
 		lines(orig_x, orig_y, lty = 4, col = "blue3", lwd = 2)
 		lines(new_x, new_y, lty = 2, col = "red3", lwd = 2)
 		if(gtap) {
-			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 		} else {
-			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original AEZs", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 		}
 	}
 	
@@ -1202,9 +1210,9 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "red3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "blue3", lwd = 2)
 	if(gtap) {
-		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	} else {
-		legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	}
 	par(new=FALSE)
 	
@@ -1233,9 +1241,9 @@ for(j in 1:num_crop) {
 		lines(new_x, new_y, lty = 1, col = "gray30", lwd = 2)
 		lines(orig_x, orig_y, lty = 2, col = "gray60", lwd = 2)
 		if(gtap) {
-			legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "LDS AEZs - FAO"), col = c("gray60", "gray30"), lwd = 2)
+			legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "Moirai GLUs - FAO"), col = c("gray60", "gray30"), lwd = 2)
 		} else {
-			legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+			legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 		}
 	} else {
 		#barplot(width = rep(2, num_bins), height = new_y, yaxt = "n", xaxt = "n",
@@ -1243,9 +1251,9 @@ for(j in 1:num_crop) {
 		lines(new_x, new_y, lty = 1, col = "red3", lwd = 2)
 		lines(orig_x, orig_y, lty = 2, col = "blue3", lwd = 2)
 		if(gtap) {
-			legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+			legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 		} else {
-			legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+			legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 		}
 	}
 	
@@ -1288,9 +1296,9 @@ for(j in 1:num_crop) {
 	lines(orig_x, orig_y, lty = 4, col = "blue3", lwd = 2)
 	lines(new_x, new_y, lty = 2, col = "red3", lwd = 2)
 	if(gtap) {
-		legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		legend(x = "topright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 	} else {
-		legend(x = "topright", lty = c(4, 2, 1), legend = c("Original AEZs", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		legend(x = "topright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
 	}
 	par(new=FALSE)
 	
@@ -1323,13 +1331,24 @@ for(j in 1:num_crop) {
 		axis(side = 1, at = new_x, labels = 10^new_x)
 	par(new=TRUE)
 
-	lines(fao_x, fao_y, lty = 1, col = "black", lwd = 2)
-	lines(orig_x, orig_y, lty = 4, col = "blue3", lwd = 2)
-	lines(new_x, new_y, lty = 2, col = "red3", lwd = 2)
-	if(gtap) {
-		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+	if(papergray) {
+		lines(fao_x, fao_y, lty = 1, col = "black", lwd = 2)
+		lines(orig_x, orig_y, lty = 4, col = "gray60", lwd = 2)
+		lines(new_x, new_y, lty = 2, col = "gray30", lwd = 2)
+		if(gtap) {
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
+		} else {
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("gray60", "gray30", "black"), lwd = 2)
+		}		
 	} else {
-		legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original AEZs", "LDS AEZs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		lines(fao_x, fao_y, lty = 1, col = "black", lwd = 2)
+		lines(orig_x, orig_y, lty = 4, col = "blue3", lwd = 2)
+		lines(new_x, new_y, lty = 2, col = "red3", lwd = 2)
+		if(gtap) {	
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("GTAP", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		} else {
+			legend(x = "bottomright", lty = c(4, 2, 1), legend = c("Original GLUs", "Moirai GLUs", "FAO"), col = c("blue3", "red3", "black"), lwd = 2)
+		}
 	}
 	par(new=FALSE)
 	
@@ -1372,9 +1391,9 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "red3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "blue3", lwd = 2)
 	if(gtap) {
-		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	} else {
-		legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	}
 	par(new=FALSE)
 	
@@ -1404,9 +1423,9 @@ for(j in 1:num_crop) {
 	lines(new_x, new_y, lty = 1, col = "red3", lwd = 2)
 	lines(orig_x, orig_y, lty = 2, col = "blue3", lwd = 2)
 	if(gtap) {
-		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("GTAP - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	} else {
-		legend(x = "topright", lty = c(2, 1), legend = c("Original AEZs - FAO", "LDS AEZs - FAO"), col = c("blue3", "red3"), lwd = 2)
+		legend(x = "topright", lty = c(2, 1), legend = c("Original GLUs - FAO", "Moirai GLUs - FAO"), col = c("blue3", "red3"), lwd = 2)
 	}
 	par(new=FALSE)
 	
@@ -2070,10 +2089,16 @@ lines(c(xmin,xmax), c(xmin * (prod_neworig_mean_slope + prod_neworig_mean_slopee
 lines(c(xmin,xmax), c(xmin * (prod_neworig_mean_slope - prod_neworig_mean_slopeerr) + (prod_neworig_mean_intercept - prod_neworig_mean_intercept),
 	xmax * (prod_neworig_mean_slope - prod_neworig_mean_slopeerr) + (prod_neworig_mean_intercept - prod_neworig_mean_intercept)), col = "red3", lty = 2, lwd = 1.5)
 par(new=FALSE)
+
+lds_text = paste("Moirai: slope = ", round(prod_neworig_mean_slope,digits=2), " +- ", round(prod_neworig_mean_slopeerr,digits=2),
+", r^2 = ", round(prod_neworig_mean_r2,digits=2), sep = "")
+fao_text = paste("FAO: slope = ", round(prod_faoorig_mean_slope,digits=2), " +- ", round(prod_faoorig_mean_slopeerr,digits=2),
+", r^2 = ", round(prod_faoorig_mean_r2,digits=2), sep = "")
+
 if(gtap) {
-	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c("Original AEZs", "FAO", "GTAP"), col = c("red3", "black", "blue3"))
+	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c(lds_text, fao_text, "GTAP: one-to-one line"), col = c("red3", "black", "blue3"))
 } else {
-	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c("New AEZs", "FAO", "Original AEZs"), col = c("red3", "black", "blue3"))
+	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c(lds_text, fao_text, "Original GLUs: one-to-one line"), col = c("red3", "black", "blue3"))
 }
 
 dev.off()
@@ -2104,12 +2129,17 @@ lines(c(xmin,xmax), c(xmin * (area_neworig_mean_slope + area_neworig_mean_slopee
 	xmax * (area_neworig_mean_slope + area_neworig_mean_slopeerr) + (area_neworig_mean_intercept + area_neworig_mean_intercept)), col = "red3", lty = 2, lwd = 1.5)
 lines(c(xmin,xmax), c(xmin * (area_neworig_mean_slope - area_neworig_mean_slopeerr) + (area_neworig_mean_intercept - area_neworig_mean_intercept),
 	xmax * (area_neworig_mean_slope - area_neworig_mean_slopeerr) + (area_neworig_mean_intercept - area_neworig_mean_intercept)), col = "red3", lty = 2, lwd = 1.5)
-
 par(new=FALSE)
+
+lds_text = paste("Moirai: slope = ", round(area_neworig_mean_slope,digits=2), " +- ", round(area_neworig_mean_slopeerr,digits=2),
+", r^2 = ", round(area_neworig_mean_r2,digits=2), sep = "")
+fao_text = paste("FAO: slope = ", round(area_faoorig_mean_slope,digits=2), " +- ", round(area_faoorig_mean_slopeerr,digits=2),
+", r^2 = ", round(area_faoorig_mean_r2,digits=2), sep = "")
+
 if(gtap) {
-	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c("Original AEZs", "FAO", "GTAP"), col = c("red3", "black", "blue3"))
+	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c(lds_text, fao_text, "GTAP: one-to-one line"), col = c("red3", "black", "blue3"))
 } else {
-	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c("New AEZs", "FAO", "Original AEZs"), col = c("red3", "black", "blue3"))
+	legend(x = "bottomright", lty = c(1,1,1), lwd = c(2,2,2), legend = c(lds_text, fao_text, "Original GLUs: one-to-one line"), col = c("red3", "black", "blue3"))
 }
 dev.off()
 

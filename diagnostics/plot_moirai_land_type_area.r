@@ -1,19 +1,18 @@
 ###### plot_moirai_land_type_area.r
 # diagnostitcs for the land type area output
 #
-# compare LDS outputs with the old GIS code
+# compare Moirai LDS outputs with the old GIS code
 # for 18 original aezs make comparisons at the aez level
 # for any geographic land units (glus) make comparisons at country level
 # need to compare specific land types
 #
-# the old gis file has been copied to the lds dir
 #
 # old gis file format (km^2)
 #	one header line with column labels
 #	4 columns: AEZ_ID, Category, Year, area(km2)
 #		AEZ_ID = 0 means that no original countryXaez info exists for those cells
 #
-# lds land type area file format (ha)
+# Moirai lds land type area file format (ha)
 #	6 header lines, with the line 6 having the column labels
 #	5 columns: iso, glu_code, land_type, year, value
 #	no records exist for zero area or for cells that do not have a country and glu match
@@ -33,14 +32,15 @@
 #	only columns 1 and 2 are used: fao_code and iso3_abbr
 #
 # the old gis data uses hyde 3.1 (with 2010 added from the new hyde data)
-# the lds has output using both the hyde 3.1 data (with 2010) and the new hyde data for all years
+# previous version of moirai lds has output using the hyde 3.1 data (with 2010)
+# the moirai lds has output using the new hyde 3.2 data for all years
 #
 # aggregate to only these four hyde land types:
 #	hyde_type = c("Cropland", "Pasture", "Urbanland", "Unmanaged")
 #	unmanaged includes the "unknown" pot veg type
 #
 # the gis area data for no country or glu (aez) are excluded from these diagnostics (about 2.1 million sq km)
-# the lds area data for no country or glu (wb235) are not in the output file, but are only ~80,000 sq km
+# the Moirai lds area data for no country or glu (wb235) are not in the output file, but are only ~80,000 sq km
 #
 # output in km^2
 #
@@ -59,18 +59,20 @@ setwd("./")
 AEZ = FALSE
 
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_test_stats_area/", sep="")
+outdir = paste("./basins235_sage_stats_area/", sep="")
+#outdir = paste("./aez_orig_sage_stats_area/", sep="")
 dir.create(outdir, recursive = TRUE)
 
 # location of the lds output files
-ldsdir = "../outputs/basins235_test/"
+ldsdir = "../outputs/basins235_sage/"
+#ldsdir = "../outputs/aez_orig_sage/"
 
 # input files
 # some of these are lds diagnostic outputs
 gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")
 lds_fname = paste("./Land_type_area_ha_h31new.csv", sep="")
 lds_new_fname = paste(ldsdir, "Land_type_area_ha.csv", sep="")
-land_types_fname = paste(ldsdir, "LDS_land_types.csv", sep="")
+land_types_fname = paste(ldsdir, "Moirai_land_types.csv", sep="")
 gis_ctry_map_fname = paste("./FAO_gtap_gcam_ctry.csv", sep="")
 fao_iso_map_fname = paste("../indata/FAO_iso_VMAP0_ctry.csv", sep="")
 
@@ -150,20 +152,20 @@ for(i in 1:num_gis_ctryglu) {
 gis_map_codes = data.frame(AEZ_ID = gis_ctryglu_code, iso = gis_iso, glu_code = gis_glu_code)
 gis = merge(gis, gis_map_codes)
 
-# rename the Category column to land_type to match the lds output
+# rename the Category column to land_type to match the moirai lds output
 gis$land_type = 0
 gis$land_type = gis$Category
 gis$Category = NULL
-# rename the area column to value to match the lds output
+# rename the area column to value to match the moirai lds output
 gis$value = 0
 gis$value = gis$Area.km2.
 gis$Area.km2. = NULL
-# rename the year column to value to match the lds output
+# rename the year column to value to match the moirai lds output
 gis$year = 0
 gis$year = gis$Year
 gis$Year = NULL
 
-# convert the lds data to km^2
+# convert the moirai lds data to km^2
 lds$value = lds$value * HA2KMSQ
 lds_new$value = lds_new$value * HA2KMSQ
 
@@ -186,9 +188,9 @@ lds_new_ctry = aggregate(value ~ year + LT_HYDE + iso, lds_new_glu, FUN = "sum",
 gis_ctry$source = NA
 gis_ctry$source = "GIS"
 lds_ctry$source = NA
-lds_ctry$source = "LDS"
+lds_ctry$source = "Original"
 lds_new_ctry$source = NA
-lds_new_ctry$source = "LDS new"
+lds_new_ctry$source = "Moirai new"
 
 # loop over the countries to make plots and csv files
 for(lds_ctry_ind in 1:num_lds_ctry) {
@@ -231,7 +233,7 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 		}
 		
 		if(length(lds_tdata[,1] > 0)) {
-			# plot the glu level data for lds
+			# plot the glu level data for moirai lds
 			p1 <- ( ggplot( lds_tdata, aes( year, value, color = as.factor(glu_code) ) ) 
 				+ geom_line() 
 				+ facet_grid( LT_HYDE~., scales="free" ) 
@@ -239,14 +241,14 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ylab( "Area (km^2)" )
 				)
 			print(p1)
-			ggsave( paste( outdir, "lds_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
+			ggsave( paste( outdir, "original_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
 			
 			# write the glu level data
-			write.csv(lds_tdata, paste(outdir, "lds_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
+			write.csv(lds_tdata, paste(outdir, "original_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
 		}
 		
 		if(length(lds_new_tdata[,1] > 0)) {
-			# plot the glu level data for lds new
+			# plot the glu level data for moirai lds new
 			p1 <- ( ggplot( lds_new_tdata, aes( year, value, color = as.factor(glu_code) ) ) 
 				+ geom_line() 
 				+ facet_grid( LT_HYDE~., scales="free" ) 
@@ -254,14 +256,14 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ylab( "Area (km^2)" )
 				)
 			print(p1)
-			ggsave( paste( outdir, "lds_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
+			ggsave( paste( outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
 			
 			# write the glu level data
-			write.csv(lds_new_tdata, paste(outdir, "lds_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
+			write.csv(lds_new_tdata, paste(outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
 		}
 	
 	} # end if there are data at the country level
-} # end for loop over lds countries
+} # end for loop over moirai lds countries
 
 
 cat("finished plot_moirai_land_type_area.r at ",date(), "\n")

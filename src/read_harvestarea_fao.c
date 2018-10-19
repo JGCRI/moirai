@@ -2,11 +2,11 @@
  read_harvestarea_fao.c
  
  read FAOSTAT harvested area file for calibrating yield and harvested area data to a different year
-	this shouldn't be necessary, but the code currently allows for recalibration to the average of years 2003-2007
  
- the harvest area data file currently contains the same years as the price, yield, and production data files (1997 - 2007)
+ the harvest area data file must be the same formt as and contain the same years as the price, yield, and production data files
+ year value fields must be empty or numeric
  
- only the 175 SAGE crops are stored
+ only the 175 SAGE crops are stored and the moirai countries
  
  the fao file is in ha, so convert to km^2 for storage array
  
@@ -19,28 +19,34 @@
  Created by Alan Di Vittorio on 1 Aug 2013
  Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
  
+ july 2018
+ Modified by A.V.D.
+ Now reads a more complete, recent FAO data file, with units and flags, and newline characters
+ 
+ 
  **********/
 
 #include "moirai.h"
 
 int read_harvestarea_fao(args_struct in_args) {
 	
-	// all reported crops listed by country with years 1997-2007 as final columns
+	// all reported crops listed by country with years 1and year flags
 	// one header row
-	// each line ends with a carraige return only ('\r')
+	// each line now ends with a newline ('\n')
 	// there can't be any blank lines for this to work properly
-	//  first column: FAO country name
-	//  second column: FAO country code
-	//  third column: FAO crop name
-	//  fourth column: FAO crop code
-	//  fifth column: FAO element name (this is the variable stored in the file, with units)
-	//  sixth column: FAO element code
-	//  columns 7-17: years 1997 - 2007
+	//  first column: FAO country code
+	//  second column: FAO country nme
+	//  third column: FAO crop code
+	//  fourth column: FAO crop name
+	//  fifth column: FAO element code (this is the variable stored in the file, with units)
+	//  sixth column: FAO element name
+	//  seventh column: units = ha
+	//  remaining columns: year, yearflag; repeating, with no missing years
 	
 	int j;
-	int nrecords = 9179;			// number of records in file
+	//int nrecords = 16066;			// number of records in file
 	int nhead = 1;					// number of header lines
-	int yr1col = 7;					// first column of year data
+	int yr1col = 8;					// first column of year data
 	
 	char fname[MAXCHAR];			// file name to open
 	FILE *fpin;						// file pointer
@@ -98,7 +104,7 @@ int read_harvestarea_fao(args_struct in_args) {
 		// this is the loop over the records
 		while (*cptr) {
 			if (!is_newrec) {
-				if (*cptr == '\r') {
+				if (*cptr == '\n') {
 					is_newrec = 1;
 				}
 			} else {
@@ -116,14 +122,14 @@ int read_harvestarea_fao(args_struct in_args) {
 			count_recs++;
 			
 			// get the country code
-			if((err = get_int_field(rec_str, delim, 2, &temp_ctry)) != OK) {
+			if((err = get_int_field(rec_str, delim, 1, &temp_ctry)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_harvestarea_fao(); record=%li, country code check\n",
 						fname, count_recs);
 				return err;
 			}
 			
 			// get the crop code
-			if((err = get_int_field(rec_str, delim, 4, &temp_crop)) != OK) {
+			if((err = get_int_field(rec_str, delim, 3, &temp_crop)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_harvestarea_fao(); record=%li, column=4\n",
 						fname, count_recs);
 				return err;
@@ -161,7 +167,7 @@ int read_harvestarea_fao(args_struct in_args) {
 				// determine the index of the harvest area data for this year and country and crop
 				out_index = ctry_ind * NUM_SAGE_CROP * NUM_FAO_YRS + crop_ind * NUM_FAO_YRS + j;
 				
-				if((err = get_float_field(rec_str, delim, j + yr1col, &harvestarea_fao[out_index])) != OK) {
+				if((err = get_float_field(rec_str, delim, (j * 2) + yr1col, &harvestarea_fao[out_index])) != OK) {
 					fprintf(fplog, "Error processing file %s: read_harvestarea_fao(); record=%li, year column=%i\n",
 							fname, count_recs, j);
 					return err;
@@ -175,12 +181,14 @@ int read_harvestarea_fao(args_struct in_args) {
 	
 	free(sptr);
 	
+	/* this no longer applies because the fao data includes extra records
 	if(count_recs != nrecords)
 	{
 		fprintf(fplog, "Error reading file %s: read_harvestarea_fao(); records read=%li != nrecords=%i\n",
 				fname, count_recs, nrecords);
 		return ERROR_FILE;
 	}
+	 */
 	
 	if (in_args.diagnostics) {
 		if ((err = write_csv_float3d(harvestarea_fao, countrycodes_fao, cropcodes_sage,

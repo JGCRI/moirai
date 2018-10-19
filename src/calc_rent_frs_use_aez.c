@@ -2,6 +2,8 @@
  calc_rent_frs_use_aez.c
  
  calculate forest land rent values for the new aezs (million USD)
+
+ the input land rent values have already been converted to the appropriate USD-year upon read in
  
  arguments:
  args_struct in_args:	input argument structure

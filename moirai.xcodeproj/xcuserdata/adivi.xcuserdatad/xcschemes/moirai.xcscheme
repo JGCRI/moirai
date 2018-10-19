@@ -64,7 +64,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "$PROJECT_DIR/input_files/lds_input_basins235.txt"
+            argument = "$PROJECT_DIR/input_files/moirai_input_basins235.txt"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

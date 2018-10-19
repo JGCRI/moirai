@@ -72,6 +72,11 @@ int write_csv_float3d(float out_array[], int d1[], int d2[], int d1_length, int 
 		fprintf(fpout,"%i,%i", d1[d1_index], d2[d2_index]);
 		for (j = 0; j < d3_length; j++) {
 			out_index = d2_length * d3_length * d1_index + d3_length * d2_index + j;
+			
+			if ( out_array[out_index] != 0) {
+				;
+			}
+			
 			fprintf(fpout,",%.2f", out_array[out_index]);
 		}
 		fprintf(fpout,"\n");

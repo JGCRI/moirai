@@ -22,7 +22,7 @@
  delim:		the delimiting character
  findex:	index of the desired field--this must start at one
  fltval:	the address for storing the retrieved float value
- return:	floating point field value; 0 if field is not numeric or is empty
+ return:	floating point field value; 0 if string is empty; ERROR_STR if field is not numeric
  ********/
 int get_float_field(char *line, const char *delim, int findex, float *fltval)
 {
@@ -61,7 +61,7 @@ int get_float_field(char *line, const char *delim, int findex, float *fltval)
  delim:		the delimiting character
  findex:	index of the desired field--this must start at one
  fltval:	the address for storing the retrieved float value
- return:	integer field value; 0 if field is not numeric or is empty
+ return:	integer field value; 0 if string is empty; ERROR_STR if field is not numeric
  ********/
 int get_int_field(char *line, const char *delim, int findex, int *intval)
 {

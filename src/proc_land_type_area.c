@@ -589,8 +589,8 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     // write header lines
     fprintf(fpout,"# File: %s\n", fname);
     fprintf(fpout,"# Author: %s\n", CODENAME);
-    fprintf(fpout,"# Description: area (ha) for sage land cells in country X glu X land type X protected category X year\n");
-    fprintf(fpout,"# Original source: hyde areas; reference veg; country raster; new glu raster; hyde land area\n");
+    fprintf(fpout,"# Description: area (ha) for land cells in country X glu X land type X protected category X year\n");
+    fprintf(fpout,"# Original source: hyde land use areas; reference veg; land cover; country raster; glu raster; hyde land area\n");
     fprintf(fpout,"# ----------\n");
     fprintf(fpout,"iso,glu_code,land_type,year,value");
     

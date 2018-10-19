@@ -135,7 +135,9 @@
  
  SAGE crop harvested area and yield for 175 crops (ca. yr 2000)
 	netcdf files at 5 arcmin resolution
-	fraction of land area in grid cell (p.c. Navin Ramankutty June 2013, confirmed in sep 2013, also see Monfreda et al. 2008 eq. on page 10)
+	area is in fraction of land area in grid cell (p.c. Navin Ramankutty June 2013, confirmed in sep 2013, also see Monfreda et al. 2008 eq. on page 10)
+ 	yield is in metric tonnes per ha
+ 	note that the data have recently been reformatted and include harvested area in ha also
 	data are based mostly on 2005 FAO database (average of years 1997 - 2003 (or 1990-1996 is a few cases))
 	these data appear to match well with independent calculations of the FOA data
 	the bases of the filenames are in the second column of SAGE_gtap_fao_crop2use.csv file, then append "_5min.nc"
@@ -219,11 +221,9 @@
         text file with values mapped to SAGE potential vegetation types, based on liturature search
             soil_carbon.csv
  
- GTAP land use 2.1V6.0:
+ GTAP land use database R2.1V6.0:
 	gcam-data-system/aglu-data/level0/
-		(included with GCAM AgLU, it is unclear whether the DGTM values were converted to yr2001 usd for the GTAP file)
 		The yield and harvested area data used in this version are the same SAGE data described above
-		But it is unclear which year(s) of price data were used (earlier version used year 2001 data)
 			GTAP_value_milUSD.csv (ctry87, 13 GTAP_use, 18 AEZs; million USD (yr2001$))
     Ideally I would have used the DGTM_DATA.CSV file extracted from GTAP DGTM_DATA.HAR, but I could not get the required metadata
         specifically the sptial data and the description of the management and forest types
@@ -247,7 +247,8 @@
  
  FAO:
 	downloaded by Alan Di Vittorio 2 Aug 2013 from faostat.fao.org/site/###/
-	yield and area are needed only if calibrating SAGE data to a different year; it is currently based on 1997-2003 FAO averages
+ 	these file need to be in the same format with the same years
+	harvested area (and yield) are needed only if calibrating SAGE data to a different year; it is currently based on 1997-2003 FAO averages; yield is just for diagnostics; recalibration uses production and harvested area
 	it appears that there are differences between these price data and those used by GTAP
 	prices are in 2004-2006 international USD values, so assume they are 2005USD for converstion to 2001USD
 	different files could be used here, just change the read function and the number of FAO years in the .h file

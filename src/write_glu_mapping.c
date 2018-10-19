@@ -27,8 +27,8 @@
     corresponds with the land type area and potveg carbon output csv files
 
  write only as a diagnostic:
-    LDS_reglr_GLU.csv    // file name for diagnostic gcam reglr+gluid to lr region abbr mapping
-    LDS_reggcam_GLU.csv  // file name for diagnostic gcam reggcam+gluid to gcam reg name mapping
+    MOIRAI_reglr_GLU.csv    // file name for diagnostic gcam reglr+gluid to lr region abbr mapping
+    MOIRAI_reggcam_GLU.csv  // file name for diagnostic gcam reggcam+gluid to gcam reg name mapping
     and some other useful files, including raster country+glu and region+glu files
  
  Serbia and Montenegro are merged for processing and output, but they are also included separately here
@@ -80,8 +80,8 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     int mne_code = 273;         // fao code for montenegro
     
     char oname1[MAXCHAR];     // file name for gcam ctry+aezid to iso mapping
-    char oname2[] = "LDS_reglr_GLU.csv";    // file name for diagnostic gcam reglr+gluid to lr region abbr mapping
-    char oname3[] = "LDS_reggcam_GLU.csv";  // file name for diagnostic gcam reggcam+gluid to gcam reg name mapping
+    char oname2[] = "MOIRAI_reglr_GLU.csv";    // file name for diagnostic gcam reglr+gluid to lr region abbr mapping
+    char oname3[] = "MOIRAI_reggcam_GLU.csv";  // file name for diagnostic gcam reggcam+gluid to gcam reg name mapping
     char oname4[MAXCHAR];   // file name for land type category mapping
     char fname1[MAXCHAR];                   // outpath plus out name 1
     char fname2[MAXCHAR];                   // outpath plus out name 2
@@ -175,7 +175,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     // write header lines for the land type file
     fprintf(fpout1,"# File: %s\n", fname1);
     fprintf(fpout1,"# Description: Mapping from LDS land categories to specific categories in databases\n");
-    fprintf(fpout1,"# Original source: land type area and pot veg carbon calc in: %s\n", CODENAME);
+    fprintf(fpout1,"# Original source: land type area and ref veg carbon calc in: %s\n", CODENAME);
     fprintf(fpout1,"# ----------\n");
     fprintf(fpout1,"Category,LT_SAGE,LT_HYDE,LT_WDPA");
     

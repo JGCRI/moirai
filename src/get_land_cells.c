@@ -10,8 +10,9 @@
  
  NOTE: the overall output land mask is determined by the intersection of hyde land, fao country, glu, and ctry87 (which determines whether an fao country is included in the output as an economic region)
  	So all the outputs are restricted to this overall mask, either spatially or thematically (the sage data are processed on the sage land base, then thematically assigned to the hyde land base)
- 	The diagnostic raster outputs are based on their original land masks
- 	The gcam region, ctry87, and gcam region/glu raster outputs represent the overall land mask
+ 	The diagnostic raster outputs are based on their original land masks, except these are based on the overall land mask:
+ 	The gcam region, country, ctry87, and gcam region/glu raster outputs represent the overall land mask,
+ 		based only on valid hyde X glu X country X ctry87 land cells
  
  also store the land cells of the new aez data in land_cells_aez_new[num_land_cells_aez_new]
  
@@ -309,7 +310,7 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 				} // end if serbia or montenegro
 			} // end else check for serbia or montenegro
 
-		}	// end if hyde land cell (if working land cell)
+		}	// end if hyde and new glu land cell (if working land cell)
 
 	}	// end for i loop over all cells
 	

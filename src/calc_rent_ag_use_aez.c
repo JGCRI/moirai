@@ -3,6 +3,8 @@
  
  calculate the agricultural (including livestock) land rent values for the new aezs (million USD)
  
+ The prices have already been converted to the appropriate USD-year upon read-in
+ 
  arguments:
  args_struct in_args:	input argument structure
  rinfo_struct raster_info: information about input raster data

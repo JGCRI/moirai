@@ -29,8 +29,11 @@
 int init_moirai(args_struct *in_args) {
     
 	// input argument structure
-	in_args->recalibrate = 0;
 	in_args->diagnostics = 0;
+	in_args->out_year_prod_ha_lr = 0;
+	in_args->in_year_sage_crops = 0;
+	in_args->out_year_usd = 0;
+	in_args->in_year_lr_usd = 0;
 	memset(in_args->inpath, '\0', MAXCHAR);
 	memset(in_args->outpath, '\0', MAXCHAR);
 	memset(in_args->sagepath, '\0', MAXCHAR);

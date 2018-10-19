@@ -5,8 +5,8 @@
 	the files are zipped orignially
 	this function will unzip them if necessary and then leaves them unzipped
 	this function could be modified to read the sage ascii grid files also
- get yield in metric tonnes per km^2
- get harvest area in km^2
+ get yield in metric tonnes per km^2 (input is metric tonnes per ha)
+ get harvest area in km^2 (first input is in fraction of land area in grid cell)
 
  the file has 4 attribute variables:
 	longitude (4320), latitude (2160), level (6), time (1)
@@ -26,7 +26,7 @@
   sage non-land cells set yields and area to NODATA
   if yield and area values are nodata for sage land cells, these values are set to zero
 
- Abnormally small values  (< 1e-6) do not pose a problem for regular processing
+ Abnormally small values do not pose a problem for regular processing
 	but they do exist in these data and pose problems for recalibration as they can produce an effectively zero
 		denominator in the recalibration calculation that causes overflow and/or huge numbers
 	harvest area in fraction small values are usually < ~1e-22, but there are some ~1e-7
@@ -35,7 +35,12 @@
 	it did not happen to production values for 2003-2007 avg recalibration
 		even though there are some abnormally small yield in values
 
- The abnormal values are filtered out in this function. This has a negligible difference on the outputs.
+ For harvested area use 1e-8 as the threshold
+ 	this threshold (1e-8) is the fraction corresponding to 1 m^2 if a cell has 100 km^2 of land area
+ 	(max sage cell land area is ~86 km^2)
+ For yield use 0.0001 t / ha as the threshold
+ 	this treshold is  0.01 t / km^2, or 0.0001 t / ha is 2 orders of magnitude less than the min fao value of ~0.02 t / ha
+ The abnormal values less than these thresholds are filtered out in this function. This has a negligible difference on the outputs.
 
  arguments:
  char *fname:	path and base filename for sage crop file to read
@@ -85,6 +90,9 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 	const char sage_crop_nctag[] = "_AreaYieldProduction.nc";					// suffix for sage base file names, netcdf, unzipped
 	const char sage_crop_ncztag[] = "_HarvAreaYield2000_NetCDF.zip";				// suffix for sage base file names, netcdf, zipped
 
+	float harvest_thresh = 1e-8;
+	float yield_thresh = 0.0001;
+	
 	// allocate arrays for the quality fields
 	qual_harv = calloc(ncells, sizeof(float));
 	if(qual_harv == NULL) {
@@ -166,11 +174,11 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 			if (land_area_sage[i] == raster_info.land_area_sage_nodata) {
 				harvestarea_in[i] = 0;
 			} else {
-				// this threshold is the fraction corresponding to 100 m^2 if a cell has 100 km^2 of land area
+				// this threshold (1e-8) is the fraction corresponding to 1 m^2 if a cell has 100 km^2 of land area
 				//  (max sage cell land area is ~86 km^2)
-				// remove these abnormal values from processing
-				if (harvestarea_in[i] < 1e-6 && harvestarea_in[i] != nodata && harvestarea_in[i] !=0) {
-					//fprintf(fplog,"Warning: fraction in[%i] = %e < 1e-6 for crop %s: read_sage_crop()\n", i, harvestarea_in[i], fname);
+				// remove these very small values from processing
+				if (harvestarea_in[i] < harvest_thresh && harvestarea_in[i] != nodata && harvestarea_in[i] !=0) {
+					//fprintf(fplog,"Warning: fraction in[%i] = %e < %f for crop %s: read_sage_crop()\n", i, harvestarea_in[i], , harvest_thresh, fname);
 					harvestarea_in[i] = 0;
 					// end if bad data then remove
 				} else if (qual_harv[i] != 0) {
@@ -208,11 +216,11 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 			if (land_area_sage[i] == raster_info.land_area_sage_nodata || harvestarea_in[i] == nodata || harvestarea_in[i] == 0 || harvestarea_in[i] == NODATA) {
 				yield_in[i] = 0;
 			} else {
-				// this treshold is  0.1 t / km^2, or 0.001 t / ha, (min fao value is ~0.02 t / ha)
-				// these values are usually on the order of 1e-19, which is unrealistic
+				// this treshold is  0.01 t / km^2, or 0.0001 t / ha, (min fao value is ~0.02 t / ha)
+				// abnormal values are usually on the order of 1e-19, which is unrealistic
 				// remove these abnormal values from processing
-				if (yield_in[i] < 0.1 && yield_in[i] != nodata && yield_in[i] !=0) {
-					//fprintf(fplog,"Warning: yield_in[%i] = %e < 0.1 t / km^2 for crop %s: read_sage_crop()\n", i, yield_in[i], fname);
+				if (yield_in[i] < yield_thresh && yield_in[i] != nodata && yield_in[i] !=0) {
+					//fprintf(fplog,"Warning: yield_in[%i] = %e < %f t / ha for crop %s: read_sage_crop()\n", i, yield_in[i], yield_thresh, fname);
 					yield_in[i] = 0;
 					// end if bad data then remove
 				} else if (qual_yield[i] != 0) {

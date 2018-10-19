@@ -2,24 +2,27 @@
  read_production_fao.c
  
  read FAOSTAT production file for weighting the price average across years and countries
- and for calibrating yield and harvested area data to a different year
-
- the production data file currently contains the same years as the price, yield, and harvest area data files (1997 - 2007)
+  and for calibrating yield and harvested area data to a different year
  
- only the 175 SAGE crops are stored
+ the production data file must be the same formt as and contain the same years as the price, yield, and harvested area data files
+ year value fields must be empty or numeric
  
- no unit conversion needed because inputs are in metric tonnes
+ only the 175 SAGE crops are stored and the moirai countries
  
- nothing special has to be done with serbia and montenegro here because they are handled correctly in the aggregation process
+ the fao file is in ha, so convert to km^2 for storage array
  
  arguments:
  args_struct in_args: the input file arguments
-
+ 
  return value:
  integer error code: OK = 0, otherwise a non-zero error code
  
  Created by Alan Di Vittorio on 1 Aug 2013
  Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+ 
+ july 2018
+ Modified by A.V.D.
+ Now reads a more complete, recent FAO data file, with units and flags, and newline characters
  
  **********/
 
@@ -27,23 +30,23 @@
 
 int read_production_fao(args_struct in_args) {
 	
-	// all reported crops listed by country with years 1997-2007 as final columns
+	// all reported crops listed by country with years 1and year flags
 	// one header row
-	// each line ends with a carraige return only ('\r')
+	// each line now ends with a newline ('\n')
 	// there can't be any blank lines for this to work properly
-	//  first column: FAO country name
-	//  second column: FAO country code
-	//  third column: FAO crop name
-	//  fourth column: FAO crop code
-	//  fifth column: FAO element name (this is the variable stored in the file, with units)
-	//  sixth column: FAO element code
-	//  columns 7-17: years 1997 - 2007
-	// units are metric tonnes
+	//  first column: FAO country code
+	//  second column: FAO country nme
+	//  third column: FAO crop code
+	//  fourth column: FAO crop name
+	//  fifth column: FAO element code (this is the variable stored in the file, with units)
+	//  sixth column: FAO element name
+	//  seventh column: units = meric tonnes
+	//  remaining columns: year, yearflag; repeating, with no missing years
 	
 	int j;
-	int nrecords = 9779;			// number of records in file
+	//int nrecords = 17193;			// number of records in file
 	int nhead = 1;					// number of header lines
-	int yr1col = 7;					// first column of year data
+	int yr1col = 8;					// first column of year data
 	
 	char fname[MAXCHAR];			// file name to open
 	FILE *fpin;						// file pointer
@@ -103,7 +106,7 @@ int read_production_fao(args_struct in_args) {
 		// this is the loop over the records
 		while (*cptr) {
 			if (!is_newrec) {
-				if (*cptr == '\r') {
+				if (*cptr == '\n') {
 					is_newrec = 1;
 				}
 			} else {
@@ -120,21 +123,19 @@ int read_production_fao(args_struct in_args) {
 			count_recs++;
 		
 			// get the country code
-			if((err = get_int_field(rec_str, delim, 2, &temp_ctry)) != OK) {
+			if((err = get_int_field(rec_str, delim, 1, &temp_ctry)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_production_fao(); record=%li, country code check\n",
 						fname, count_recs);
 				return err;
 			}
 			
 			// get the crop code
-			if((err = get_int_field(rec_str, delim, 4, &temp_crop)) != OK) {
+			if((err = get_int_field(rec_str, delim, 3, &temp_crop)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_production_fao(); record=%li, column=4\n",
 						fname, count_recs);
 				return err;
 			}
-			if(temp_crop == 257) {
-				crop_ind = NOMATCH;
-			}
+
 			// determine the country and crop indices for this record
 			// skip record if country or crop do not match fao to sage mappings
 			ctry_ind = NOMATCH;
@@ -167,7 +168,7 @@ int read_production_fao(args_struct in_args) {
 				// determine the index of the production data for this year and country and crop
 				out_index = ctry_ind * NUM_SAGE_CROP * NUM_FAO_YRS + crop_ind * NUM_FAO_YRS + j;
 				
-				if((err = get_float_field(rec_str, delim, j + yr1col, &production_fao[out_index])) != OK) {
+				if((err = get_float_field(rec_str, delim, (j * 2) + yr1col, &production_fao[out_index])) != OK) {
 					fprintf(fplog, "Error processing file %s: read_production_fao(); record=%li, year column=%i\n",
 							fname, count_recs, j);
 					return err;
@@ -196,12 +197,14 @@ int read_production_fao(args_struct in_args) {
 		}
 	}	
 	
+	/* this no longer applies because the fao data includes extra records
 	if(count_recs != nrecords)
 	{
 		fprintf(fplog, "Error reading file %s: read_production_fao(); records read=%li != nrecords=%i\n",
 				fname, count_recs, nrecords);
 		return ERROR_FILE;
 	}
+	 */
 	
 	if (in_args.diagnostics) {
 		if ((err = write_csv_float3d(production_fao, countrycodes_fao, cropcodes_sage,

@@ -45,9 +45,21 @@
 #define MIN_SAGE_FOREST_CODE    1
 
 // counts of useful variables
+#define NUM_IN_ARGS							54							// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
-#define NUM_FAO_YRS							11							// number of years in FAOSTAT production, yield, havested area, and price files
-#define NUM_IN_ARGS							51							// number of input variables in the input file
+
+// necessary FAO input data info
+// this applies to the yield, harvest area, production, and prod price input FAO data
+// these four files all need to be in the same format with the same years, in order and contiguous
+#define FAO_START_YEAR_COL					8		// the column of the start year in the fao input data
+#define FAO_START_YEAR						1993	// first year in fao yield, HA, prod, and prodprice files
+#define FAO_END_YEAR						2016	// last year in fao yield, HA, prod, and prodprice files
+#define NUM_FAO_YRS							(FAO_END_YEAR - FAO_START_YEAR + 1)	// number of years in the files
+
+// averaging periods and years for production, harvest area, yield, and land rent data
+#define SAGE_AVG_PERIOD			7
+#define SAGE_START_YEAR			1997
+#define RECALIB_AVG_PERIOD		5
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
@@ -66,13 +78,13 @@
 #define SCALE_POTVEG            100             // used to generate land type category
 #define NUM_LU_CATS             4               // crop, pasture, urban, potential veg (pv code = 0)
 #define NUM_WF_CROPS            18              // number of water footprint crops
-#define NUM_WF_TYPES            4               // number of water footprint types
+#define NUM_WF_TYPES            4               // number of water footprint types (blue, green, gray, total)
 
 // conversion factors for output
 #define KMSQ2HA					100.0						// km^2 * KMSQ2HA = ha
-#define MSQ2KMSQ				1/1000000.0					// m^2 * MSQ2KMSQ = km^2
+#define MSQ2KMSQ				(1/1000000.0)					// m^2 * MSQ2KMSQ = km^2
 #define KGMSQ2MGHA              10.0                        // kg/m^2 * KGMSQ2MGHA = Mg/ha
-#define USD2MILUSD				1/1000000.0					// USD * USD2MILUSD = million USD
+#define USD2MILUSD				(1/1000000.)0					// USD * USD2MILUSD = million USD
 
 // conversion factors for inputs
 #define HGHA2TKMSQ				0.01			// conversion factor from hg / ha to t / km^2; FAOSTAT yield file
@@ -83,28 +95,28 @@
 #define NOMATCH					-1				// if there isn't a matching country across data sets
 #define NA_TEXT                  "-"            // if there is no iso3 or name for a country/territory
 #define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id; this is also used for the region-glu image
-#define ZERO_THRESH				1/1000000.0		// if a value is less than this, it is zero
+#define ZERO_THRESH				1/1000000.0		// if a landtype area value is less than this, it is zero
 
 // working resolution is 5 arcmin (2160x4320), WGS84 spherical earth, lat-lon projection
 // the origin is the upper left corner at 90 Lat and -180 Lon
 // the lat/lon dimensions need to have an even number of cells
 #define NUM_LAT					2160						// number of lats in working grids
 #define NUM_LON					4320						// number of lons in working grids
-#define NUM_CELLS				NUM_LAT * NUM_LON			// number of grid cells in working grids
-#define GRID_RES				5.0/60.0					// working grid resolution; decimal degree
+#define NUM_CELLS				(NUM_LAT * NUM_LON)			// number of grid cells in working grids
+#define GRID_RES				(5.0/60.0)					// working grid resolution; decimal degree
 #define GRID_RES_SEC			300.0						// workding grid resolution; arc-seconds
 #define NODATA					-9999						// nodata value
 
 // LULC input grid; the origin corner is 0 lon and -90 lat
 #define NUM_LAT_LULC			360							// number of lats in input lulc data
 #define NUM_LON_LULC			720							// number of lons in input lulc
-#define NUM_CELLS_LULC			NUM_LAT_LULC * NUM_LON_LULC			// number of grid cells in input lulc data
+#define NUM_CELLS_LULC			(NUM_LAT_LULC * NUM_LON_LULC)			// number of grid cells in input lulc data
 
 // some constants for calculating the area of a grid cell
 #define AVE_ER					6371007.181		// average earth radius; from MODIS land products WGS84 average spherical radius;  meters
 #define PI						(4.0*atan(1.0))
-#define DEG2RAD					PI/180.0
-#define SEC2DEG					1/3600.0
+#define DEG2RAD					(PI/180.0)
+#define SEC2DEG					(1/3600.0)
 #define DEG2SEC					3600.0
 
 // error codes
@@ -225,11 +237,14 @@ int num_forest_cells;						// the actual number of land cell indices in forest_c
 
 // original GTAP data as input to GCAM; aez varies fastest, then use, then ctry87
 // the order of country is the GTAP_GCAM_ctry87 order, the order of use is the GTAP use order, and the order of original AEZs is 1-NUM_ORIG_AEZ
-float *rent_orig_aez;		// original land rent (million USD, yr2001$)
+float *rent_orig_aez;		// original land rent (million USD, the currency year of these values is an input)
 
-// FAOSTAT data; year varies fastest, then crop, then fao country
+// FAOSTAT data
+// the four associated input files need to be in the same format with the same years, in order and contiguous
+// for non-price data the year varies fastest, then crop, then fao country
 // the order of country is the FAO order, the order of crop is the GTAP order, and the yeas are chronological
 // these are only needed if recalibrating the SAGE data to a different year (the current input data are calibrated to 1997-2003 FAO averages)
+// the yield data are actually just for diagnostics; production and harvest area are used to recalibrate yield
 // the annual values are stored for weighted averaging
 float *yield_fao;           // yield from the FAO file (metric tonnes / km^2 )
 float *harvestarea_fao;     // harvested area from the FAO file (km^2)
@@ -420,9 +435,14 @@ typedef struct {
 // data structure to store the information from the input control file
 typedef struct {
 	// flags
-	int recalibrate;					// 1=recalibrate to a different reference year; 0=no recalibration
 	int diagnostics;					// 1=output diagnostics; 0=do not output diagnostics
 
+	// data years for recalibration
+	int out_year_prod_ha_lr;			// output year for crop production, harvest area, and land rent
+	int in_year_sage_crops;				// input year of the 175 crop harvest area and yield data
+	int out_year_usd;					// the output US dollar value year for land rent
+	int in_year_lr_usd;					// the US dollar value year for the input land rent data
+	
 	// useful paths
 	char inpath[MAXCHAR];				// path to the input data directory
 	char outpath[MAXCHAR];				// path to the output data directory

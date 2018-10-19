@@ -4,7 +4,9 @@
  read the original GTAP land rents into rent_orig_aez[NUM_GTAP_CTRY87 * NUM_GTAP_USE * NUM_ORIG_AEZ]
  zero values represent either zero or no data
  
- convert input units of million yr2001USD to yr2001USD
+ the current GTAP input land rent data are assumed to be in yr2001USD
+ so:
+ convert input units of million yr2001USD to desired year USD
  
  arguments:
  args_struct in_args: the input file arguments
@@ -32,7 +34,7 @@ int read_rent_orig(args_struct in_args) {
 	// the order of the rows are in order of GTAP_GCAM_ctry87.csv first and then GTAP_use.csv in order per country
 	// units are million yr2001USD
 	
-	int j;
+	int i,j;
 	int ncols = 20;					// ctry87, GTAP_use, 18 AEZs
 	int nrecords = 1131;			// number of records in file
 	int nhead = 6;					// number of header lines to skip
@@ -53,6 +55,14 @@ int read_rent_orig(args_struct in_args) {
 	char *sptr;						// dynamically allocated buffer for whole file as a string
 	char *cptr;						// pointer to traverse the file string
 	
+	// file info for the usd conversion factors
+	// one header line
+	int num_cpi_years = 0;			// number of cpi years read
+	int cpi_year[100];				// list of usd cpi years
+	float cpi_val[100];				// list of cpi values
+	int cpi_index = 0;				// the index for storing values
+	float cpi_factor = 0;				// the multiplier to the input price to obtiain the output price
+	
 	char out_name[] = "rent_orig_aez.csv";	// diagnositic output csv file name
 	
 	float *lrout;					// output the original land rent diagnostics in USD for formatting purposes
@@ -63,6 +73,63 @@ int read_rent_orig(args_struct in_args) {
 	if(lrout == NULL) {
 		fprintf(fplog,"Failed to allocate memory for lrout:  read_rent_orig()\n");
 		return ERROR_MEM;
+	}
+	
+	// read the cpi values
+	strcpy(fname, in_args.inpath);
+	strcat(fname, in_args.convert_usd_fname);
+	if((fpin = fopen(fname, "r")) == NULL)
+	{
+		fprintf(fplog,"Failed to open file %s:  read_rent_orig()\n", fname);
+		return ERROR_FILE;
+	}
+	// skip the header line
+	if(fscanf(fpin, "%[^\n]\n", rec_str) == EOF)
+	{
+		fprintf(fplog,"Failed to scan over file %s header:  read_rent_orig()\n", fname);
+		return ERROR_FILE;
+	}
+
+	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		// get the input year
+		if((err = get_int_field(rec_str, delim, 1, &cpi_year[cpi_index])) != OK) {
+			fprintf(fplog, "Error processing file %s: read_rent_orig(); record=%i, column=1\n",
+					fname, num_cpi_years + 1);
+			return err;
+		}
+		// get the corresponding value
+		if((err = get_float_field(rec_str, delim, 2, &cpi_val[cpi_index++])) != OK) {
+			fprintf(fplog, "Error processing file %s: read_rent_orig(); record=%i, column=2\n",
+					fname, num_cpi_years + 1);
+			return err;
+		}
+		num_cpi_years++;
+	} // end while loop for reading cpi file
+	fclose(fpin);
+	
+	// get the cpi value for the output price data
+	for (i = 0; i < num_cpi_years; i++) {
+		if (in_args.out_year_usd == cpi_year[i]) {
+			if (cpi_val[i] != 0) {
+				cpi_factor = cpi_val[i];
+			}else {
+				fprintf(fplog,"Invalid out year cpi value %f in file %s for year %i:  read_rent_orig()\n", cpi_val[i], fname, cpi_year[i]);
+				return ERROR_FILE;
+			}
+			break;
+		}
+	}
+	// get the cpi value for the input price data and calc the factor
+	for (i = 0; i < num_cpi_years; i++) {
+		if (in_args.in_year_lr_usd == cpi_year[i]) {
+			if (cpi_val[i] != 0) {
+				cpi_factor = cpi_factor / cpi_val[i];
+			}else {
+				fprintf(fplog,"Invalid in year cpi value %f in file %s for year %i:  read_rent_orig()\n", cpi_val[i], fname, cpi_year[i]);
+				return ERROR_FILE;
+			}
+			break;
+		}
 	}
 	
 	// create file name and open it
@@ -122,8 +189,8 @@ int read_rent_orig(args_struct in_args) {
 							fname, count_recs, j);
 					return err;
 				}
-				// convert to USD for diagnostic output
-				lrout[out_index - 1] = MIL2ONE * rent_orig_aez[out_index - 1];
+				// convert to desired year USD for diagnostic output
+				lrout[out_index - 1] = MIL2ONE * cpi_factor * rent_orig_aez[out_index - 1];
 			}
 		
 		if((j-1) != ncols)

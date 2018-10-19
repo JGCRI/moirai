@@ -331,8 +331,8 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     // write header lines
     fprintf(fpout,"# File: %s\n", fname);
     fprintf(fpout,"# Author: %s\n", CODENAME);
-    fprintf(fpout,"# Description: crop average annual water volume consumed (m^3) for sage land cells in country X glu\n");
-    fprintf(fpout,"# Original source: water footprint network; country raster; new glu raster\n");
+    fprintf(fpout,"# Description: crop average annual water volume consumed (m^3) for land cells in country X glu\n");
+    fprintf(fpout,"# Original source: water footprint network; country raster; glu raster\n");
     fprintf(fpout,"# ----------\n");
     fprintf(fpout,"iso,glu_code,SAGE_crop,water_type,value");
     

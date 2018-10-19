@@ -2,33 +2,25 @@
  read_prodprice_fao.c
  
  read the FAOSTAT producer price file for use in disaggregating land rents to AEZs
- it is unclear which year of price data was used in GTAP land use 2.1V6.0
-	this GTAP LU version uses 1997-2003 yield and harvested area data with values in yr2001USD
- a previous GTAP LU version used year 2001 price, yield, production, harvest data and yr2001USD
+
+ GTAP land use 2.1V6.0 uses circa 2000 (1997-2003 avg) yield and harvested area data with values in yr2001USD
  
- the FAO PRICESTAT data is based on yrs2004-2006USD, and the source file is in USD/metric tonne
+ the 11-year FAO PRICESTAT data is based on yrs2004-2006USD, and the source file is in USD/metric tonne
   (this has been clarified through email with faostat support)
  
- so calculate production weighted average annual price for years 1997 - 2003
+ i don't know the USD year yet for the more recent data
+ 
+ calculate production weighted average annual price for the appropriate data years
 	the stored average will be for the GTAP 87 countries, rather than the FAO countries
  
- the code is set up to calculate this average for years 2003-2007 if desired
-  (in conjunction with yield/area recalibration, see calc_harvarea_prod_out_crop_aez())
-  the recalibration year is hardcoded, and only implemented as of sep 2014
-	using just the 2005 single year did not generate good recalibration (several missing values at low levels)
-	the 2003-2007 average for yield/area recalibration showed that the GTAP data is based on the original data
-	however, I have not tried to recalibrate to the 1997-2003 average
- 
- the price data file currently contains the same years as the production, yield, and harvest area data files (1997 - 2007)
+ the price data file must be the same format and contain the same years as the production, yield, and harvest area data files
+ year value fields must be empty or numeric
  
  only the 175 SAGE crops are stored
  
- this function also reads in a file containing factors to convert 1999-2006USD to yr2001USD
-  for now, assume the input prices are based on 2004-2006 dollars, so convert from 2005USD to 2001USD
- 
- it is easy to convert to other USD year values, but the GTAP LU database is based on yr2001USD
-  the input usd conversion file determines which year the values are converted to
-  this function is hard-coded for the particular input usd conversion file
+ this function also reads in a file containing the annual average consumer price index for all users and all items and all US
+ 	use this to convert the input FAO price USD year to the desired output USD year
+ 	base and output years are specified in the input file
  
  arguments:
  args_struct in_args: the input file arguments
@@ -39,27 +31,31 @@
  Created by Alan Di Vittorio on 1 Aug 2013
  Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
  
+ july 2018
+ Modified by A.V.D.
+ Now reads a more complete, recent FAO data file, with units and flags, and newline characters
+ 
  **********/
 
 #include "moirai.h"
 
 int read_prodprice_fao(args_struct in_args) {
 	
-	// all reported crops listed by country with years 1997-2007 as final columns, in USD/metric tonne
+	// all reported crops listed by country with years 1and year flags
 	// one header row
-	// each line ends with a carraige return only ('\r')
+	// each line now ends with a newline ('\n')
 	// there can't be any blank lines for this to work properly
-	// each record is a unique country-crop combination
-	//  first column: FAO country name
-	//  second column: FAO country code
-	//  third column: FAO crop name
-	//  fourth column: FAO crop code
-	//  fifth column: FAO element name (this is the variable stored in the file, with units)
-	//  sixth column: FAO element code
-	//  columns 7-17: years 1997 - 2007
+	//  first column: FAO country code
+	//  second column: FAO country nme
+	//  third column: FAO crop code
+	//  fourth column: FAO crop name
+	//  fifth column: FAO element code (this is the variable stored in the file, with units)
+	//  sixth column: FAO element name
+	//  seventh column: units = USD
+	//  remaining columns: year, yearflag; repeating, with no missing years
 	
 	int i,j;
-	int nrecords = 6922;			// number of records in file
+	//int nrecords = 8615;			// number of records in file
 	int nhead = 1;					// number of header lines
 	
 	char fname[MAXCHAR];			// file name to open
@@ -75,6 +71,7 @@ int read_prodprice_fao(args_struct in_args) {
 	int temp_ctry = NODATA;			// temporary country code
 	int temp_crop = NODATA;			// temporary crop code
 	float temp_flt = 0;				// float variable for read in
+	double temp_dbl = 0;			// variable for gettin integer part of quotient
 	double avg_sum = 0;				// the sum of (prices times production) across years
 	double *prod_sum;				// the sum of production across years, per fao country, per sage crop
 	double *prodprice_temp;			// the temporal average production price by fao country and sage crop
@@ -82,6 +79,8 @@ int read_prodprice_fao(args_struct in_args) {
 	float *float_out;				// diagnostic output array
 	int num_avg;					// number of years to average
 	int avg_cols[100];				// the columns to average
+	int start_recalib_year = 0;			// the first year of recalibration average
+	int fao_start_year_index = NOMATCH;		// the fao year index of the starting year for averaging
 	
 	long flen = 0;					// length of file in bytes
 	long count_lines = 0;			// count the number of lines to skip the header
@@ -90,6 +89,15 @@ int read_prodprice_fao(args_struct in_args) {
 	int is_newrec = 0;				// flag to denote end of record
 	char *sptr;						// dynamically allocated buffer for whole file as a string
 	char *cptr;						// pointer to traverse the file string
+	
+	// file info for the usd conversion factors
+	// one header line
+	int num_cpi_years = 0;			// number of cpi years read
+	int cpi_year[100];				// list of usd cpi years
+	float cpi_val[100];				// list of cpi values
+	int cpi_index = 0;				// the index for storing values
+	float cpi_out_val = 0;			// the cpi value for the output year
+	float cpi_in_val = 0;			// the cpi value for the intput year
 	
 	char out_namef[] = "prodprice_fao.csv";		// diagnositic output csv file name
 	char out_nameg[] = "prodprice_fao_reglr.csv";	// diagnositic output csv file name
@@ -117,52 +125,52 @@ int read_prodprice_fao(args_struct in_args) {
 		return ERROR_MEM;
 	}
 	
-	if (in_args.recalibrate) {
-		// columns for using 2005 only (to check the recalib routine)
-		//num_avg = 1;
-		//avg_cols[0] = 15;
-		
-		// columns for averaging 2003-2007 (if calibrating to 2005 data; must do this for the SAGE data as well)
-		num_avg = 5;
-		avg_cols[0] = 13;
-		avg_cols[1] = 14;
-		avg_cols[2] = 15;
-		avg_cols[3] = 16;
-		avg_cols[4] = 17;
-		
-		/*
-		// test recalibration to original years
-		num_avg = 7;
-		avg_cols[0] = 7;
-		avg_cols[1] = 8;
-		avg_cols[2] = 9;
-		avg_cols[3] = 10;
-		avg_cols[4] = 11;
-		avg_cols[5] = 12;
-		avg_cols[6] = 13;
-		 */
+	// deal with output crop data year here
+	if (in_args.out_year_prod_ha_lr != 0) {
+		// data have been recalibrated
+		// get the appropriate columns for prod price
+		num_avg = RECALIB_AVG_PERIOD;
+		temp_flt = (float) modf(RECALIB_AVG_PERIOD / 2, &temp_dbl);
+		start_recalib_year = in_args.out_year_prod_ha_lr - (int) temp_dbl;
+		// columns for averaging recalib years
+		for (i = 0; i < RECALIB_AVG_PERIOD; i++) {
+			// match the fao data year col to the recalib data years
+			// and get the fao year index for the first averaging year
+			for (j = 0; j < NUM_FAO_YRS; j++) {
+				if ((FAO_START_YEAR + j) == (start_recalib_year + i)) {
+					avg_cols[i] = FAO_START_YEAR_COL + (j * 2);
+					if (i == 0) {
+						fao_start_year_index = j;
+					}
+				}
+			} // end for j loop over fao years
+		} // end for i loop over average period
+		if (fao_start_year_index == NOMATCH) {
+			fprintf(fplog,"Recalibrate: Failed to find start FAO data for year %i:  read_prodprice_fao()\n", start_recalib_year);
+			return ERROR_IND;
+		}
 	} else {
-		
-		// columns for averaging 1997-2003 (to match input SAGE data)
-		num_avg = 7;
-		avg_cols[0] = 7;
-		avg_cols[1] = 8;
-		avg_cols[2] = 9;
-		avg_cols[3] = 10;
-		avg_cols[4] = 11;
-		avg_cols[5] = 12;
-		avg_cols[6] = 13;
-	}
+		num_avg = SAGE_AVG_PERIOD;
+		// columns for averaging years matching sage 175 input data
+		for (i = 0; i < SAGE_AVG_PERIOD; i++) {
+			// match the fao data year col to the sage data years
+			// and get the fao year index for the first averaging year
+			for (j = 0; j < NUM_FAO_YRS; j++) {
+				if ((FAO_START_YEAR + j) == (SAGE_START_YEAR + i)) {
+					avg_cols[i] = FAO_START_YEAR_COL + (j * 2);
+					if (i == 0) {
+						fao_start_year_index = j;
+					}
+				}
+			} // end for j loop over fao years
+		} // end for i loop over average period
+		if (fao_start_year_index == NOMATCH) {
+			fprintf(fplog,"Recalibrate: Failed to find start FAO data for year %i:  read_prodprice_fao()\n", SAGE_START_YEAR);
+			return ERROR_IND;
+		}
+	} // end else use the input sage average period
 	
-	// file info for the usd conversion factors
-	// one header line
-	int num_factors = 8;			// number of factors for years 1999 - 2006
-	int inyear[num_factors];		// list of input usd years for conversion
-	float divisor[num_factors];		// the conversion factors (yr2001USD = yr####USD / yr####USD_divisor)
-	int divisor_index = 0;			// the index for storing the factors and for retrieving the needed factor
-	int conv_year = 2005;			// the year to convert from
-	
-	// read the dollar conversion factors to convert to yr2001USD
+	// read the cpi values
 	strcpy(fname, in_args.inpath);
 	strcat(fname, in_args.convert_usd_fname);
 	if((fpin = fopen(fname, "r")) == NULL)
@@ -176,32 +184,33 @@ int read_prodprice_fao(args_struct in_args) {
 		fprintf(fplog,"Failed to scan over file %s header:  read_prodprice_fao()\n", fname);
 		return ERROR_FILE;
 	}
-	for (i = 0; i < num_factors; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+
+	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
 			// get the input year
-			if((err = get_int_field(rec_str, delim, 1, &inyear[divisor_index])) != OK) {
+			if((err = get_int_field(rec_str, delim, 1, &cpi_year[cpi_index])) != OK) {
 				fprintf(fplog, "Error processing file %s: read_prodprice_fao(); record=%i, column=1\n",
-						fname, i + 1);
+						fname, num_cpi_years + 1);
 				return err;
 			}
-			// get the corresponding divisor
-			if((err = get_float_field(rec_str, delim, 2, &divisor[divisor_index++])) != OK) {
+			// get the corresponding value
+			if((err = get_float_field(rec_str, delim, 2, &cpi_val[cpi_index++])) != OK) {
 				fprintf(fplog, "Error processing file %s: read_prodprice_fao(); record=%i, column=2\n",
-						fname, i + 1);
+						fname, num_cpi_years + 1);
 				return err;
 			}
-		}else {
-			fprintf(fplog, "Error reading file %s: read_prodprice_fao(); record=%i\n", fname, i + 1);
-			return ERROR_FILE;
-		}
-	}
+		num_cpi_years++;
+	} // end while loop for reading cpi file
 	fclose(fpin);
 	
-	// assume the input prices are based on 2004-2006 dollars, so convert from 2005USD to 2001USD
-	divisor_index = 6;	// 2005 by default
-	for (i = 0; i < num_factors; i++) {
-		if (conv_year == inyear[i]) {
-			divisor_index = i;
+	// get the cpi value for the output price data
+	for (i = 0; i < num_cpi_years; i++) {
+		if (in_args.out_year_usd == cpi_year[i]) {
+			if (cpi_val[i] != 0) {
+				cpi_out_val = cpi_val[i];
+			}else {
+				fprintf(fplog,"Invalid out year cpi value %f in file %s for year %i:  read_prodprice_fao()\n", cpi_val[i], fname, cpi_year[i]);
+				return ERROR_FILE;
+			}
 			break;
 		}
 	}
@@ -240,7 +249,7 @@ int read_prodprice_fao(args_struct in_args) {
 		// this is the loop to obtain each record string
 		while (*cptr) {
 			if (!is_newrec) {
-				if (*cptr == '\r') {
+				if (*cptr == '\n') {
 					is_newrec = 1;
 				}
 			} else {
@@ -258,14 +267,14 @@ int read_prodprice_fao(args_struct in_args) {
 			count_recs++;
 			
 			// get the country code
-			if((err = get_int_field(rec_str, delim, 2, &temp_ctry)) != OK) {
+			if((err = get_int_field(rec_str, delim, 1, &temp_ctry)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_prodprice_fao(); record=%li, column=2\n",
 						fname, count_recs);
 				return err;
 			}
 			
 			// get the crop code
-			if((err = get_int_field(rec_str, delim, 4, &temp_crop)) != OK) {
+			if((err = get_int_field(rec_str, delim, 3, &temp_crop)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_prodprice_fao(); record=%li, column=4\n",
 						fname, count_recs);
 				return err;
@@ -303,29 +312,36 @@ int read_prodprice_fao(args_struct in_args) {
 							return err;
 						}
 						
-						// determine the index of the production data for this year and country and crop
-						prod_index = ctry_ind * NUM_SAGE_CROP * NUM_FAO_YRS + crop_ind * NUM_FAO_YRS + j;
-						if (in_args.recalibrate) {
-							// adjust the index to start at 2005; no average
-							prod_index = prod_index	+ 8;
-							// adjust the index to start at 2003; average around 2005
-							//prod_index = prod_index	+ 6;
+						// get the cpi index for this input year
+						for (i = 0; i < num_cpi_years; i++) {
+							if ((FAO_START_YEAR + j + fao_start_year_index) == cpi_year[i]) {
+								if (cpi_val[i] != 0) {
+									cpi_in_val = cpi_val[i];
+								}else {
+									fprintf(fplog,"Invalid in year cpi value %f for year %i:  read_prodprice_fao()\n", cpi_val[i], cpi_year[i]);
+									return ERROR_FILE;
+								}
+								break;
+							}
 						}
 						
-						// get the averaging sums
+						// determine the index of the production data for this year and country and crop
+						prod_index = ctry_ind * NUM_SAGE_CROP * NUM_FAO_YRS + crop_ind * NUM_FAO_YRS + j + fao_start_year_index;
+						
+						// get the averaging sums; multiply the cpi ratio
 						prod_sum[out_index] = prod_sum[out_index] + production_fao[prod_index];
-						avg_sum = avg_sum + production_fao[prod_index] * temp_flt;
+						avg_sum = avg_sum + production_fao[prod_index] * temp_flt * cpi_out_val / cpi_in_val;
 					}
 					
-					// make the conversion to 2001USD after the temporal average is calculated
-					// prod_sum could be zero, but divisor is non-zero by definition
+					// make the conversion to output USD year after the temporal average is calculated
+					// prod_sum could be zero, but cpi factor is non-zero by definition
 					// might not need to divide by prod_sum here, because of later multiplication
 					//	but keep it for now because this is the temporal average
 					if (prod_sum[out_index] == 0) {
 						prodprice_temp[out_index] = 0;
 					}else {
-						prodprice_temp[out_index] = avg_sum / prod_sum[out_index] / divisor[divisor_index];
-						float_out[out_index] = (float) prodprice_temp[out_index];
+						prodprice_temp[out_index] = avg_sum / prod_sum[out_index];
+						float_out[out_index] = (float) prodprice_temp[out_index]; // for diagnostic output
 						//if(float_out[out_index] != 0) {
 						//	fprintf(stderr, "found non-zero float_out\n");
 						//}
@@ -350,16 +366,18 @@ int read_prodprice_fao(args_struct in_args) {
 	
 	free(sptr);
 	
+	/* this no longer applies because the fao data includes extra records
 	if(count_recs != nrecords)
 	{
 		fprintf(fplog, "Error reading file %s: read_prodprice_fao(); records read=%li != nrecords=%i\n",
 				fname, count_recs, nrecords);
 		return ERROR_FILE;
 	}
+	 */
 	
 	// now aggregate the temporal averages to the 87 GTAP countries
     // valid fao/vmap0 territories with no economic regions have value = NOMATCH for gtap87 and gcam regions
-    // so just keip them in the processing
+    // so just keep them in the processing
 	for (crop_ind = 0; crop_ind < NUM_SAGE_CROP; crop_ind++) {
 		for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY; ctry_ind++) {
 			

@@ -64,16 +64,45 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 	double ymax;			// latitude max grid boundary
 	
 	int i, k;
+	int sysrv;						// system return value
 	
 	char fname[MAXCHAR];            // file name to open
 	char tmp_str[MAXCHAR];          // temporary string
 	FILE* fpin;
 	
 	char atag[] = "AD.asc";
+	char lutag[] = "AD_lu.zip";
+	char poptag[] = "AD_pop.zip";
 	
 	// get one header and set the lu info
 	// the geographic parameters are the same for all the hyde files
 	
+	strcpy(fname, in_args.hydepath);
+	strcat(fname, lutypenames_hyde[0]);
+	sprintf(tmp_str, "%i%s", year, atag);
+	strcat(fname, tmp_str);
+	
+	// if this file doesn't exist, then unzip this year's data
+	if((fpin = fopen(fname, "rb")) == NULL)
+	{
+		// unzip the lu files
+		strcpy(fname, "unzip ");
+		strcat(fname, in_args.hydepath);
+		sprintf(tmp_str, "%i%s -d %s", year, lutag, in_args.hydepath);
+		strcat(fname, tmp_str);
+		sysrv = system(fname);
+		// unzip the pop files
+		strcpy(fname, "unzip ");
+		strcat(fname, in_args.hydepath);
+		sprintf(tmp_str, "%i%s -d %s", year, poptag, in_args.hydepath);
+		strcat(fname, tmp_str);
+		sysrv = system(fname);
+		
+	} else {
+		fclose(fpin);
+	}
+	
+	// now make the unzipped file name again
 	strcpy(fname, in_args.hydepath);
 	strcat(fname, lutypenames_hyde[0]);
 	sprintf(tmp_str, "%i%s", year, atag);
@@ -112,6 +141,33 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 	// loop through the data files
 	for (k = 0; k < NUM_HYDE_TYPES; k++) {
 		
+		strcpy(fname, in_args.hydepath);
+		strcat(fname, lutypenames_hyde[k]);
+		sprintf(tmp_str, "%i%s", year, atag);
+		strcat(fname, tmp_str);
+		
+		
+		// if this file doesn't exist, then unzip this year's data
+		if((fpin = fopen(fname, "rb")) == NULL)
+		{
+			// unzip the lu files
+			strcpy(fname, "unzip ");
+			strcat(fname, in_args.hydepath);
+			sprintf(tmp_str, "%i%s", year, lutag);
+			strcat(fname, tmp_str);
+			sysrv = system(fname);
+			// unzip the pop files
+			strcpy(fname, "unzip ");
+			strcat(fname, in_args.hydepath);
+			sprintf(tmp_str, "%i%s", year, poptag);
+			strcat(fname, tmp_str);
+			sysrv = system(fname);
+			
+		} else {
+			fclose(fpin);
+		}
+		
+		// now make the unzipped file name again
 		strcpy(fname, in_args.hydepath);
 		strcat(fname, lutypenames_hyde[k]);
 		sprintf(tmp_str, "%i%s", year, atag);

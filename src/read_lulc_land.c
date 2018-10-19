@@ -105,7 +105,7 @@ int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int
 	{
 		// gunzip this file
 		strcpy(lname, "gunzip -k ");
-		strcpy(lname, in_args.lulcpath);
+		strcat(lname, in_args.lulcpath);
 		strcat(lname, basename);
 		sprintf(tmp_str, "%i%s", year, ncgztag);
 		strcat(lname, tmp_str);

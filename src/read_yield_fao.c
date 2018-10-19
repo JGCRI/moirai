@@ -1,25 +1,27 @@
 /**********
  read_yield_fao.c
  
- read FAOSTAT yield file for calibrating yield and harvested area data to a different year
-	this shouldn't be necessary, but the code currently allows for recalibration to the average of years 2003-2007
+ read FAOSTAT yield file for diagnostics
  
- the yield data file currently contains the same years as the price, production, and harvest area data files (1997 - 2007)
+ the yield data file must be the same format as and contain the same years as the price, production, and harvested area data files
+ year value fields must be empty or numeric
  
- only the 175 SAGE crops are stored
+ only the 175 SAGE crops are stored and the moirai countries
  
- convert from hg / ha to t / km^2
- 
- if an fao yield country or the crop is not found in the lists, then skip the record and write a warning to the log file
+ the fao file is in ha, so convert to km^2 for storage array
  
  arguments:
  args_struct in_args: the input file arguments
-
+ 
  return value:
  integer error code: OK = 0, otherwise a non-zero error code
  
  Created by Alan Di Vittorio on 1 Aug 2013
  Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+ 
+ july 2018
+ Modified by A.V.D.
+ Now reads a more complete, recent FAO data file, with units and flags, and newline characters
  
  **********/
 
@@ -27,23 +29,23 @@
 
 int read_yield_fao(args_struct in_args) {
 	
-	// all reported crops listed by country with years 1997-2007 as final columns
+	// all reported crops listed by country with years 1and year flags
 	// one header row
-	// each line ends with a carraige return only ('\r')
+	// each line now ends with a newline ('\n')
 	// there can't be any blank lines for this to work properly
-	//  first column: FAO country name
-	//  second column: FAO country code
-	//  third column: FAO crop name
-	//  fourth column: FAO crop code
-	//  fifth column: FAO element name (this is the variable stored in the file, with units)
-	//  sixth column: FAO element code
-	//  columns 7-17: years 1997 - 2007
-	// units are hg / ha
+	//  first column: FAO country code
+	//  second column: FAO country nme
+	//  third column: FAO crop code
+	//  fourth column: FAO crop name
+	//  fifth column: FAO element code (this is the variable stored in the file, with units)
+	//  sixth column: FAO element name
+	//  seventh column: units = hg / ha
+	//  remaining columns: year, yearflag; repeating, with no missing years
 	
 	int j;
-	int nrecords = 8859;			// number of records in file
+	//int nrecords = 15213;			// number of records in file
 	int nhead = 1;					// number of header lines
-	int yr1col = 7;					// first column of year data
+	int yr1col = 8;					// first column of year data
 	
 	char fname[MAXCHAR];			// file name to open
 	FILE *fpin;						// file pointer
@@ -52,8 +54,8 @@ int read_yield_fao(args_struct in_args) {
 	const char* delim = ",";		// delimiter string for csv file
 	int err = OK;					// error code for the string parsing function
 	int out_index = 0;				// the index of the yield array to fill
-	int ctry_ind = 0;				// the FAO country index with respect to countrycodes_fao[]
-	int crop_ind = 0;				// the SAGE crop index with respect to int cropcodes_sage2fao[] and cropcodes_sage[]
+	int ctry_ind = NOMATCH;			// the FAO country index with respect to countrycodes_fao[]
+	int crop_ind = NOMATCH;			// the SAGE crop index with respect to int cropcodes_sage2fao[] and cropcodes_sage[]
 	int temp_ctry = NODATA;			// temporary country code
 	int temp_crop = NODATA;			// temporary crop code
 	
@@ -101,7 +103,7 @@ int read_yield_fao(args_struct in_args) {
 		// this is the loop over the records
 		while (*cptr) {
 			if (!is_newrec) {
-				if (*cptr == '\r') {
+				if (*cptr == '\n') {
 					is_newrec = 1;
 				}
 			} else {
@@ -118,26 +120,28 @@ int read_yield_fao(args_struct in_args) {
 			count_recs++;
 			
 			// get the country code
-			if((err = get_int_field(rec_str, delim, 2, &temp_ctry)) != OK) {
+			if((err = get_int_field(rec_str, delim, 1, &temp_ctry)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_yield_fao(); record=%li, country code check\n",
 						fname, count_recs);
 				return err;
 			}
 			
 			// get the crop code
-			if((err = get_int_field(rec_str, delim, 4, &temp_crop)) != OK) {
+			if((err = get_int_field(rec_str, delim, 3, &temp_crop)) != OK) {
 				fprintf(fplog, "Error processing file %s: read_yield_fao(); record=%li, column=4\n",
 						fname, count_recs);
 				return err;
 			}
 			
 			// determine the country and crop indices for this record
+			ctry_ind = NOMATCH;
 			for (j = 0; j < NUM_FAO_CTRY; j++) {
 				if (countrycodes_fao[j] == temp_ctry) {
 					ctry_ind = j;
                     break;
 				}
 			}
+			crop_ind = NOMATCH;
 			for (j = 0; j < NUM_SAGE_CROP; j++) {
 				if (cropcodes_sage2fao[j] == temp_crop) {
 					crop_ind = j;
@@ -146,7 +150,7 @@ int read_yield_fao(args_struct in_args) {
 			}
             
             // skip this record if the country or crop is not found
-            if (ctry_ind == NUM_FAO_CTRY || crop_ind == NUM_SAGE_CROP) {
+            if (ctry_ind == NOMATCH || crop_ind == NOMATCH) {
                 fprintf(fplog, "Warning: extra fao country %i or sage crop %i in file %s: read_yield_fao(); record=%li\n",
                         temp_ctry, temp_crop, fname, count_recs);
             }else {
@@ -155,7 +159,7 @@ int read_yield_fao(args_struct in_args) {
                     // determine the index of the yield data for this year and country and crop
                     out_index = ctry_ind * NUM_SAGE_CROP * NUM_FAO_YRS + crop_ind * NUM_FAO_YRS + j;
                     
-                    if((err = get_float_field(rec_str, delim, j + yr1col, &yield_fao[out_index++])) != OK) {
+                    if((err = get_float_field(rec_str, delim, (j * 2) + yr1col, &yield_fao[out_index++])) != OK) {
                         fprintf(fplog, "Error processing file %s: read_yield_fao(); record=%li, year column=%i\n",
                                 fname, count_recs, j);
                         return err;
@@ -170,12 +174,14 @@ int read_yield_fao(args_struct in_args) {
 	
 	free(sptr);
 	
+	/* this no longer applies because the fao data includes extra records
 	if(count_recs != nrecords)
 	{
 		fprintf(fplog, "Error reading file %s: read_yield_fao(); records read=%li != nrecords=%i\n",
 				fname, count_recs, nrecords);
 		return ERROR_FILE;
 	}
+	 */
 	
 	if (in_args.diagnostics) {
 		if ((err = write_csv_float3d(yield_fao, countrycodes_fao, cropcodes_sage,

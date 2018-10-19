@@ -4,7 +4,7 @@
  write a csv text file from a flattened 2d float array
  
  arguments:
- int out_array[]:		1d array to write to file; it is a flattened 3d array
+ int out_array[]:		1d array to write to file; it is a flattened 2d array
  int d1[]:				array of numeric codes to write for the first dimension
  int d1_length:			length of dimension 1
  int d2_length:			length of dimension 2

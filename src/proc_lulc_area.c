@@ -10,7 +10,7 @@
  it does not currently deal with lulc data at finer resolution than hyde
  
  only one non-land-use land cover type is currently allowed in each working grid cell
- currently aggregate to sage potential veg types, because that is what gcam data systemcurrently uses
+ currently aggregate to sage potential veg types, because that is what gcam data system currently uses
  
  arguments:
  args_struct in_args:		input argument structure
@@ -354,9 +354,11 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 			if (sum_area_diff >= refveg_area_out[i] && sum_area_diff > 0 && potveg_val != 8 && potveg_val != 0) {
 				refveg_them[i] = potveg_val;
 				refveg_type_area_sum[potveg_ind] = refveg_type_area_sum[potveg_ind] + refveg_area_out[i];
-			} else if (lulc_scalar == 0 && lc_agg_area[potveg_ind] > 0) {
-				// store the type, but don't add any area
-				refveg_them[i] = potveg_val;
+			} else if (lulc_scalar == 0 && potveg_val != 0) {
+				if (lc_agg_area[potveg_ind] > 0) {
+					// store the type, but don't add any area
+					refveg_them[i] = potveg_val;
+				}
 			} else {
 				// find an appropriate subsitute land cover
 				switch (potveg_val) {
@@ -604,7 +606,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 						}
 						refveg_them[i] = potveg_val;
 						// add the area if appropriate
-						if (lulc_scalar != 0) {
+						if (lulc_scalar != 0 && potveg_val != 0) {
 							refveg_type_area_sum[potveg_val - 1] = refveg_type_area_sum[potveg_val - 1] + refveg_area_out[i];
 						}
 					} else if (refveg_them[i] == 0) { // set it only if it has not been set

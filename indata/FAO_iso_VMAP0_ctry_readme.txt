@@ -2,9 +2,11 @@ Remapping the countries to iso and VMAP0 so that the outputs are not beholden to
 13 Oct 2015
 Alan Di Vittorio
 
+The FAO_iso_VMAP0_ctry.csv file was updated June 2018
+
 Started with the FAO_gtap_gcam_ctry.csv as described below
 
-FAO data used here includes 1997-2007, so these mappings may not apply to other periods.
+FAO data used here includes 1997-2016, so these mappings may not apply to other periods.
 
 Raster FAO country file: fao_ctry_rast.bil
 Based on VMAP0 data, with Timor-Leste added
