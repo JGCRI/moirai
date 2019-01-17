@@ -84,7 +84,7 @@
  Note: The read functions for the data below need to be modular so they can be swapped easily
  to accommodate other data sources
  
- Note: Using Hyde 3.2 for land area and land use area
+ Note: Using Hyde 3.2.000 for land area and land use area
     2000 is the REF_YEAR data for carbon and land rent are consistent with the historical hyde area data
     sage land area is used only for sage-based processing:
         175 crop data, mirca2000 data, the deprecated N fert data
@@ -121,9 +121,9 @@
 	single-band binary file (BIL), nodata=-9999,4-byte integer
 	5 arcmin resolution, 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
 	added fao country codes: antarctica (300), Hong Kong (302), Macao (301), Spratly Islands (304), Taiwan (303)
-	Timor-Leste was added to the initial VMAP0 country boundary shapefile
 	the initial rasterization of the shapefile has been 'grown' by one cell to include coastal boundaries and all associated land area
 		fao_ctry_rast.bil
+ 	Timor-Leste was added to the raster file
  
  NOTE: The harvested area could be non-zero where the cropland extent data is zero
 	This is even the case for the sage cropland data
@@ -246,18 +246,19 @@
 		(sage_crop_code, sage_file_name (just the base), sage_crop_name, gtap_crop_name, gtap_crop_use_code, gtap_crop_use_name (3 character abbreviation), fao_crop_code, fao_crop_name)
  
  FAO:
-	downloaded by Alan Di Vittorio 2 Aug 2013 from faostat.fao.org/site/###/
- 	these file need to be in the same format with the same years
-	harvested area (and yield) are needed only if calibrating SAGE data to a different year; it is currently based on 1997-2003 FAO averages; yield is just for diagnostics; recalibration uses production and harvested area
+	downloaded by Alan Di Vittorio July 2018 from www.fao.org/faostat/
+ 	Annual 1993-2016, supposedly no empty rows
+ 	these file need to be in the same format with the same years (these are used as downloaded)
+	harvested area (and yield) are needed only if calibrating SAGE data to a different year; SAGE is currently based on 1997-2003 FAO averages; yield is just for diagnostics; recalibration uses production and harvested area
 	it appears that there are differences between these price data and those used by GTAP
-	prices are in 2004-2006 international USD values, so assume they are 2005USD for converstion to 2001USD
+	prices are in nominal USD (i.e., 2006 values are in 2006 USD); this is the basis for conversion to consisten USD year
 	different files could be used here, just change the read function and the number of FAO years in the .h file
 	the forage crop data is included, although it is not listed on the selection screen when downloading
-		FAO_ag_HA_ha_PRODSTAT.csv (1997-2007; supposedly no empty rows)
-		FAO_ag_yield_hg_ha_PRODSTAT.csv (1997-2007; supposedly no empty rows)
+		FAO_ag_HA_ha_PRODSTAT.csv
+		FAO_ag_yield_hg_ha_PRODSTAT.csv
 	these data are needed to disaggregrate land rents to AEZs
-		FAO_ag_prod_t_PRODSTAT.csv (1997-2007; supposedly no empty rows)
-		FAO_ag_an_prodprice_USD_t_PRICESTAT_11yrs.csv (1997-2007; supposedly no empty rows)
+		FAO_ag_prod_t_PRODSTAT.csv
+		FAO_ag_an_prodprice_USD_t_PRICESTAT_11yrs.csv
  
  Note: make sure that this GCAM file is consistent with the other mapping files, namely the iso files listed above:
     AGLU_ctry.csv

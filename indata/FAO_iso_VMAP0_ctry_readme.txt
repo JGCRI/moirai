@@ -73,17 +73,12 @@ There is one header line followed by 246 record lines. There are no duplicates o
 Spatial Data:
 
 Downloaded VMAP0 political boundaries shapefile from University of Washington Geomorphological Research Group
-Downloaded Timor-Leste administrative boundaries from the Timor-Leste GIG
 
-Added Timor-Leste country boundary to the vmap0 data set:
+Creating the final raster:
 
-Dissolve the admin1 district boundaries to get the country boundary
-Union the Timor-Leste data with the VMAP0 data (couldn't snap to the VMAP0 boundaries)
-Set the extra polygons to be part of Timor-Leste and dissolve the boundaries
-There is some coastline that still belongs to indonesia because the boundaries do not line up
-Add an FAO_code column to the attribute table and assign the values based on the mapping described below
 Create an initial raster file of the FAO codes (coastal boundaries are not included)
 Grow the raster by one cell to include coastal boundaries and all associated land area
+Set the Timor-Leste pixels to the Timor-Leste FAO code based on a map
 Write a raster file of the FAO country codes
 
 FAO country data:
