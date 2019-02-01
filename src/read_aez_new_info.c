@@ -1,18 +1,23 @@
-//
-//  read_aez_new_info.c
-//
-//  ids and names corresponding to aez_bounds_new
-//  the number ids must range from 1 to NUM_NEW_AEZ
-//
-//  arguments:
-//  args_struct in_args: the input file arguments
-//
-//  return value:
-//  integer error code: OK = 0, otherwise a non-zero error code
-//
-//  Created by Alan Di Vittorio on 10/13/15.
-//
-//
+/**********
+  read_aez_new_info.c
+
+  ids and names corresponding to aez_bounds_new
+  the number ids must range from 1 to NUM_NEW_AEZ
+
+  arguments:
+  args_struct in_args: the input file arguments
+
+  return value:
+  integer error code: OK = 0, otherwise a non-zero error code
+
+  Created by Alan Di Vittorio on 10/13/15.
+Copyright 2018 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+
+This file is part of Moirai.
+
+Moirai is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. Moirai is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with Moirai (/moirai/docs/COPYING.txt). If not, see <https://www.gnu.org/licenses/>.
+
+ **********/
 
 #include "moirai.h"
 

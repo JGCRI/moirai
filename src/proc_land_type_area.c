@@ -53,7 +53,11 @@
  rinfo_struct *raster_info: information about input raster data
  
  created by Alan Di Vittorio, 13 jan 2016
- Copyright 2016 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+ Copyright 2018 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+ 
+ This file is part of Moirai.
+ 
+ Moirai is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. Moirai is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with Moirai (/moirai/docs/COPYING.txt). If not, see <https://www.gnu.org/licenses/>.
  
  Modified by Alan Di VIittorio, jan 2018
  	use lulc data to calc the reference veg area instead of just the potential veg area

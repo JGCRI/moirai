@@ -2,8 +2,12 @@
  moirai.h
 
  Created by Alan Di Vittorio on 3 May 2013
- Copyright 2013 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
+ Copyright 2018 Alan Di Vittorio, Lawrence Berkeley National Laboratory, All rights reserved
 
+ This file is part of Moirai.
+ 
+ Moirai is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. Moirai is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with Moirai (/moirai/docs/COPYING.txt). If not, see <https://www.gnu.org/licenses/>.
+ 
  September 2015 - renamed LDS (land data system) by Alan Di Vittorio
     This is to be the base code for developing a system that works with an arbitrary number of AEZs
     An AEZ (agro-ecological zone) can be defined arbitrarily
