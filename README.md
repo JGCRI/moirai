@@ -1,5 +1,7 @@
 # Moirai Land Data System (Moirai LDS)
 
+[![DOI](https://zenodo.org/badge/101787317.svg)](https://zenodo.org/badge/latestdoi/101787317)
+
 ## Version: 3.0
 
 ## NOTICE:
