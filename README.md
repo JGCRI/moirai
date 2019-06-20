@@ -2,6 +2,10 @@
 
 ## Version: 3.0
 
+## Version History
+* **Version 3.0.0:** 5 March 2019; http://doi.org/10.5281/zenodo.2584035
+* **Version 2.0.0:** 4 December 2017; no DOI
+
 ## NOTICE:
 This repository uses Git Large File Storage (LFS). Please download and install from here: [https://github.com/git-lfs/git-lfs/wiki/Installation](https://github.com/git-lfs/git-lfs/wiki/Installation)
 
