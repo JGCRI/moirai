@@ -67,6 +67,10 @@
             argument = "$PROJECT_DIR/input_files/moirai_input_basins235.txt"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$PROJECT_DIR/input_files/moirai_input_aez_orig.txt"
+            isEnabled = "NO">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>

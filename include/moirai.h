@@ -60,7 +60,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#include "/usr/local/include/netcdf.h"
+#include <netcdf.h>
 
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.0"           			// current version
