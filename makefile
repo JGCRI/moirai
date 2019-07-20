@@ -23,7 +23,7 @@ LDS_HDRS = moirai.h
 NCHDRDIR = /usr/local/include
 
 # link the math library and the netcdf support libraries
-LDFLAGS_GENERIC = -lm -L/usr/local/lib -lnetcdf -L/usr/local/include
+LDFLAGS_GENERIC = -lm -L/usr/local/lib -lnetcdf
 
 # include the lds and netcdf header directories
 INCDIRS = $(HDRDIR) $(NCHDRDIR)

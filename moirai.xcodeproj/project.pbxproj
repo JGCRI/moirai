@@ -394,7 +394,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-L/usr/local/include",
+					"-L/usr/local/lib",
 					"-lnetcdf",
 					"-lm",
 				);
@@ -421,7 +421,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-L/usr/local/include",
+					"-L/usr/local/lib",
 					"-lnetcdf",
 					"-lm",
 				);
