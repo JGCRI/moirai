@@ -124,8 +124,6 @@ int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args) 
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
-    
-    fclose(fpin);
      
     if (in_args.diagnostics) {
         if ((err = write_raster_float(soil_carbon_grid, ncells, out_name, in_args))) {

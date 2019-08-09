@@ -21,8 +21,8 @@
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./example_outputs/aez_orig/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
-./example_outputs/aez_orig/aglu-data/mappings/     		# mapdestpath: destination path for the gcam data system mapping files
+./outputs/aez_orig/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
+./outputs/aez_orig/aglu-data/mappings/     		# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)

@@ -9,7 +9,7 @@
  only countries with glus are written
  only countries with valid economic (ctry87) mapping are processed
  
- the land type categories are in LDS_land_types.csv and are generated as follows:
+ the land type categories are in MOIRAI_land_types.csv and are generated as follows:
     sage potential vegetation code * 100 + lu_code + proctected_code
     sage potential vegetation values are 0=unknown, and 1-15 in order of SAGE_PVLT.csv
     lu_code is 0 for non-crop, non-pasture, non-urban (i.e. non hyde)

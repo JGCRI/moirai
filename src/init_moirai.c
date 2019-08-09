@@ -50,10 +50,12 @@ int init_moirai(args_struct *in_args) {
     
 	// input argument structure
 	in_args->diagnostics = 0;
+	// data years for calibration
 	in_args->out_year_prod_ha_lr = 0;
 	in_args->in_year_sage_crops = 0;
 	in_args->out_year_usd = 0;
 	in_args->in_year_lr_usd = 0;
+	// file paths; must include final "/"
 	memset(in_args->inpath, '\0', MAXCHAR);
 	memset(in_args->outpath, '\0', MAXCHAR);
 	memset(in_args->sagepath, '\0', MAXCHAR);
@@ -63,6 +65,7 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->wfpath, '\0', MAXCHAR);
     memset(in_args->ldsdestpath, '\0', MAXCHAR);
     memset(in_args->mapdestpath, '\0', MAXCHAR);
+	// input raster file names (without path)
 	memset(in_args->cell_area_fname, '\0', MAXCHAR);
 	memset(in_args->land_area_sage_fname, '\0', MAXCHAR);
 	memset(in_args->land_area_hyde_fname, '\0', MAXCHAR);
@@ -71,8 +74,9 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->potveg_fname, '\0', MAXCHAR);
 	memset(in_args->country_fao_fname, '\0', MAXCHAR);
     memset(in_args->protected_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_rast_fname, '\0', MAXCHAR);
+    memset(in_args->nfert_rast_fname, '\0', MAXCHAR); // still in input file but not used
 	memset(in_args->cropland_sage_fname, '\0', MAXCHAR);
+	// input csv file names (without path)
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
 	memset(in_args->country87map_fao_fname, '\0', MAXCHAR);
@@ -92,13 +96,14 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->convert_usd_fname, '\0', MAXCHAR);
     memset(in_args->vegc_csv_fname, '\0', MAXCHAR);
     memset(in_args->soilc_csv_fname, '\0', MAXCHAR);
+	// output file names (without path)
     memset(in_args->lds_logname, '\0', MAXCHAR);
     memset(in_args->harvestarea_fname, '\0', MAXCHAR);
     memset(in_args->production_fname, '\0', MAXCHAR);
     memset(in_args->rent_fname, '\0', MAXCHAR);
     memset(in_args->mirca_irr_fname, '\0', MAXCHAR);
     memset(in_args->mirca_rfd_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_fname, '\0', MAXCHAR);
+    memset(in_args->nfert_fname, '\0', MAXCHAR);	// not in input file and not used
     memset(in_args->land_type_area_fname, '\0', MAXCHAR);
     memset(in_args->refveg_carbon_fname, '\0', MAXCHAR);
     memset(in_args->wf_fname, '\0', MAXCHAR);

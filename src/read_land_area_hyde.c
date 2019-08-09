@@ -102,8 +102,6 @@ int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info) {
                 fname, num_read, ncells);
         return ERROR_FILE;
     }
-     
-	fclose(fpin);
 	
 	if (in_args.diagnostics) {
 		if ((err = write_raster_float(land_area_hyde, ncells, out_name, in_args))) {

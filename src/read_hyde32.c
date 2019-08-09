@@ -86,7 +86,7 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 	int sysrv;						// system return value
 	
 	char fname[MAXCHAR];            // file name to open
-	char tmp_str[MAXCHAR];          // temporary string
+	char tmp_str[1100];          // temporary string
 	FILE* fpin;
 	
 	char atag[] = "AD.asc";

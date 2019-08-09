@@ -89,7 +89,6 @@ int read_nfert(char *fname, float *nfert_grid, args_struct in_args) {
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
-    fclose(fpin);
     
     if (in_args.diagnostics) {
         if ((err = write_raster_float(nfert_grid, ncells, out_name, in_args))) {

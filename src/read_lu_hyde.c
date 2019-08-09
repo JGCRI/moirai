@@ -123,8 +123,6 @@ int read_lu_hyde(args_struct in_args, int year, float* crop_grid, float* pasture
         return ERROR_FILE;
     }
     
-    fclose(fpin);
-    
     // pasture
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.hist_pasture_rast_name);
@@ -146,8 +144,6 @@ int read_lu_hyde(args_struct in_args, int year, float* crop_grid, float* pasture
         return ERROR_FILE;
     }
     
-    fclose(fpin);
-    
     // urban
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.hist_urban_rast_name);
@@ -168,8 +164,6 @@ int read_lu_hyde(args_struct in_args, int year, float* crop_grid, float* pasture
                 in_args.hist_urban_rast_name, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
-    
-    fclose(fpin);
     
     return OK;
 }

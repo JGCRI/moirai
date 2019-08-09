@@ -330,7 +330,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 					for (x = toprow; x <= botrow; x++) {
 						if (x == toprow || x == botrow) {
 							// loop over columns if at top or bottom of search ring
-							for (y = icol - count; y <= icol + count; y++) {
+							for (y = leftcol; y <= rightcol; y++) {
 								current_val = potveg_thematic[x * nrows + y];
 								// grab the first found value
 								if (current_val != raster_info.potveg_nodata) {

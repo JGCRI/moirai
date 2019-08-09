@@ -132,7 +132,6 @@ int get_cell_area(args_struct in_args, rinfo_struct *raster_info) {
                 fname, num_read, ncells);
         return ERROR_FILE;
     }
-	fclose(fpin);
     
 	// calculate the grid cell area
 	for (i = 0; i < ncells; i++) {
