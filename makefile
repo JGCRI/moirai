@@ -8,9 +8,8 @@
 #	or the paths must be updated in the input file to reflect the calling/working directory
 #
 # NetCDF library and header locations:
-#   the defaults are: /usr/local/lib and /usr/local/include
-#   change LDFLAGS_GENERIC line below to point to your instance of the netcdf library (the -L<text>)
-#   change NCHDRDIR line below to point to your instance of the netcdf header
+#   these are now set automatically based on the install location
+#   if netcdf is not installed the makefile stops and returns an error message
 
 SRCDIR = ${PWD}/src
 HDRDIR = ${PWD}/include
@@ -19,21 +18,29 @@ OBJDIR = ${PWD}/obj
 
 LDS_HDRS = moirai.h
 
-# netcdf header path
-NCHDRDIR = /usr/local/include
-
-# link the math library and the netcdf support libraries
-LDFLAGS_GENERIC = -lm -L/usr/local/lib -lnetcdf
+# if netcdf is installed, assign header and library paths and set linker flags; else, exit with error
+# LDFLAGS_GENERIC links the math library and the netcdf support libraries
+ifneq ("$(wildcard $(shell $$cat which nc-config))", "")
+	NCHDRDIR := $(shell $$cat nc-config --includedir)
+	NCLIBS := $(shell $$cat nc-config --libs)
+	LDFLAGS_GENERIC = -lm $(NCLIBS)
+else
+	NCERROR = "NetCDF-C library not found. \
+			   Please install NetCDF-C library and try again."
+	# NOTE:  next line uses spaces to indent instead of tab which indicates a
+	#  command which cannot exist outside of a rule
+    $(error $(NCERROR))
+endif
 
 # include the lds and netcdf header directories
 INCDIRS = $(HDRDIR) $(NCHDRDIR)
 IFLAGS = $(INCDIRS:%=-I%)
 
 # For Linux
-#CFLAGS =  -O3 -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
+CFLAGS =  -O3 -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
 # CFLAGS = -fast -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
 # CFLAGS = -O3 -std=c99 -ffloat-store ${CFLAGS_GENERIC} # Use precise IEEE Floating Point
-CFLAGS = -g -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # debugging with line/file reporting and 'standards' testing flags
+#CFLAGS = -g -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # debugging with line/file reporting and 'standards' testing flags
 # CFLAGS = -fast -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # testing with line/file reporting and 'standards' testing flags
 LDFLAGS = ${LDFLAGS_GENERIC}
 CC = gcc
@@ -58,6 +65,8 @@ ${OBJDIR}/%.o : ${SRCDIR}/%.c ${LDS_INCLUDE}
 	${CC} -c $< -o $@ ${CFLAGS} ${IFLAGS}
 
 moirai : ${OBJ}
+	@echo "Path to NetCDF header source directory:  $(NCHDRDIR)"
+	@echo "Path to NetCDF library source directory (includes linker flags):  $(NCLIBS)"
 	@mkdir -p ${EXEDIR}
 	${CC} -o ${EXEDIR}/$@ ${CFLAGS} ${OBJ} ${LDFLAGS} ${IFLAGS}
 
