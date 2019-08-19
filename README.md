@@ -5,7 +5,7 @@ Alan Di Vittorio, Lawrence Berkeley National Laboratory
 ## Version: 3
 
 ## Version History
-* **Version 3.0.1:** August 2019; DOI to be determined
+* **Version 3.0.1:** 18 August 2019; http://doi.org/10.5281/zenodo.3370875
 	* This fixes a makefile compilation bug and removes the absolute path in `moirai.h` for the NetCDF library header file
 * **Version 3.0.0:** 5 March 2019; http://doi.org/10.5281/zenodo.2584035
 * **Version 2.0.0:** 4 December 2017; no DOI
