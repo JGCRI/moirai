@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/JGCRI/moirai.svg?branch=master)](https://travis-ci.org/JGCRI/moirai)
+
 # Moirai Land Data System (Moirai LDS)
 
 Alan Di Vittorio, Lawrence Berkeley National Laboratory
