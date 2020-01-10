@@ -63,12 +63,14 @@
 #include <netcdf.h>
 
 #define CODENAME				"moirai"				// name of the compiled program
-#define VERSION         		"3.0"           			// current version
+#define VERSION         		"3.1"           			// current version
 #define MAXCHAR					1000						// maximum string length
 #define MAXRECSIZE				10000						// maximum record (csv line) length in characters
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
-#define REF_YEAR               2000
+#define REF_YEAR				2000
+// this needs to be in the input file, but just define it here for now
+#define LT_WRITE_YEAR			2015
 
 // the min and max forest codes for the SAGE raster data (see SAGE_PVLT.csv)
 // these assume that the forest codes are all consecutive with no others mixed in the enumeration
