@@ -16,5 +16,5 @@ Suggests:
     dplyr,
     tibble,
     raster,
-    rgdal (== 1.4-1)
+    rgdal
 VignetteBuilder: knitr
