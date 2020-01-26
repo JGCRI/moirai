@@ -12,5 +12,9 @@ Encoding: UTF-8
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    dplyr,
+    tibble,
+    raster,
+    rgdal
 VignetteBuilder: knitr
