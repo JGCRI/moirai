@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/JGCRI/moirai.svg?branch=master)](https://travis-ci.org/JGCRI/moirai)
+[![Build Status](https://travis-ci.org/JGCRI/moirai.svg?build-r-package)](https://travis-ci.org/JGCRI/moirai)
 
 # Moirai Land Data System (Moirai LDS)
 
