@@ -16,5 +16,6 @@ Suggests:
     dplyr,
     tibble,
     raster,
-    rgdal
+    rgdal,
+    data.table
 VignetteBuilder: knitr
