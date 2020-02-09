@@ -6,9 +6,9 @@ library(testthat)
 library(rgdal)
 library(data.table)
 
-#kbn 2020-01-30 Adding system.time
 
-start.time <- Sys.time()
+
+
 test_that("Compare raster outputs with LDS outputs at basin level", {
   #Get land data from raster files for each basin intersection (32 regions, 235 basins)
   #Get output data from LDS and compare with the above
@@ -79,16 +79,16 @@ test_that("Compare raster outputs with LDS outputs at basin level", {
     left_join(LDS_data_intersections, by=c("moirai_valid_region32_water_basin235")) 
     
   
-  expect_equal(Reco$Total_Raster_LandArea, Reco$Total_Intersection_Area_LDS, tolerance=0.02,info= paste("data in raster does not match land data outputs"))
+  expect_equal(Reco$Total_Raster_LandArea, Reco$Total_Intersection_Area_LDS, tolerance=0.01,info= paste("data in raster does not match land data outputs"))
   
 })
 
-end.time <- Sys.time()
-
-print(paste0("Test - Compare raster outputs with LDS outputs at basin level  completing in ",start.time - end.time, " seconds" ))
 
 
-start.time <- Sys.time()
+
+
+
+
 test_that("Compare raster outputs with LDS outputs at country level", {
   #Get land data from raster files for each region (32 regions)
   #Get output data from LDS and compare with the above
@@ -160,8 +160,7 @@ test_that("Compare raster outputs with LDS outputs at country level", {
     left_join(LDS_data_Country ,by=c("moirai_valid_region32")) 
   
   
-  expect_equal(Reco$Total_Raster_LandArea, Reco$Total_Country_Area_LDS, tolerance=0.02,info= paste("data in raster does not match land data outputs"))
+  expect_equal(Reco$Total_Raster_LandArea, Reco$Total_Country_Area_LDS, tolerance=0.01,info= paste("data in raster does not match land data outputs"))
   
 })
-end.time <- Sys.time()
-print(paste0("Test - Compare raster outputs with LDS outputs at country level completing in ",start.time - end.time, " seconds" ))
+
