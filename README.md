@@ -45,7 +45,7 @@ Moirai (moi’-rĪ) is free software: you can use it under the terms of the modi
 ## Citations
 Please cite the associated paper in the Journal of Open Research Software:
 
-A.V. Di Vittorio, C. Vernon, and S. Shu, 2020, “Moirai version 3: A data processing system to generate recent historical land inputs for global modeling applications at various scales”, Journal of Open Research Software. doi: 10.5334/jors.266.
+A.V. Di Vittorio, C. Vernon, and S. Shu, 2020, “Moirai version 3: A data processing system to generate recent historical land inputs for global modeling applications at various scales”, Journal of Open Research Software. doi: 10.5334/jors.266. Available at: https://openresearchsoftware.metajnl.com/articles/10.5334/jors.266/.
 
 Also please cite the appropriate input data and associated papers (see Required downloads and installs below, Inputs below, and also [.../moirai/docs/third_party_contributions.docx](https://github.com/JGCRI/moirai/blob/master/docs/third_party_contributions.pdf)).
 
