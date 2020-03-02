@@ -114,6 +114,8 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     float *urban_grid;  // 1d array to store current urban data; start up left corner, row by row; lon varies faster
 	float **lu_detail_grid;		// for the rest of the hyde types; dim1=hyde types, dim2=cells
 	float **lulc_temp_grid;		// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
+	float *refveg_area_grid;         // out reference vegetation area (km^2
+	int *refveg_them_out;       // out reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 	
 	// used to determine working grid cell indices
 	int num_split = 0;		// number of working grid cells in one dimension of one lulc cell
@@ -151,6 +153,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     int hyde_years[NUM_HYDE_YEARS]; // the years in the hyde historical lu files
    
     char fname[MAXCHAR];        // current file name to write
+	char tmp_str[1100];        // temporary string
     FILE *fpout;                // out file pointer
     
     double tmp_dbl;
@@ -212,6 +215,18 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lulc_temp_grid[%i]: proc_land_type_area()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
 		}
+	}
+	
+	refveg_area_grid = calloc(NUM_CELLS, sizeof(int));
+	if(refveg_area_grid == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area_grid: proc_land_type_area()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	
+	refveg_them_out = calloc(NUM_CELLS, sizeof(int));
+	if(refveg_them_out == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_them_out: proc_land_type_area()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
 	}
 	
 	// for proc_lulc_area
@@ -564,6 +579,31 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 					
 				} // end if valid land area
 				
+				// store the updated grid data in the input arrays for each year in case they are to be written
+				// set cell to nodata if it is not a land cell
+				
+				if (land_area_hyde[grid_ind] != raster_info.land_area_hyde_nodata) {
+					crop_grid[grid_ind] = lu_area[j][crop_ind];
+					pasture_grid[grid_ind] = lu_area[j][pasture_ind];
+					urban_grid[grid_ind] = lu_area[j][urban_ind];
+					for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
+						lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = lu_area[j][m];
+					}
+					refveg_area_grid[grid_ind] = refveg_area_out[j];
+					refveg_them_out[grid_ind] = refveg_them[j];
+					
+				} else {
+					crop_grid[grid_ind] = NODATA;
+					pasture_grid[lu_indices[j]] = NODATA;
+					urban_grid[grid_ind] = NODATA;
+					for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
+						lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = NODATA;
+					}
+					refveg_area_grid[grid_ind] = NODATA;
+					refveg_them_out[grid_ind] = raster_info.potveg_nodata;
+				}
+ 
+				
 			} // end for j loop over the lu cells to store
 			
 		} // end for i loop over the lulc cells
@@ -592,6 +632,51 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 				}
 			}
 			fprintf(fplog, "Global land area: out =\t%f;\tin =\t%f\n", global_area_out, global_area_in);
+		} // end if write diagnostics
+		
+		// write this year's land cover/use grids if desired - currently hardcoded to 2015
+		
+		if (hyde_years[year_ind] == LT_WRITE_YEAR) {
+			// cropland area
+			strcpy(fname, "cropland_area_");
+			sprintf(tmp_str, "%i.bil", hyde_years[year_ind]);
+			strcat(fname, tmp_str);
+			if ((err = write_raster_float(crop_grid, NUM_CELLS, fname, in_args))) {
+				fprintf(fplog, "Error writing file %s: proc_land_type_area()\n", fname);
+				return err;
+			}
+			// pasture area
+			strcpy(fname, "pasture_area_");
+			sprintf(tmp_str, "%i.bil", hyde_years[year_ind]);
+			strcat(fname, tmp_str);
+			if ((err = write_raster_float(pasture_grid, NUM_CELLS, fname, in_args))) {
+				fprintf(fplog, "Error writing file %s: proc_land_type_area()\n", fname);
+				return err;
+			}
+			// urban area
+			strcpy(fname, "urban_area_");
+			sprintf(tmp_str, "%i.bil", hyde_years[year_ind]);
+			strcat(fname, tmp_str);
+			if ((err = write_raster_float(urban_grid, NUM_CELLS, fname, in_args))) {
+				fprintf(fplog, "Error writing file %s: proc_land_type_area()\n", fname);
+				return err;
+			}
+			// reference vegetation area
+			strcpy(fname, "refveg_area_");
+			sprintf(tmp_str, "%i.bil", hyde_years[year_ind]);
+			strcat(fname, tmp_str);
+			if ((err = write_raster_float(refveg_area_grid, NUM_CELLS, fname, in_args))) {
+				fprintf(fplog, "Error writing file %s: proc_land_type_area()\n", fname);
+				return err;
+			}
+			// reference vegetation types
+			strcpy(fname, "refveg_thematic_");
+			sprintf(tmp_str, "%i.bil", hyde_years[year_ind]);
+			strcat(fname, tmp_str);
+			if ((err = write_raster_int(refveg_them_out, NUM_CELLS, fname, in_args))) {
+				fprintf(fplog, "Error writing file %s: proc_land_type_area()\n", fname);
+				return err;
+			}
 		}
 		
     } // end for year_ind loop over the years
@@ -667,6 +752,8 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 	free(lu_area);
 	free(global_lt_out);
 	free(global_lulc_in);
+	free(refveg_them_out);
+	free(refveg_area_grid);
 	
     return OK;
 
