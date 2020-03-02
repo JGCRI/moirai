@@ -1,0 +1,15 @@
+ENVI
+description = {
+/Users/adivi/projects/gcam_lds/moirai/ancillary/moirai_valid_reigon32.bsq}
+samples = 4320
+lines   = 2160
+bands   = 1
+header offset = 0
+file type = ENVI Standard
+data type = 3
+interleave = bsq
+byte order = 0
+map info = {Geographic Lat/Lon, 1, 1, -180, 90, 0.0833333333333333, 0.0833333333333333,WGS-84}
+coordinate system string = {GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]}
+band names = {
+region32_gcam_moirai_out}
