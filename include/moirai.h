@@ -78,7 +78,7 @@
 #define MIN_SAGE_FOREST_CODE    1
 
 // counts of useful variables
-#define NUM_IN_ARGS							54							// number of input variables in the input file
+#define NUM_IN_ARGS							60							// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -251,7 +251,14 @@ int *land_mask_potveg;                  // 1=land; 0=no land
 int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
 short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
-
+//kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7 
+float *protected_Cat_1;
+float *protected_Cat_2;
+float *protected_Cat_3;
+float *protected_Cat_4;
+float *protected_Cat_5;
+float *protected_Cat_6;
+float *protected_Cat_7;
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
@@ -496,7 +503,15 @@ typedef struct {
 	char potveg_fname[MAXCHAR];				// file name only of the potential vegetation raster file
 	char country_fao_fname[MAXCHAR];		// file name only of the fao country code raster file
     char protected_fname[MAXCHAR];          // file name only of the protected pixel raster file
-    char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
+    //kbn 2020-02-29 Introducing file names for new EPA suitability and protected area rasters
+	char L1_fname[MAXCHAR];                //L1 suitability raster
+	char L2_fname[MAXCHAR];                //L2 suitability raster
+	char L3_fname[MAXCHAR];                //L3 suitability raster
+	char L4_fname[MAXCHAR];                //L4 suitability raster 
+	char ALL_IUCN_fname[MAXCHAR];          //IUCN All protected area raster
+	char IUCN_1a_1b_2_fname[MAXCHAR];      //IUCN 1a_1b_2 protected area raster
+	
+	char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
     //char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
     //char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
     //char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
