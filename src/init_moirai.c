@@ -74,7 +74,14 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->potveg_fname, '\0', MAXCHAR);
 	memset(in_args->country_fao_fname, '\0', MAXCHAR);
     memset(in_args->protected_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_rast_fname, '\0', MAXCHAR); // still in input file but not used
+    //kbn 2020-02-29 Introduce memory set for each of the suitability, protected area rasters
+	memset(in_args->L1_fname, '\0', MAXCHAR);
+	memset(in_args->L2_fname, '\0', MAXCHAR);
+	memset(in_args->L3_fname, '\0', MAXCHAR);
+	memset(in_args->L4_fname, '\0', MAXCHAR);
+	memset(in_args->ALL_IUCN_fname, '\0', MAXCHAR);
+	memset(in_args->IUCN_1a_1b_2_fname, '\0', MAXCHAR);
+	memset(in_args->nfert_rast_fname, '\0', MAXCHAR); // still in input file but not used
 	memset(in_args->cropland_sage_fname, '\0', MAXCHAR);
 	// input csv file names (without path)
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);

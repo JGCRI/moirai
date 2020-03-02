@@ -33,6 +33,12 @@ AEZ_orig_lds.gri			# aez_orig_fname: original climate AEZs for reference (themat
 potveg_plus.bil				# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
 fao_ctry_rast.bil			# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
 ProArea_0408_ENVI.img       # protected_fname: protected pixels (thematic)
+L1_processed.bil            # L1_fname: suitability pixels (thematic) 
+L2_processed.bil            # L2_fname: suitability pixels (thematic)
+L3_processed.bil            # L3_fname: suitability pixels (thematic)
+L3_processed.bil                  # L4_fname: suitability pixels (thematic)
+All_IUCN.bil                # ALL_IUCN_fname: protected pixels (thematic)
+1a_1b_2_processed.bil       # IUCN_1a_1b_2_fname: protected pixels (thematic)
 Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
 Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
 

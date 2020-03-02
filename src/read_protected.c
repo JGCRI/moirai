@@ -56,7 +56,8 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
     int ncells = nrows * ncols;		// number of input grid cells
-    int insize = 1;					// 1 byte unsigned char for input
+    int insize = 1;
+    int insize_IUCN = 4;					// 1 byte unsigned char for input
     double res = 5.0 / 60.0;		// resolution
     double xmin = -180.0;			// longitude min grid boundary
     double xmax = 180.0;			// longitude max grid boundary
@@ -68,10 +69,25 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     int num_read;					// how many values read in
     
     unsigned char *in_array;       // temporary array for input
-    
+    //kbn 2020-02-29 introduce temporary input arrays for all 6 suitability,protected area raster files
+    float *L1_array;
+    float *L2_array;
+    float *L3_array;
+    float *L4_array;
+    float *ALL_IUCN_array;
+    float *IUCN_1a_1b_2_array;
+
     int err = OK;								// store error code from the write file
     char out_name[] = "protected.bil";		// diagnositic output raster file name
-    
+    //kbn 2020-02-29 introduce output arrays for all 7 categories
+    char out_name_Cat1[]= "Category1.bil";
+    char out_name_Cat2[]= "Category2.bil";
+    char out_name_Cat3[]= "Category3.bil";
+    char out_name_Cat4[]= "Category4.bil";
+    char out_name_Cat5[]= "Category5.bil";
+    char out_name_Cat6[]= "Category6.bil";
+    char out_name_Cat7[]= "Category7.bil";
+
     // store file specific info
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
@@ -94,12 +110,16 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     // create file name and open it
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.protected_fname);
-    
+	printf(in_args.protected_fname);
+    printf("printing");
+	//printf(in_args);
     if((fpin = fopen(fname, "rb")) == NULL)
     {
         fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
         return ERROR_FILE;
     }
+
+	
     
     // read the data and check for same size as the working grid
     num_read = fread(in_array, insize, ncells, fpin);
@@ -111,6 +131,10 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         return ERROR_FILE;
     }
     
+
+
+
+
     // put the data in a short array for storage and further processing
     // also change the values to match the output land categories generation scheme
     for (i = 0; i < ncells; i++) {
@@ -121,6 +145,13 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         }
     }
     
+      
+    
+    // reads and stores input
+    //scanf("%d", ncells);
+    // displays output
+    
+    
     if (in_args.diagnostics) {
         if ((err = write_raster_short(protected_thematic, ncells, out_name, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
@@ -128,7 +159,59 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         }
     }
     
-    free(in_array);
+    //kbn 2020-02-29 Start code to read in suitability and protected area raster files
     
+    //1. Start with processing for Category 2 
+    
+    // allocate the temp array
+    L4_array = calloc(ncells, sizeof(float));
+    if(L4_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.L4_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(L4_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+   //kbn read category 2 data from L4_array as a test
+    for (i = 0; i < ncells; i++) {
+        protected_Cat_2[i] = L4_array[i]; 
+    }
+   //Write Category 2 data out for diagnostics
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_Cat_2, ncells, out_name_Cat2, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+    
+    //2. Category 1
+    
+
+    
+       //Comment in this exit function as a break point for testing.
+       //exit(0);
+
+    free(in_array);
+    free(L4_array);
     return OK;
 }

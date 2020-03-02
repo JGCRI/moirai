@@ -15,24 +15,30 @@
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./outputs/basins235_lulcc/                			# outpath: path to output files
+./outputs/basins235/                			# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./outputs/basins235_lulcc/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
-./outputs/basins235_lulcc/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
+./outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
+./outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
 sage_land_frac.bil			# land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
-hyde_land_plus.bil          # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
+hyde_land_plus.bil           # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
 Global235_CLM_5arcmin.bil   # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ) --updated 30Sep2017
 AEZ_orig_lds.gri			# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
 potveg_plus.bil				# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
 fao_ctry_rast.bil			# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
 ProArea_0408_ENVI.img       # protected_fname: protected pixels (thematic)
+L1_processed.bil            # L1_fname: suitability pixels (thematic) 
+L2_processed.bil            # L2_fname: suitability pixels (thematic)
+L3_processed.bil            # L3_fname: suitability pixels (thematic)
+L3_processed.bil                  # L4_fname: suitability pixels (thematic)
+All_IUCN.bil                # ALL_IUCN_fname: protected pixels (thematic)
+1a_1b_2_processed.bil       # IUCN_1a_1b_2_fname: protected pixels (thematic)
 Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
 Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
 

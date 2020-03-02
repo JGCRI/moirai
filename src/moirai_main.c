@@ -727,6 +727,12 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_thematic: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+    //kbn 2020
+    protected_Cat_2 = calloc(NUM_CELLS, sizeof(float));
+    if(protected_Cat_2 == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_Cat_2: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
     if((error_code = read_protected(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -770,6 +776,8 @@ int main(int argc, const char * argv[]) {
 	free(land_area_hyde);
     free(land_cells_aez_new);
     free(protected_thematic);
+    //kbn 2020
+    free(protected_Cat_2);
     free(potveg_thematic);
 	free(refveg_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {
