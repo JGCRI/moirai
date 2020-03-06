@@ -115,7 +115,7 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
             return ERROR_MEM;
         }
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            nfert_out[i][j] = calloc(NUM_PROTECTED, sizeof(float));
+            nfert_out[i][j] = calloc(EPA_PROTECTED, sizeof(float));
             if(nfert_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for nfert_out[%i][%i]: proc_nfert()\n", i, j);
                 return ERROR_MEM;
@@ -219,7 +219,7 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
     // write the records (truncated to 3 decimal places)
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-            for (pc_ind = 0; pc_ind < NUM_PROTECTED; pc_ind++) {
+            for (pc_ind = 0; pc_ind < EPA_PROTECTED; pc_ind++) {
                 outval = (float) floor((double) 0.5 + nfert_out[ctry_ind][aez_ind][pc_ind]);
                 // output only positive values
                 if (outval > 0) {
