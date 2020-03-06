@@ -99,6 +99,7 @@
 #define PROTECTED               1               // value assigned to protected pixels for generating land category (this value - 1 is the output array index)
 #define UNPROTECTED             2               // value assigned to unprotected pixels for generating land category (this value - 1 is the output array index)
 #define NUM_PROTECTED           2               // number of protection categories
+#define NUM_EPA_PROTECTED       8
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -173,6 +174,8 @@ int NUM_SAGE_PVLT;						// number of SAGE potential vegetation land types (see S
 int NUM_SAGE_CROP;						// number of SAGE crops (SAGE_crop) (see SAGE_gtap_fao_crop2use.csv)
 int NUM_HYDE_TYPES;						// number of hyde land use types/files; the first 3 describe the total land use state
 int NUM_LULC_TYPES;						// number of input lulc types
+//kbn 2020 5 Mar 2020
+//int NUM_PROTECTED_EPA                  //Number of protected area categories from the EPA 
 
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
@@ -252,13 +255,9 @@ int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
 short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
 //kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7 
-float *protected_Cat_1;
-float *protected_Cat_2;
-float *protected_Cat_3;
-float *protected_Cat_4;
-float *protected_Cat_5;
-float *protected_Cat_6;
-float *protected_Cat_7;
+
+float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
+
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells

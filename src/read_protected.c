@@ -80,13 +80,13 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     int err = OK;								// store error code from the write file
     char out_name[] = "protected.bil";		// diagnositic output raster file name
     //kbn 2020-02-29 introduce output arrays for all 7 categories
-    char out_name_Cat1[]= "Category1.bil";
-    char out_name_Cat2[]= "Category2.bil";
-    char out_name_Cat3[]= "Category3.bil";
-    char out_name_Cat4[]= "Category4.bil";
-    char out_name_Cat5[]= "Category5.bil";
-    char out_name_Cat6[]= "Category6.bil";
-    char out_name_Cat7[]= "Category7.bil";
+    char out_name_Cat1[]= "EPA_Protected_Category1.bil";
+    char out_name_Cat2[]= "EPA_Protected_Category2.bil";
+    char out_name_Cat3[]= "EPA_Protected_Category3.bil";
+    char out_name_Cat4[]= "EPA_Protected_Category4.bil";
+    char out_name_Cat5[]= "EPA_Protected_Category5.bil";
+    char out_name_Cat6[]= "EPA_Protected_Category6.bil";
+    char out_name_Cat7[]= "EPA_Protected_Category7.bil";
 
     // store file specific info
     raster_info->protected_nrows = nrows;
@@ -164,6 +164,94 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     //1. Start with processing for Category 2 
     
     // allocate the temp array
+    //1. L1_array
+    L1_array = calloc(ncells, sizeof(float));
+    if(L1_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.L1_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(L1_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //2. L2_array
+    L2_array = calloc(ncells, sizeof(float));
+    if(L2_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.L2_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(L2_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //L3_Array
+    L3_array = calloc(ncells, sizeof(float));
+    if(L3_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.L3_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(L3_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+    //4. L4_array
     L4_array = calloc(ncells, sizeof(float));
     if(L4_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -192,26 +280,164 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         return ERROR_FILE;
     }
     
-   //kbn read category 2 data from L4_array as a test
-    for (i = 0; i < ncells; i++) {
-        protected_Cat_2[i] = L4_array[i]; 
+    //5.ALL_IUCN
+    ALL_IUCN_array = calloc(ncells, sizeof(float));
+    if(ALL_IUCN_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
     }
-   //Write Category 2 data out for diagnostics
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.ALL_IUCN_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(ALL_IUCN_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+   //6. IUCN_1a_1b_2
+    IUCN_1a_1b_2_array = calloc(ncells, sizeof(float));
+    if(IUCN_1a_1b_2_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.IUCN_1a_1b_2_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+
+     	
+    // read the data and check for same size as the working grid
+    num_read = fread(IUCN_1a_1b_2_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+   
+
+
+   //kbn read category  data from arrays as a test
+    for (i = 0; i < ncells; i++) {
+        //Category 1
+        protected_EPA[1][i] = 1 - ALL_IUCN_array[i]- L4_array[i];  
+        //Category 2
+        protected_EPA[2][i] = L4_array[i];
+        //Category 3
+        protected_EPA[3][i] = L1_array[i]- L3_array[i];
+        //Category 4
+        protected_EPA[4][i] = L3_array[i]- L2_array[i];
+        //Category 5
+        protected_EPA[5][i] = L2_array[i]- L4_array[i];
+        //Category 6
+        protected_EPA[6][i] = IUCN_1a_1b_2_array[i]- L1_array[i]+L2_array[i];
+        //Category 7
+        protected_EPA[7][i] = ALL_IUCN_array[i]- L2_array[i] + L4_array[i] - IUCN_1a_1b_2_array[i];
+    
+    //Check for negative grid cells
+    if(protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i] < 0)
+    {
+        fprintf(fplog, "Grid cells from EPA are below 0. Please check inputs"
+                );
+        return ERROR_FILE;
+    }
+    
+    //Check to ensure grid cells add up to 1
+    if(protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i] > 1)
+    {
+        fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputs"
+                );
+        return ERROR_FILE;
+    }
+    
+    
+    
+    
+    }
+   //Write Category data out for diagnostics
     if (in_args.diagnostics) {
-        if ((err = write_raster_float(protected_Cat_2, ncells, out_name_Cat2, in_args))) {
+        if ((err = write_raster_float(protected_EPA[1], ncells, out_name_Cat1, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
             return err;
         }
     }
+
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[2], ncells, out_name_Cat2, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+    
+    
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[3], ncells, out_name_Cat3, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[4], ncells, out_name_Cat4, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+    
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[5], ncells, out_name_Cat5, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[6], ncells, out_name_Cat6, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[7], ncells, out_name_Cat7, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
+
     
     //2. Category 1
     
 
     
        //Comment in this exit function as a break point for testing.
-       //exit(0);
+       exit(0);
 
     free(in_array);
     free(L4_array);
+
     return OK;
 }

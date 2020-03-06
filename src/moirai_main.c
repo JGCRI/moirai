@@ -728,11 +728,21 @@ int main(int argc, const char * argv[]) {
         return ERROR_MEM;
     }
     //kbn 2020
-    protected_Cat_2 = calloc(NUM_CELLS, sizeof(float));
-    if(protected_Cat_2 == NULL) {
-        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_Cat_2: main()\n", get_systime(), ERROR_MEM);
+    protected_EPA = calloc(NUM_EPA_PROTECTED, sizeof(float*));
+    if(protected_EPA == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+    for (i = 0; i < NUM_EPA_PROTECTED; i++) {
+		protected_EPA[i] = calloc(NUM_CELLS, sizeof(float));
+		if(protected_EPA[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+
+
+
     if((error_code = read_protected(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -777,7 +787,10 @@ int main(int argc, const char * argv[]) {
     free(land_cells_aez_new);
     free(protected_thematic);
     //kbn 2020
-    free(protected_Cat_2);
+    for (i = 0; i < NUM_EPA_PROTECTED; i++) {
+		free(protected_EPA[i]);
+	}
+	free(protected_EPA);
     free(potveg_thematic);
 	free(refveg_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {
