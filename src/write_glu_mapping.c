@@ -111,7 +111,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     FILE *fpout3;					// file 2 pointer
 	
     char *lult_names[NUM_LU_CATS] = {"Unmanaged","Cropland","Pasture","UrbanLand"};
-    char *protected_names[NUM_PROTECTED] = {"Protected","Non-protected"};
+    char *protected_names[EPA_PROTECTED] = {"Protected_Category_1","Protected_Category_2","Protected_Category_3","Protected_Category_4","Protected_Category_5","Protected_Category_6","Protected_Category_7"};
     
     // get the output mapping file names
     strcpy(oname1, in_args.iso_map_fname);
@@ -200,7 +200,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     fprintf(fpout1,"Category,LT_SAGE,LT_HYDE,LT_WDPA");
     
     // add one pv cat for unknown
-    num_lt_cats = (NUM_SAGE_PVLT + 1) * NUM_LU_CATS * NUM_PROTECTED;
+    num_lt_cats = (NUM_SAGE_PVLT + 1) * NUM_LU_CATS * EPA_PROTECTED;
     lt_cats = calloc(num_lt_cats, sizeof(int));
     if(lt_cats == NULL) {
         fprintf(fplog,"Failed to allocate memory for lt_cats: write_glu_mapping()\n");
@@ -209,7 +209,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     cur_lt_cat_ind = 0;
     for (k = 0; k <= NUM_SAGE_PVLT; k++) {
         for (j = 0; j < NUM_LU_CATS; j++) {
-            for (i = 1; i <= NUM_PROTECTED; i++) {
+            for (i = 1; i <= EPA_PROTECTED; i++) {
                 lt_cats[cur_lt_cat_ind++] = (k * SCALE_POTVEG) + (j * 10) + i;
                 if (k == 0) {
                     fprintf(fpout1,"\n%i,%s,%s,%s", lt_cats[cur_lt_cat_ind-1], "Unknown",

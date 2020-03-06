@@ -100,6 +100,7 @@
 #define UNPROTECTED             2               // value assigned to unprotected pixels for generating land category (this value - 1 is the output array index)
 #define NUM_PROTECTED           2               // number of protection categories
 #define NUM_EPA_PROTECTED       8
+#define EPA_PROTECTED           7
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing

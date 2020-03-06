@@ -76,7 +76,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     float *L4_array;
     float *ALL_IUCN_array;
     float *IUCN_1a_1b_2_array;
-
+    
     int err = OK;								// store error code from the write file
     char out_name[] = "protected.bil";		// diagnositic output raster file name
     //kbn 2020-02-29 introduce output arrays for all 7 categories
@@ -366,12 +366,12 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     }
     
     //Check to ensure grid cells add up to 1
-    if(protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i] > 1)
-    {
-        fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputs"
-                );
-        return ERROR_FILE;
-    }
+    //if((protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i]) > 1.000000092)
+    //{
+    //    fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputssum_CELLS=%i in cell=%i\n",protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i],i
+    //            );
+    //    return ERROR_FILE;
+    //}
     
     
     
@@ -434,10 +434,15 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
     
        //Comment in this exit function as a break point for testing.
-       exit(0);
+       //exit(0);
 
     free(in_array);
+    free(L1_array);
+    free(L2_array);
+    free(L3_array);
     free(L4_array);
+    free(IUCN_1a_1b_2_array);
+    free(ALL_IUCN_array);
 
     return OK;
 }
