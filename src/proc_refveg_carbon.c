@@ -236,7 +236,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             }
             
             // get index of land category
-            cur_lt_cat = rv_value * SCALE_POTVEG + protected_thematic[grid_ind];
+            cur_lt_cat = rv_value * SCALE_POTVEG + protected_EPA[grid_ind];
             cur_lt_cat_ind = NOMATCH;
             for (i = 0; i < num_lt_cats; i++) {
                 if (lt_cats[i] == cur_lt_cat) {
