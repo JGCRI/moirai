@@ -409,6 +409,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			
 			// add data to output array as appropriate
 			// don't need to store the updated grid data at all in the read in grids
+			//This loop ends at line 608
 			for (j = 0; j < num_lu_cells; j++) {
 				grid_ind = lu_indices[j];
 				// process only if there is land area
@@ -482,9 +483,12 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 						} else {
 							rv_value = refveg_them[j];
 						}
-						
+						//kbn 2020
+						for (k=1; k < NUM_EPA_PROTECTED; k++){
+						//Print log 
+						fprintf(fplog, "Currently processing protected category %i:proc_land_type_area()\n", k);
 						// reference veg; i.e. non-crop, non-pasture, non-urban
-						cur_lt_cat = rv_value * SCALE_POTVEG + protected_thematic[grid_ind];
+						cur_lt_cat = rv_value * SCALE_POTVEG + k;
 						cur_lt_cat_ind = NOMATCH;
 						for (m = 0; m < num_lt_cats; m++) {
 							if (lt_cats[m] == cur_lt_cat) {
@@ -493,19 +497,19 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 							}
 						}
 						if (cur_lt_cat_ind == NOMATCH) {
-							fprintf(fplog, "Failed to match lt_cat %i: proc_land_type_area()\n", cur_lt_cat);
+							fprintf(fplog, "Failed to match lt_cat %i:,reference veg, EPACAT %i proc_land_type_area()\n", cur_lt_cat,protected_thematic[grid_ind]);
 							return ERROR_IND;
 						}
 						if (refveg_area_out[j] != NODATA) { // don't add if NODATA
 							temp_flt = refveg_area_out[j];
-							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] +	refveg_area_out[j];
+							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] +(refveg_area_out[j])*protected_EPA[k][j];
 							// sum the global out land type area
 							// use the rv values as the index to capture the unknown value of zero
-							global_lt_out[rv_value] = global_lt_out[rv_value] + refveg_area_out[j];
+							global_lt_out[rv_value] = global_lt_out[rv_value] + (refveg_area_out[j])*protected_EPA[k][j];
 						}
 						
 						// crop
-						cur_lt_cat = rv_value * SCALE_POTVEG + CROP_LT_CODE + protected_thematic[grid_ind];
+						cur_lt_cat = rv_value * SCALE_POTVEG + CROP_LT_CODE + k;
 						cur_lt_cat_ind = NOMATCH;
 						for (m = 0; m < num_lt_cats; m++) {
 							if (lt_cats[m] == cur_lt_cat) {
@@ -514,19 +518,19 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 							}
 						}
 						if (cur_lt_cat_ind == NOMATCH) {
-							fprintf(fplog, "Failed to match lt_cat %i: proc_land_type_area()\n", cur_lt_cat);
+							fprintf(fplog, "Failed to match lt_cat %i:,crop proc_land_type_area()\n", cur_lt_cat);
 							return ERROR_IND;
 						}
 						if (lu_area[j][crop_ind] != raster_info.lu_nodata) { // don't add if nodata
 							temp_flt = lu_area[j][crop_ind];
-							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + lu_area[j][crop_ind];
+							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + (lu_area[j][crop_ind])*protected_EPA[k][j];
 							// sum the global out land type area
 							// sage types plus one are first, then hyde types
-							global_lt_out[crop_ind + NUM_SAGE_PVLT + 1] = global_lt_out[crop_ind + NUM_SAGE_PVLT + 1] + lu_area[j][crop_ind];
+							global_lt_out[crop_ind + NUM_SAGE_PVLT + 1] = global_lt_out[crop_ind + NUM_SAGE_PVLT + 1] + (lu_area[j][crop_ind])*protected_EPA[k][j];
 						}
 						
 						// pasture
-						cur_lt_cat = rv_value * SCALE_POTVEG + PASTURE_LT_CODE + protected_thematic[grid_ind];
+						cur_lt_cat = rv_value * SCALE_POTVEG + PASTURE_LT_CODE + k;
 						cur_lt_cat_ind = NOMATCH;
 						for (m = 0; m < num_lt_cats; m++) {
 							if (lt_cats[m] == cur_lt_cat) {
@@ -535,19 +539,19 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 							}
 						}
 						if (cur_lt_cat_ind == NOMATCH) {
-							fprintf(fplog, "Failed to match lt_cat %i: proc_land_type_area()\n", cur_lt_cat);
+							fprintf(fplog, "Failed to match lt_cat %i:,pasture proc_land_type_area()\n", cur_lt_cat);
 							return ERROR_IND;
 						}
 						if (lu_area[j][pasture_ind] != raster_info.lu_nodata) { // don't add if nodata
 							temp_flt = lu_area[j][pasture_ind];
-							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + lu_area[j][pasture_ind];
+							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + (lu_area[j][pasture_ind])*protected_EPA[k][j];
 							// sum the global out land type area
 							// sage types plus one are first, then hyde types
-							global_lt_out[pasture_ind + NUM_SAGE_PVLT + 1] = global_lt_out[pasture_ind + NUM_SAGE_PVLT + 1] + lu_area[j][pasture_ind];
+							global_lt_out[pasture_ind + NUM_SAGE_PVLT + 1] = global_lt_out[pasture_ind + NUM_SAGE_PVLT + 1] + (lu_area[j][pasture_ind])*protected_EPA[k][j];
 						}
 						
 						// urban
-						cur_lt_cat = rv_value * SCALE_POTVEG + URBAN_LT_CODE + protected_thematic[grid_ind];
+						cur_lt_cat = rv_value * SCALE_POTVEG + URBAN_LT_CODE + k;
 						cur_lt_cat_ind = NOMATCH;
 						for (m = 0; m < num_lt_cats; m++) {
 							if (lt_cats[m] == cur_lt_cat) {
@@ -555,30 +559,31 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								break;
 							}
 						}
+						//fprintf(fplog, "Matching categories rv_value %i:,SCALE_POT_VEG %i:,URBAN_LT_CODE %i:,  protected %i\n,cur_cat %i", rv_value,SCALE_POTVEG,URBAN_LT_CODE,protected_thematic[grid_ind],cur_lt_cat);
 						if (cur_lt_cat_ind == NOMATCH) {
-							fprintf(fplog, "Failed to match lt_cat %i: proc_land_type_area()\n", cur_lt_cat);
+							fprintf(fplog, "Failed to match lt_cat %i:,protected_epa %i:,urban,  proc_land_type_area()\n", cur_lt_cat,grid_ind);
 							return ERROR_IND;
 						}
 						if (lu_area[j][urban_ind] != raster_info.lu_nodata) { // don't add if nodata
 							temp_flt = lu_area[j][urban_ind];
-							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + lu_area[j][urban_ind];
+							area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + (lu_area[j][urban_ind])*protected_EPA[k][j];
 							// sum the global out land type area
 							// sage types plus one are first, then hyde types
-							global_lt_out[urban_ind + NUM_SAGE_PVLT + 1] = global_lt_out[urban_ind + NUM_SAGE_PVLT + 1] + lu_area[j][urban_ind];
+							global_lt_out[urban_ind + NUM_SAGE_PVLT + 1] = global_lt_out[urban_ind + NUM_SAGE_PVLT + 1] + (lu_area[j][urban_ind])*protected_EPA[k][j];
 						}
 						
 						// sum the detailed lu categories also
 						for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
 							temp_flt = lu_area[j][m];
 							if (lu_area[j][m] != raster_info.lu_nodata) { // don't add if nodata
-								global_lt_out[m + NUM_SAGE_PVLT + 1] = global_lt_out[m + NUM_SAGE_PVLT + 1] + lu_area[j][m];
+								global_lt_out[m + NUM_SAGE_PVLT + 1] = global_lt_out[m + NUM_SAGE_PVLT + 1] + (lu_area[j][m])*protected_EPA[k][j];
 							}
 						}
 						
 					} // end if valid glu cell
 					
 				} // end if valid land area
-				
+				}//Finish loop for protected areas
 				// store the updated grid data in the input arrays for each year in case they are to be written
 				// set cell to nodata if it is not a land cell
 				
