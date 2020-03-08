@@ -92,7 +92,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
     raster_info->protected_ncells = ncells;
-    raster_info->protected_insize = insize;
+    raster_info->protected_insize = insize_IUCN;
     raster_info->protected_res = res;
     raster_info->protected_xmin = xmin;
     raster_info->protected_xmax = xmax;
@@ -344,6 +344,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     for (i = 0; i < ncells; i++) {
         //Category 1
         protected_EPA[1][i] = 1 - ALL_IUCN_array[i]- L4_array[i];  
+        //protected_EPA[1][i] =floor()
         //Category 2
         protected_EPA[2][i] = L4_array[i];
         //Category 3
