@@ -67,7 +67,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     char fname[MAXCHAR];			// file name to open
     FILE *fpin;						// file pointer
     int num_read;					// how many values read in
-    
+    float tmp_check;                 // temporary array to check values
     unsigned char *in_array;       // temporary array for input
     //kbn 2020-02-29 introduce temporary input arrays for all 6 suitability,protected area raster files
     float *L1_array;
@@ -359,7 +359,9 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         protected_EPA[7][i] = ALL_IUCN_array[i]- L2_array[i] + L4_array[i] - IUCN_1a_1b_2_array[i];
     
     //Check for negative grid cells
-    if(protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i] < 0)
+    tmp_check = protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i];
+    
+    if(tmp_check < 0)
     {
         fprintf(fplog, "Grid cells from EPA are below 0. Please check inputs"
                 );
@@ -367,16 +369,11 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     }
     
     //Check to ensure grid cells add up to 1
-    //if((protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i]) > 1.000000092)
-    //{
-    //    fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputssum_CELLS=%i in cell=%i\n",protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i],i
-    //            );
-    //    return ERROR_FILE;
-    //}
-    
-    
-    
-    
+    if(tmp_check > 1)
+    {
+        fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputs sum_CELLS=%i in cell=%i\n",tmp_check,i);
+        return ERROR_FILE;
+    }
     }
    //Write Category data out for diagnostics
     if (in_args.diagnostics) {
@@ -430,12 +427,12 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     
-    //2. Category 1
+    
     
 
     
        //Comment in this exit function as a break point for testing.
-       //exit(0);
+    //exit(0);
 
     free(in_array);
     free(L1_array);
@@ -444,6 +441,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     free(L4_array);
     free(IUCN_1a_1b_2_array);
     free(ALL_IUCN_array);
+    
 
     return OK;
 }
