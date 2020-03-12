@@ -111,8 +111,6 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.protected_fname);
 	printf(in_args.protected_fname);
-    printf("printing");
-	//printf(in_args);
     if((fpin = fopen(fname, "rb")) == NULL)
     {
         fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);

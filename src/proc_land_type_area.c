@@ -725,7 +725,6 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
             for (cur_lt_cat_ind = 0; cur_lt_cat_ind < num_lt_cats; cur_lt_cat_ind++) {
-                fprintf(fplog,"categories printed are %i",cur_lt_cat_ind);
 				for (year_ind = 0; year_ind < NUM_HYDE_YEARS; year_ind++) {
                     tmp_dbl = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind];
                     outval = (float) floor((double) 0.5 + area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] * KMSQ2HA);

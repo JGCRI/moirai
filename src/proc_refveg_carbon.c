@@ -104,6 +104,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     
     char fname[MAXCHAR];        // current file name to write
     FILE *fpout;                // out file pointer
+    float temp_frac;           //Create temporary fraction for protected areas
     
     // allocate arrays
     
@@ -165,8 +166,13 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     // loop over the valid hyde land cells
     //  and skip it if no valid glu value or country value (country has to be mapped to ctry87)
     for (j = 0; j < num_land_cells_hyde; j++) {
+        //kbn 2020 Add code for protected areas
+        for (k=1; k< NUM_EPA_PROTECTED; k++){
+
         grid_ind = land_cells_hyde[j];
-        
+        //temporary fractions for protected areas
+        temp_frac = protected_EPA[k][grid_ind];
+
         aez_val = aez_bounds_new[grid_ind];
         ctry_code = country_fao[grid_ind];
         
@@ -236,7 +242,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             }
             
             // get index of land category
-            cur_lt_cat = rv_value * SCALE_POTVEG + protected_EPA[grid_ind];
+            cur_lt_cat = rv_value * SCALE_POTVEG + k;
             cur_lt_cat_ind = NOMATCH;
             for (i = 0; i < num_lt_cats; i++) {
                 if (lt_cats[i] == cur_lt_cat) {
@@ -251,23 +257,24 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             
             // calculate an area weighted average based on ref veg area for HYDE_YEAR
             // the unit conversion cancels out when the average is calculated, so don't do it here
-            
+            //kbn 2020 Updating below for protected area fractions
             // soil c
             refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] =
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] +
-                soil_carbon_sage[rv_ind] * refveg_area[grid_ind];
+                soil_carbon_sage[rv_ind] * refveg_area[grid_ind]*temp_frac;
             
             // veg c
             refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] =
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] +
-                veg_carbon_sage[rv_ind] * refveg_area[grid_ind];
+                veg_carbon_sage[rv_ind] * refveg_area[grid_ind]*temp_frac;
             
             // area
             refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] =
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] +
-                refveg_area[grid_ind];
+                refveg_area[grid_ind]*temp_frac;
             
         }	// end if valid aez cell
+        }   //end loop for protected areas
     }	// end for j loop over valid hyde land cells
     
     // write the output file
