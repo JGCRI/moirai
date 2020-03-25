@@ -76,17 +76,19 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     float *L4_array;
     float *ALL_IUCN_array;
     float *IUCN_1a_1b_2_array;
+    float *hyde_temp_array;
     
     int err = OK;								// store error code from the write file
     char out_name[] = "protected.bil";		// diagnositic output raster file name
     //kbn 2020-02-29 introduce output arrays for all 7 categories
-    char out_name_Cat1[]= "EPA_Protected_Category1.bil";
-    char out_name_Cat2[]= "EPA_Protected_Category2.bil";
-    char out_name_Cat3[]= "EPA_Protected_Category3.bil";
-    char out_name_Cat4[]= "EPA_Protected_Category4.bil";
-    char out_name_Cat5[]= "EPA_Protected_Category5.bil";
-    char out_name_Cat6[]= "EPA_Protected_Category6.bil";
-    char out_name_Cat7[]= "EPA_Protected_Category7.bil";
+    char out_name_Cat0[]= "Unknown.bil";
+    char out_name_Cat1[]= "UnsuitableUnprotected.bil";
+    char out_name_Cat2[]= "SuitableUnprotected.bil";
+    char out_name_Cat3[]= "SuitableHighProtectionIntact.bil";
+    char out_name_Cat4[]= "SuitbaleHighProtectionDeforested.bil";
+    char out_name_Cat5[]= "SuitableLowProtection.bil";
+    char out_name_Cat6[]= "UnsuitableHighProtection.bil";
+    char out_name_Cat7[]= "UnsuitableLowProtection.bil";
 
     // store file specific info
     raster_info->protected_nrows = nrows;
@@ -110,7 +112,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     // create file name and open it
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.protected_fname);
-	printf(in_args.protected_fname);
+	
     if((fpin = fopen(fname, "rb")) == NULL)
     {
         fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
@@ -336,6 +338,31 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         return ERROR_FILE;
     }
    
+   //7. Temporary hyde array
+   hyde_temp_array = calloc(ncells, sizeof(float));
+    if(hyde_temp_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    
+   strcpy(fname, in_args.inpath);
+   strcat(fname, in_args.land_area_hyde_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
+        return ERROR_FILE;
+    }
+  	
+    // read the data and check for same size as the working grid
+    num_read = fread(hyde_temp_array, insize_IUCN, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
 
 
    //kbn read category  data from arrays as a test
@@ -355,10 +382,17 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
         protected_EPA[6][i] = IUCN_1a_1b_2_array[i]- L1_array[i]+L2_array[i];
         //Category 7
         protected_EPA[7][i] = ALL_IUCN_array[i]- L2_array[i] + L4_array[i] - IUCN_1a_1b_2_array[i];
-    
+            
     //Check for negative grid cells
     tmp_check = protected_EPA[1][i]+protected_EPA[2][i]+protected_EPA[3][i]+protected_EPA[4][i]+protected_EPA[5][i]+protected_EPA[6][i]+protected_EPA[7][i];
     
+    //Check if there is hyde area where there is no protected area. 
+    if(tmp_check = 0 ){
+        if (hyde_temp_array[i] > 0){
+        protected_EPA[0][i] = 1;
+    }}
+    
+    //Check if total value is negative in any grid cell.
     if(tmp_check < 0)
     {
         fprintf(fplog, "Grid cells from EPA are below 0. Please check inputs"
@@ -367,7 +401,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     }
     
     //Check to ensure grid cells add up to 1
-    if(tmp_check > 1)
+    if((tmp_check+protected_EPA[0][i]) > 1)
     {
         fprintf(fplog, "Grid cells from EPA do not add up to 1. Please check inputs sum_CELLS=%i in cell=%i\n",tmp_check,i);
         return ERROR_FILE;
@@ -423,7 +457,13 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
             return err;
         }
     }
-
+    
+    if (in_args.diagnostics) {
+        if ((err = write_raster_float(protected_EPA[0], ncells, out_name_Cat0, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
+            return err;
+        }
+    }
     
     
     
@@ -439,6 +479,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     free(L4_array);
     free(IUCN_1a_1b_2_array);
     free(ALL_IUCN_array);
+    free(hyde_temp_array);
     
 
     return OK;

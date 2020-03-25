@@ -166,12 +166,10 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     // loop over the valid hyde land cells
     //  and skip it if no valid glu value or country value (country has to be mapped to ctry87)
     for (j = 0; j < num_land_cells_hyde; j++) {
-        //kbn 2020 Add code for protected areas
-        for (k=1; k< NUM_EPA_PROTECTED; k++){
+        
 
         grid_ind = land_cells_hyde[j];
-        //temporary fractions for protected areas
-        temp_frac = protected_EPA[k][grid_ind];
+        
 
         aez_val = aez_bounds_new[grid_ind];
         ctry_code = country_fao[grid_ind];
@@ -240,6 +238,12 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             } else {
                 rv_value = refveg_thematic[grid_ind];
             }
+            
+            
+            //kbn 2020 Add code for protected areas
+        for (k=0; k< NUM_EPA_PROTECTED; k++){
+        //temporary fractions for protected areas
+        temp_frac = protected_EPA[k][grid_ind];    
             
             // get index of land category
             cur_lt_cat = rv_value * SCALE_POTVEG + k;

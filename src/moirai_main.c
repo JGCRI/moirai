@@ -733,7 +733,7 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    for (i = 1; i < NUM_EPA_PROTECTED; i++) {
+    for (i = 0; i < NUM_EPA_PROTECTED; i++) {
 		protected_EPA[i] = calloc(NUM_CELLS, sizeof(float));
 		if(protected_EPA[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA[%i]: main()\n", get_systime(), ERROR_MEM, i);

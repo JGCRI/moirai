@@ -417,10 +417,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 				grid_ind = lu_indices[j];
 				// process only if there is land area
 				// also skip if not a valid economic country
-			    //kbn 2020
-				for (k = 1; k < NUM_EPA_PROTECTED; k++){
-                //get fraction values of protected_cells here
-				temp_frac = protected_EPA[k][grid_ind];	
+			    	
 
 				if (land_area_hyde[grid_ind] != raster_info.land_area_hyde_nodata && land_area_hyde[grid_ind] != 0) {
 					
@@ -495,6 +492,12 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 						//Print log 
 						//fprintf(fplog, "Currently processing protected category %i:proc_land_type_area()\n", k);
 						// reference veg; i.e. non-crop, non-pasture, non-urban
+						
+						//kbn 2020
+				       for (k = 0; k < NUM_EPA_PROTECTED; k++){
+                       //get fraction values of protected_cells here
+				       temp_frac = protected_EPA[k][grid_ind];
+						
 						cur_lt_cat = rv_value * SCALE_POTVEG + k;
 						
 						//fprintf(fplog,"cur_lt_cat is %i",cur_lt_cat);
