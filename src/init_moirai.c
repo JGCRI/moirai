@@ -55,6 +55,7 @@ int init_moirai(args_struct *in_args) {
 	in_args->in_year_sage_crops = 0;
 	in_args->out_year_usd = 0;
 	in_args->in_year_lr_usd = 0;
+	in_args->lulc_out_year = 0;
 	// file paths; must include final "/"
 	memset(in_args->inpath, '\0', MAXCHAR);
 	memset(in_args->outpath, '\0', MAXCHAR);
@@ -73,7 +74,7 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->aez_orig_fname, '\0', MAXCHAR);
 	memset(in_args->potveg_fname, '\0', MAXCHAR);
 	memset(in_args->country_fao_fname, '\0', MAXCHAR);
-    memset(in_args->protected_fname, '\0', MAXCHAR);
+    //memset(in_args->protected_fname, '\0', MAXCHAR);
     //kbn 2020-02-29 Introduce memory set for each of the suitability, protected area rasters
 	memset(in_args->L1_fname, '\0', MAXCHAR);
 	memset(in_args->L2_fname, '\0', MAXCHAR);

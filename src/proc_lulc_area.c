@@ -19,8 +19,9 @@
  float *lu_indices:			array of lu cell indices for lu_area etc., from main lu raster arrays
  float **lu_area:			2-d array of area values for each lu cell and land type; d1=num_lu_cells (upper left start), d2=NUM_HYDE_TYPES
  float *refveg_area_out:	array of ref veg area values for each out lu cell
- int *refveg_them;			array of refveg thematic out values for each lu cell
+ int *refveg_them:			array of refveg thematic out values for each lu cell
  int num_lu_cells:			number of lu cells in lulc cell
+ int lulc_index:			index of the current lulc cell
 
  
  return value:
@@ -53,7 +54,7 @@
 
 #include "moirai.h"
 
-int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells) {
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index) {
 	
 	int i, j, x, y, m;
 	int potveg_ind;			// the index of current cell potential vegeation; for refveg_type_area_sum and lc_agg_area
@@ -87,7 +88,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	int max_resid_ind;				// index of the max residual area
 	int num_leftover_cells = 0;		// number of output cells not assigned a ref veg in the first pass
 	int *leftover_cell_inds;		// the indices of the output cells not assigned a ref veg in the first pass
-	int rand_order[num_lu_cells];	// the randomized array for selecting the lu cell to process
+	//int rand_order[num_lu_cells];	// the randomized array for selecting the lu cell to process
 	float sum_area_diff;			// difference between lulc area for a given type and the ref veg area for a given type within the lulc cell
 	float max_sum_area_diff;		// the maximum sum_area_diff across types
 	float *type_area_resid;			// array of residual areas (lulc - assigned refveg within lulc cell) for the types after the first pass
@@ -248,7 +249,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 		sum_refveg_area = sum_refveg_area + refveg_area_out[i];
 		
 		// fill the array with the enumerated indices so they can be shuffled below
-		rand_order[i] = i;
+		//rand_order[i] = i;
 		
 	} // end i loop over the lu cells to determine total areas
 
@@ -271,19 +272,19 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	
 	// "randomize" the lu cell order
 	// this will be the order of the cells to process
-	for (i = num_lu_cells - 1; i > 0; i--) {
-		j = rand() % (i+1);
-		temp_int = rand_order[i];
-		rand_order[i] = rand_order[j];
-		rand_order[j] = temp_int;
-	}
+	//for (i = num_lu_cells - 1; i > 0; i--) {
+	//	j = rand() % (i+1);
+	//	temp_int = rand_order[i];
+	//	rand_order[i] = rand_order[j];
+	//	rand_order[j] = temp_int;
+	//}
 	
 	// distribute the land cover based on the potential vegetation and adjust to lulc as necessary, but not over lulc limts
 	// no lu land sets ref veg to nodata
 	// zero ref veg area sets ref veg to pot veg
 	for (m = 0; m < num_lu_cells; m++) {
 		// get the randomized cell index
-		i = rand_order[m];
+		i = rand_order[lulc_index][m];
 		
 		// do this only for cells with land area
 		if (land_area_hyde[lu_indices[i]] != raster_info.land_area_hyde_nodata) {
@@ -691,7 +692,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 		} else {
 			refveg_them[leftover_cell_inds[i]] = 0;
 		}
-
+		
 	} // end for i loop over cells to deal with unassigned cells and residual area
 	
 	//if (in_args.diagnostics) {

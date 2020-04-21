@@ -81,8 +81,8 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
     
     float *nfert_grid;  // 1d array to store the nfert data; start up left corner, row by row; lon varies faster
     
-    // output table as 3-d array
-    float ***nfert_out;		// the nfert out table
+    // output table as 2-d array
+    float **nfert_out;		// the nfert out table
     float outval;             // for output value
     
     int aez_val;            // current aez value
@@ -114,13 +114,6 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
             fprintf(fplog,"Failed to allocate memory for nfert_out[%i]: proc_nfert()\n", i);
             return ERROR_MEM;
         }
-        for (j = 0; j < ctry_aez_num[i]; j++) {
-            nfert_out[i][j] = calloc(NUM_PROTECTED, sizeof(float));
-            if(nfert_out[i][j] == NULL) {
-                fprintf(fplog,"Failed to allocate memory for nfert_out[%i][%i]: proc_nfert()\n", i, j);
-                return ERROR_MEM;
-            }
-        } // end for j loop over aezs
     } // end for i loop over fao country
     
     // read the nfert file
@@ -183,16 +176,10 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
                 fprintf(fplog, "Failed to match aez %i to country %i: proc_nfert()\n",aez_val,ctry_code);
                 return ERROR_IND;
             }
-            
-            // get the protected index
-            if (protected_thematic[land_cells_sage[j]] == PROTECTED) {
-                i = PROTECTED - 1;
-            } else {
-                i = UNPROTECTED - 1;
-            }
+			
             // multiply the rate by the area (also convert km^2 area to ha)
-            nfert_out[ctry_ind][aez_ind][i] =
-                nfert_out[ctry_ind][aez_ind][i] +
+            nfert_out[ctry_ind][aez_ind] =
+                nfert_out[ctry_ind][aez_ind] +
                 nfert_grid[land_cells_sage[j]] * KMSQ2HA * land_area_sage[land_cells_sage[j]];
             
         }	// end if valid aez cell
@@ -211,23 +198,21 @@ int proc_nfert(args_struct in_args, rinfo_struct raster_info) {
     // write header lines
     fprintf(fpout,"# File: %s\n", fname);
     fprintf(fpout,"# Author: %s\n", CODENAME);
-    fprintf(fpout,"# Description: nitrogen application (kg) for sage land cells in country X glu X protected category\n");
+    fprintf(fpout,"# Description: nitrogen application (kg) for sage land cells in country X glu \n");
     fprintf(fpout,"# Original source: Nfert raster; country raster; new glu raster; sage land area\n");
     fprintf(fpout,"# ----------\n");
-    fprintf(fpout,"iso,glu_code,protected_category,value");
+    fprintf(fpout,"iso,glu_code,value");
     
     // write the records (truncated to 3 decimal places)
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-            for (pc_ind = 0; pc_ind < NUM_PROTECTED; pc_ind++) {
-                outval = (float) floor((double) 0.5 + nfert_out[ctry_ind][aez_ind][pc_ind]);
+                outval = (float) floor((double) 0.5 + nfert_out[ctry_ind][aez_ind]);
                 // output only positive values
                 if (outval > 0) {
-                    fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-                            pc_ind+1, outval);
+                    fprintf(fpout,"\n%s,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+                            outval);
                     nrecords++;
                 } // end if value is positive
-            } // end for protected loop
         } // end for aez loop
     } // end for country loop
     

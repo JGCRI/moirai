@@ -1,7 +1,7 @@
 /***********
  proc_refveg_carbon.c
  
- generate csv table of total reference vegetation carbon density (MgC/ha), based on HYDE_YEAR pot veg area
+ generate csv table of total reference vegetation carbon density (MgC/ha), based on REF_YEAR pot veg area
     by country and glu and land type category (pot veg only, but uses codes from LDS_land_types.csv)
  output table has 4 label columns and on value column
  iso, glu, land type category, carbon type (soil, or veg(includes roots)), value (MgC/ha)
@@ -228,61 +228,90 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             // get index of sage pot veg; set value to 0 if unknown
             rv_ind = NOMATCH;
             for (i = 0; i < NUM_SAGE_PVLT; i++) {
-                if (potveg_thematic[grid_ind] == landtypecodes_sage[i]) {
+                if (refveg_thematic[grid_ind] == landtypecodes_sage[i]) {
                     rv_ind = i;
                     break;
                 }
             }
+			// set the c values for this cell; use existing variables
             if (rv_ind == NOMATCH) {
                 rv_value = 0;
+				outval_soilc = 0;
+				outval_vegc = 0;
+				//fprintf(fplog, "Unknown ref veg, cell %i\n", grid_ind);
             } else {
                 rv_value = refveg_thematic[grid_ind];
+				outval_soilc = soil_carbon_sage[rv_ind];
+				outval_vegc = veg_carbon_sage[rv_ind];
             }
-            
-            
-            //kbn 2020 Add code for protected areas
-        for (k=0; k< NUM_EPA_PROTECTED; k++){
-        //temporary fractions for protected areas
-        temp_frac = protected_EPA[k][grid_ind];    
-            
-            // get index of land category
-            cur_lt_cat = rv_value * SCALE_POTVEG + k;
-            cur_lt_cat_ind = NOMATCH;
-            for (i = 0; i < num_lt_cats; i++) {
-                if (lt_cats[i] == cur_lt_cat) {
-                    cur_lt_cat_ind = i;
-                    break;
-                }
-            }
-            if (cur_lt_cat_ind == NOMATCH) {
-                fprintf(fplog, "Failed to match lt_cat %i: proc_refveg_carbon()\n", cur_lt_cat);
-                return ERROR_IND;
-            }
-            
-            // calculate an area weighted average based on ref veg area for HYDE_YEAR
-            // the unit conversion cancels out when the average is calculated, so don't do it here
-            //kbn 2020 Updating below for protected area fractions
-            // soil c
-            refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] =
-                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] +
-                soil_carbon_sage[rv_ind] * refveg_area[grid_ind]*temp_frac;
-            
-            // veg c
-            refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] =
-                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] +
-                veg_carbon_sage[rv_ind] * refveg_area[grid_ind]*temp_frac;
-            
-            // area
-            refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] =
-                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] +
-                refveg_area[grid_ind]*temp_frac;
-            
-        }	// end if valid aez cell
-        }   //end loop for protected areas
-    }	// end for j loop over valid hyde land cells
-    
+			
+			
+			//kbn 2020 Add code for protected areas
+			for (k=0; k< NUM_EPA_PROTECTED; k++){
+				//temporary fractions for protected areas
+				temp_frac = protected_EPA[k][grid_ind];
+				
+				// get index of land category
+				cur_lt_cat = rv_value * SCALE_POTVEG + k;
+				cur_lt_cat_ind = NOMATCH;
+				for (i = 0; i < num_lt_cats; i++) {
+					if (lt_cats[i] == cur_lt_cat) {
+						cur_lt_cat_ind = i;
+						break;
+					}
+				}
+				if (cur_lt_cat_ind == NOMATCH) {
+					fprintf(fplog, "Failed to match lt_cat %i: proc_refveg_carbon()\n", cur_lt_cat);
+					return ERROR_IND;
+				}
+				
+				// calculate an area weighted average based on ref veg area for REF_YEAR
+				// the unit conversion cancels out when the average is calculated, so don't do it here
+				//kbn 2020 Updating below for protected area fractions
+				// soil c
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] +
+				outval_soilc * refveg_area[grid_ind]*temp_frac;
+				
+				// veg c
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] +
+				outval_vegc * refveg_area[grid_ind]*temp_frac;
+				
+				// area
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] +
+				refveg_area[grid_ind]*temp_frac;
+				
+				/*
+				if(countrycodes_fao[ctry_ind] == 58 && aez_val == 180) {
+					if(cur_lt_cat == 1007) {
+						fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: sc = %f, vc = %f, pf = %f, ra = %f\n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, soil_carbon_sage[rv_ind], veg_carbon_sage[rv_ind], temp_frac, refveg_area[grid_ind]);
+						if (refveg_area[grid_ind] > 0) {
+							;
+						}
+						if (temp_frac > 0) {
+							;
+						}
+					}
+					if(cur_lt_cat == 1303) {
+						fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: sc = %f, vc = %f, pf = %f, ra = %f\n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, soil_carbon_sage[rv_ind], veg_carbon_sage[rv_ind], temp_frac, refveg_area[grid_ind]);
+						if (refveg_area[grid_ind] > 0) {
+							;
+						}
+						if (temp_frac > 0) {
+							;
+						}
+					}
+				}
+				*/
+				
+			}	// end if valid aez cell
+		}   //end k loop for protected areas
+	}	// end for j loop over valid hyde land cells
+	
     // write the output file
-    
+	
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.refveg_carbon_fname);
     fpout = fopen(fname,"w"); //float
@@ -303,11 +332,14 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
             for (cur_lt_cat_ind = 0; cur_lt_cat_ind < num_lt_cats; cur_lt_cat_ind++) {
-                if (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] > 0) {
-                    for (i = 0; i < 2; i++) {
+				// round the area first to match the proc_land_type area output
+				temp_float = (float) floor((double) 0.5 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] * KMSQ2HA);
+                if (temp_float > 0) {
+					// don't need a loop here
+                    //for (i = 0; i < 2; i++) {
                         // output only the carbon values - soil is the first index
                         // average, convert to Mg/ha, and round at the end
-                        if (i == soilc_ind) {
+                        //if (i == soilc_ind) {
                             // soil carbon
                             temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] /
                             refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
@@ -321,7 +353,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                                 fprintf(fpout,",%.0f", outval_soilc);
                                 nrecords++;
                             }
-                        } else if (i == vegc_ind) {
+                        //} else if (i == vegc_ind) {
                             // veg carbon
                             temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] /
                             refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
@@ -335,9 +367,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                                 fprintf(fpout,",%.0f", outval_vegc);
                                 nrecords++;
                             }
-                        } // end if soil else veg
-                    } // end if positive area value
-                } // end for outval loop
+                        //} // end if soil else veg
+						
+                    //} // ond for i loop
+				
+                } // end if positive area value
             } // end for land type loop
         } // end for glu loop
     } // end for country loop
@@ -364,7 +398,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
         free(refveg_carbon_out[i]);
     }
     free(refveg_carbon_out);
-    
+	for (i = 0; i < raster_info.lulc_input_ncells; i++) {
+		free(rand_order[i]);
+	}
+	free(rand_order);
+	
     return OK;
     
 }

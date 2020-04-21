@@ -686,6 +686,7 @@ int main(int argc, const char * argv[]) {
 	
 	////
 	// convert the hyde land use, lulc, and sage potential veg input data to working grid area
+	// the rand_order array is allocated here in calc_refvef_area and is deallocated in proc_refveg_carbon
 	if((error_code = calc_refveg_area(in_args, &raster_info))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
@@ -694,7 +695,6 @@ int main(int argc, const char * argv[]) {
     // free some raster arrays
     free(urban_area);
     free(region_gcam);
-    free(cell_area_hyde);
     free(sage_minus_hyde_land_area);
     free(glacier_water_area_hyde);
     free(land_mask_aez_orig);
@@ -764,8 +764,9 @@ int main(int argc, const char * argv[]) {
         return error_code;
     }
     
-    // process the potential vegetation carbon data
-    //  needed arrays are allocated/freed within proc_potveg_carbon()
+    // process the reference vegetation carbon data
+    //  needed arrays are allocated/freed within proc_refveg_carbon()
+	// the rand_order array that is allocated in calc_refvef_area is deallocated in proc_refveg_carbon
     if((error_code = proc_refveg_carbon(in_args, raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -777,13 +778,14 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
+	
     // free the land type category array
     free(lt_cats);
     
     // free some rasters
 	free(cell_area);
 	free(land_area_hyde);
+	free(cell_area_hyde);
     free(land_cells_aez_new);
     free(protected_thematic);
     //kbn 2020

@@ -69,8 +69,6 @@
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
 #define REF_YEAR				2000
-// this needs to be in the input file, but just define it here for now
-#define LT_WRITE_YEAR			2015
 
 // the min and max forest codes for the SAGE raster data (see SAGE_PVLT.csv)
 // these assume that the forest codes are all consecutive with no others mixed in the enumeration
@@ -96,11 +94,7 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
-#define PROTECTED               1               // value assigned to protected pixels for generating land category (this value - 1 is the output array index)
-#define UNPROTECTED             2               // value assigned to unprotected pixels for generating land category (this value - 1 is the output array index)
-#define NUM_PROTECTED           2               // number of protection categories
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
-#define EPA_PROTECTED           8
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -131,6 +125,7 @@
 #define NA_TEXT                  "-"            // if there is no iso3 or name for a country/territory
 #define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id; this is also used for the region-glu image
 #define ZERO_THRESH				1/1000000.0		// if a landtype area value is less than this, it is zero
+#define ROUND_TOLERANCE			1/1000000.0		// tolerance for checking sums and zeros
 
 // working resolution is 5 arcmin (2160x4320), WGS84 spherical earth, lat-lon projection
 // the origin is the upper left corner at 90 Lat and -180 Lon
@@ -175,8 +170,10 @@ int NUM_SAGE_PVLT;						// number of SAGE potential vegetation land types (see S
 int NUM_SAGE_CROP;						// number of SAGE crops (SAGE_crop) (see SAGE_gtap_fao_crop2use.csv)
 int NUM_HYDE_TYPES;						// number of hyde land use types/files; the first 3 describe the total land use state
 int NUM_LULC_TYPES;						// number of input lulc types
-//kbn 2020 5 Mar 2020
-//int NUM_PROTECTED_EPA                  //Number of protected area categories from the EPA 
+
+// for downscaling the lulc data to the working grid
+int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
+float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
 
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
@@ -254,9 +251,8 @@ int *land_mask_fao;                     // 1=land; 0=no land
 int *land_mask_potveg;                  // 1=land; 0=no land
 int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
-short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
-//kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7 
 
+//kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7
 float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
 
 // raster arrays for inputs with different resolution
@@ -483,6 +479,9 @@ typedef struct {
 	int out_year_usd;					// the output US dollar value year for land rent
 	int in_year_lr_usd;					// the US dollar value year for the input land rent data
 	
+	// year to write set of output land use/cover rasters
+	int lulc_out_year;					// if this year falls outside of processing years then no output
+	
 	// useful paths
 	char inpath[MAXCHAR];				// path to the input data directory
 	char outpath[MAXCHAR];				// path to the output data directory
@@ -502,7 +501,6 @@ typedef struct {
 	char aez_orig_fname[MAXCHAR];			// file name only of the original aez boundaries raster file
 	char potveg_fname[MAXCHAR];				// file name only of the potential vegetation raster file
 	char country_fao_fname[MAXCHAR];		// file name only of the fao country code raster file
-    char protected_fname[MAXCHAR];          // file name only of the protected pixel raster file
     //kbn 2020-02-29 Introducing file names for new EPA suitability and protected area rasters
 	char L1_fname[MAXCHAR];                //L1 suitability raster
 	char L2_fname[MAXCHAR];                //L2 suitability raster
@@ -510,11 +508,7 @@ typedef struct {
 	char L4_fname[MAXCHAR];                //L4 suitability raster 
 	char ALL_IUCN_fname[MAXCHAR];          //IUCN All protected area raster
 	char IUCN_1a_1b_2_fname[MAXCHAR];      //IUCN 1a_1b_2 protected area raster
-	
 	char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
-    //char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
-    //char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
-    //char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
 	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
 
 	// input csv file names
@@ -604,7 +598,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
 int proc_nfert(args_struct in_args, rinfo_struct raster_info);
-int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells);
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
 

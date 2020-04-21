@@ -91,56 +91,56 @@ int get_in_args(const char *fname, args_struct *in_args) {
 					in_args->in_year_lr_usd = atoi(fld_str);
 					break;
 				case 6:
-					strcpy(in_args->inpath, fld_str);
+					in_args->lulc_out_year = atoi(fld_str);
 					break;
 				case 7:
+					strcpy(in_args->inpath, fld_str);
+					break;
+				case 8:
 					strcpy(in_args->outpath, fld_str);
 					break;
-                case 8:
+                case 9:
 					strcpy(in_args->sagepath, fld_str);
 					break;
-				case 9:
+				case 10:
 					strcpy(in_args->hydepath, fld_str);
 					break;
-				case 10:
+				case 11:
 					strcpy(in_args->lulcpath, fld_str);
 					break;
-                case 11:
+                case 12:
                     strcpy(in_args->mircapath, fld_str);
                     break;
-                case 12:
+                case 13:
                     strcpy(in_args->wfpath, fld_str);
                     break;
-                case 13:
+                case 14:
                     strcpy(in_args->ldsdestpath, fld_str);
                     break;
-                case 14:
+                case 15:
                     strcpy(in_args->mapdestpath, fld_str);
                     break;
-                case 15:
+                case 16:
 					strcpy(in_args->cell_area_fname, fld_str);
 					break;
-				case 16:
+				case 17:
 					strcpy(in_args->land_area_sage_fname, fld_str);
 					break;
-				case 17:
+				case 18:
 					strcpy(in_args->land_area_hyde_fname, fld_str);
 					break;
-				case 18:
+				case 19:
 					strcpy(in_args->aez_new_fname, fld_str);
 					break;
-				case 19:
+				case 20:
 					strcpy(in_args->aez_orig_fname, fld_str);
 					break;
-				case 20:
+				case 21:
 					strcpy(in_args->potveg_fname, fld_str);
 					break;
-				case 21:
+				case 22:
 					strcpy(in_args->country_fao_fname, fld_str);
 					break;
-                case 22:
-                    strcpy(in_args->protected_fname, fld_str);
-                    break;
 				case 23:
                     strcpy(in_args->L1_fname, fld_str);
                     break;
