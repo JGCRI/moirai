@@ -64,7 +64,7 @@ int get_in_args(const char *fname, args_struct *in_args) {
 	
 	// read the input file
 	count = 0;
-	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+	while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 		rm_whitesp(cln_str, rec_str);
 		memset(fld_str, '\0', MAXRECSIZE);
 		// skip blank and comment lines, and count the records

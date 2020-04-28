@@ -233,12 +233,14 @@ int calc_rent_frs_use_aez(args_struct in_args, rinfo_struct raster_info) {
 			newvorigrent87[reglr_ind * 2 + 1] = newvorigrent87[reglr_ind * 2 + 1] + MIL2ONE * rent_orig_aez[roa_ind];
 			
 			// log if there is original forest land rent but no forest area in this ctry87 and aez
-			if (forest_area[fa_ind] == 0 && rent_orig_aez[roa_ind] > 0) {
-				if (in_args.diagnostics){
-					fprintf(fplog,"Warning: No forest area but orig rent for reglr_ind %i, aez_ind %i:  calc_rent_frs_use_aez()\n",
-                        reglr_ind, aez_ind_orig);
+			if (in_args.diagnostics) {
+				if (forest_area[fa_ind] == 0 && rent_orig_aez[roa_ind] > 0) {
+					if (in_args.diagnostics){
+						fprintf(fplog,"Warning: No forest area but orig rent for reglr_ind %i, aez_ind %i:  calc_rent_frs_use_aez()\n",
+            	            reglr_ind, aez_ind_orig);
+					}
 				}
-			}
+			} // end if diagnostic output
 
 		}	// end for aez_ind_orig loop to calc rent_orig_per_area
         

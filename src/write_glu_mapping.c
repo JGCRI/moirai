@@ -15,15 +15,15 @@
  there can be zero GLUs in an fao country or land rent region
  
  write the GCAM country+glu to iso lookup table for the new aezs (this name can be changed in the LDS input file):
-		LDS_ctry_GLU.csv (depends on aez numbers in countries; this is iso abbr mapping)
+		MOIRAI_ctry_GLU.csv (depends on aez numbers in countries; this is iso abbr mapping)
         records are written only if there is at least one glu in a country/region
  
  write the GIS land type file and store it in an array for use by later functions (this name can be changed in the LDS input file):
-    LDS_land_types.csv
+    MOIRAI_land_types.csv
     SAGE potveg cat * 100 + land use code + protected code
         potveg cat: 0 = unknown, 1-15 are sage pot veg cats
         land use code: 0=unmanaged, 10=cropland, 20=pasture, 30=urbanland (crop, pasture, and urban are set in moirai.h)
-        protected code: 1 = protected, 2= non-protected
+        protected code: 0 to 7, see read_protected
     corresponds with the land type area and potveg carbon output csv files
 
  write only as a diagnostic:
@@ -183,7 +183,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
         }
     }
     
-    // generate the LDS_land_types.csv array, and write it on the fly
+    // generate the MOIRAI_land_types.csv array, and write it on the fly
     strcpy(fname1, in_args.outpath);
     strcat(fname1, oname4);
     if((fpout1 = fopen(fname1, "w")) == NULL)
@@ -397,7 +397,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
     fprintf(fpout1,"# Description: Mapping from LDS-based country+GLU dataset to iso\n");
     fprintf(fpout1,"# Original source: GCAM iso to region mapping and the new country+GLUs from %s\n", CODENAME);
     fprintf(fpout1,"# ----------\n");
-    fprintf(fpout1,"country_code,glu,iso,fao_country_name");
+    fprintf(fpout1,"country_code,glu,iso,fao_country_name,glu_name");
     
 	// write diagnostic files
     if (in_args.diagnostics) {
@@ -416,7 +416,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
         fprintf(fpout2,"# Description: Mapping from LDS-based land rent region+GLU dataset to region abbr\n");
         fprintf(fpout2,"# Original source: country to land rent mapping and new GLUs from %s\n", CODENAME);
         fprintf(fpout2,"# ----------\n");
-        fprintf(fpout2,"lr_reg_code,glu,lr_reg_iso_abbr,lr_reg_name");
+        fprintf(fpout2,"lr_reg_code,glu,lr_reg_iso_abbr,lr_reg_name,glu_name");
         
         // gcam region file
         // create file name and open it
@@ -433,7 +433,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
         fprintf(fpout3,"# Description: Mapping from LDS-based gcam region+GLU dataset to region name\n");
         fprintf(fpout3,"# Original source: GCAM iso to region mapping and new GLUs from %s\n", CODENAME);
         fprintf(fpout3,"# ----------\n");
-        fprintf(fpout3,"gcam_reg_code,glu,gcam_reg_name");
+        fprintf(fpout3,"gcam_reg_code,glu,gcam_reg_name,glu_name");
         
     } // end if diagnostic output
     
@@ -461,8 +461,19 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
 			if (ctry2ctry87codes_gtap[ctry_ind] != NOMATCH) {
             	// make the country+aez id
             	gcam_id = countrycodes_fao[ctry_ind] * FAOCTRY2GCAMCTRYAEZID + ctry_aez_list[ctry_ind][j];
-            	fprintf(fpout1,"\n%i,%i,%s,%s", countrycodes_fao[ctry_ind], ctry_aez_list[ctry_ind][j],
-            	        countryabbrs_iso[ctry_ind], countrynames_fao[ctry_ind]);
+				// get the glu index to find the glu name
+				k = NOMATCH;
+				for (k = 0; k < NUM_NEW_AEZ; k++) {
+					if (aez_codes_new[k] == ctry_aez_list[ctry_ind][j]) {
+						break;
+					}
+				}
+				if (k == NOMATCH) { // this shouldn't happen
+					fprintf(fplog, "Error finding glu index for glu name: write_glu_mapping()\n");
+					return ERROR_IND;
+				}
+            	fprintf(fpout1,"\n%i,%i,%s,%s,%s", countrycodes_fao[ctry_ind], ctry_aez_list[ctry_ind][j],
+            	        countryabbrs_iso[ctry_ind], countrynames_fao[ctry_ind],aez_names_new[k]);
 			} // end if country is assigned to ctry87
         }	// end for j loop over the aezs within countries
     }	// end for ctry_ind loop for sorting the country aez lists
@@ -490,10 +501,19 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
         if (in_args.diagnostics) {
             // now write the sorted values
             for (j = 0; j < reglr_aez_num[reglr_ind]; j++) {
-                // make the reglr+aez id
-                gcam_id = country87codes_gtap[reglr_ind] * FAOCTRY2GCAMCTRYAEZID + reglr_aez_list[reglr_ind][j];
-                fprintf(fpout2,"\n%i,%i,%s,%s", country87codes_gtap[reglr_ind], reglr_aez_list[reglr_ind][j],
-                        country87abbrs_gtap[reglr_ind], country87names_gtap[reglr_ind]);
+				// get the glu index to find the glu name
+				k = NOMATCH;
+				for (k = 0; k < NUM_NEW_AEZ; k++) {
+					if (aez_codes_new[k] == reglr_aez_list[reglr_ind][j]) {
+						break;
+					}
+				}
+				if (k == NOMATCH) { // this shouldn't happen
+					fprintf(fplog, "Error finding glu index for glu name: write_glu_mapping()\n");
+					return ERROR_IND;
+				}
+                fprintf(fpout2,"\n%i,%i,%s,%s,%s", country87codes_gtap[reglr_ind], reglr_aez_list[reglr_ind][j],
+                        country87abbrs_gtap[reglr_ind], country87names_gtap[reglr_ind], aez_names_new[k]);
             }	// end for j loop over the aezs within regions
         } // end if diagnostic output
     }	// end for reglr_ind loop for sorting the land rent region lists
@@ -520,10 +540,19 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
         if (in_args.diagnostics) {
             // now write the sorted values
             for (j = 0; j < reggcam_aez_num[reggcam_ind]; j++) {
-                // make the reggcam+aez id
-                gcam_id = regioncodes_gcam[reggcam_ind] * FAOCTRY2GCAMCTRYAEZID + reggcam_aez_list[reggcam_ind][j];
-                fprintf(fpout3,"\n%i,%i,%s", regioncodes_gcam[reggcam_ind], reggcam_aez_list[reggcam_ind][j],
-                        regionnames_gcam[reggcam_ind]);
+				// get the glu index to find the glu name
+				k = NOMATCH;
+				for (k = 0; k < NUM_NEW_AEZ; k++) {
+					if (aez_codes_new[k] == reggcam_aez_list[reggcam_ind][j]) {
+						break;
+					}
+				}
+				if (k == NOMATCH) { // this shouldn't happen
+					fprintf(fplog, "Error finding glu index for glu name: write_glu_mapping()\n");
+					return ERROR_IND;
+				}
+                fprintf(fpout3,"\n%i,%i,%s,%s", regioncodes_gcam[reggcam_ind], reggcam_aez_list[reggcam_ind][j],
+                        regionnames_gcam[reggcam_ind], aez_names_new[k]);
             }	// end for j loop over the aezs within regions
         } // end if diagnostic output
     }	// end for reggcam_ind loop for sorting the gcam region lists

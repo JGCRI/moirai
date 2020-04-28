@@ -10,15 +10,15 @@ setwd("~/projects/gcam_lds/moirai/diagnostics")
 #1. The original dataset
 Original_LDS_Data<-read.csv("../outputs/basins235_lulcc/Land_type_area_ha.csv",skip = 5, stringsAsFactors=FALSE)
 #2. Updated dataset
-Updated_LDS_Data<-read.csv("../outputs/basins235_test_newprotected/Land_type_area_ha.csv",skip = 5, stringsAsFactors=FALSE)
+Updated_LDS_Data<-read.csv("../outputs/basins235_test_new_protected/Land_type_area_ha.csv",skip = 5, stringsAsFactors=FALSE)
 #3. Old land types
 MOIRAI_Types_old<-read.csv("../outputs/basins235_lulcc/MOIRAI_land_types.csv",skip=4, stringsAsFactors=FALSE)
 #4. New land types
-MOIRAI_Types_new<-read.csv("../outputs/basins235_test_newprotected/MOIRAI_land_types.csv",skip = 4, stringsAsFactors=FALSE)
+MOIRAI_Types_new<-read.csv("../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",skip = 4, stringsAsFactors=FALSE)
 #5. Old carbon file
 Old_Carbon_Data<- read.csv("../outputs/basins235_lulcc/Ref_veg_carbon_Mg_per_ha.csv",skip = 5, stringsAsFactors=FALSE)
 #6. New carbon file
-New_Carbon_Data<- read.csv("../outputs/basins235_test_newprotected/Ref_veg_carbon_Mg_per_ha.csv",skip = 5, stringsAsFactors=FALSE)
+New_Carbon_Data<- read.csv("../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",skip = 5, stringsAsFactors=FALSE)
 
 
 
@@ -83,6 +83,7 @@ test_that("Compare difference by year and value",{
 
 })
 
+
 #Compare Hyde type - to get to gcam nat veg cats need to aggregate the Unmanaged separately
 Original_LDS_Data %>%
   left_join(MOIRAI_Types_old %>% dplyr::select(Category,LT_HYDE,LT_SAGE) %>% rename(land_type=Category),by=c("land_type")) %>%
@@ -99,11 +100,14 @@ Updated_LDS_Data %>%
   distinct() %>%
   filter(Updated_Value>0)->ISO_GLU_HYDE_Year_Data_New
 
-ISO_GLU_HYDE_Year_Data_Old %>% left_join(ISO_GLU_HYDE_Year_Data_New,by=c("iso","glu_code","LT_HYDE","year")) %>%
-  mutate(Difference=Updated_Value-value) %>%
-  mutate(Difference_Percent=(Difference/value)*100) %>%
-  filter(!is.na(Updated_Value))->tmp1
-
+ISO_GLU_HYDE_Year_Data_Old %>% full_join(ISO_GLU_HYDE_Year_Data_New,by=c("iso","glu_code","LT_HYDE","year")) -> tmp1
+z=which(is.na(tmp1$value))
+if(length(z)>0) {tmp1$value[z] = 0}
+z=which(is.na(tmp1$Updated_Value))
+if(length(z)>0) {tmp1$Updated_Value[z] = 0}
+mutate(tmp1, Difference=Updated_Value-value) %>%
+  mutate(Difference_Percent=(Difference/value)*100) -> tmp1
+  
 test_that("Compare difference at lowest level",{
   
   expect_equal(tmp1$Updated_Value,tmp1$value, tolerance=1e-5,info=paste("Differences at the lowest level are not reasonable"))
@@ -145,10 +149,13 @@ Updated_LDS_Data %>%
   distinct() %>%
   filter(Updated_Value>0)->ISO_GLU_SAGE_Year_Data_New
 
-ISO_GLU_SAGE_Year_Data_Old %>% left_join(ISO_GLU_SAGE_Year_Data_New,by=c("iso","glu_code","LT_SAGE","year")) %>%
-  mutate(Difference=Updated_Value-value) %>%
-  mutate(Difference_Percent=(Difference/value)*100) %>%
-  filter(!is.na(Updated_Value))->tmp2
+ISO_GLU_SAGE_Year_Data_Old %>% full_join(ISO_GLU_SAGE_Year_Data_New,by=c("iso","glu_code","LT_SAGE","year")) -> tmp2
+z=which(is.na(tmp2$value))
+if(length(z)>0) {tmp2$value[z] = 0}
+z=which(is.na(tmp2$Updated_Value))
+if(length(z)>0) {tmp2$Updated_Value[z] = 0}
+ mutate(tmp2, Difference=Updated_Value-value) %>%
+  mutate(Difference_Percent=(Difference/value)*100) -> tmp2
 
 test_that("Compare difference at lowest level",{
   
@@ -190,10 +197,13 @@ Updated_LDS_Data %>%
   distinct() %>%
   filter(Updated_Value>0)->ISO_GLU_LT_Year_Data_New
 
-ISO_GLU_LT_Year_Data_Old %>% left_join(ISO_GLU_LT_Year_Data_New,by=c("iso","glu_code","LT_HYDE","year","LT_SAGE")) %>%
-  mutate(Difference=Updated_Value-value) %>%
-  mutate(Difference_Percent=(Difference/value)*100) %>%
-  filter(!is.na(Updated_Value))->tmp
+ISO_GLU_LT_Year_Data_Old %>% full_join(ISO_GLU_LT_Year_Data_New,by=c("iso","glu_code","LT_HYDE","year","LT_SAGE")) -> tmp
+z=which(is.na(tmp$value))
+if(length(z)>0) {tmp$value[z] = 0}
+z=which(is.na(tmp$Updated_Value))
+if(length(z)>0) {tmp$Updated_Value[z] = 0}
+mutate(tmp, Difference=Updated_Value-value) %>%
+  mutate(Difference_Percent=(Difference/value)*100) -> tmp
 
 g<-ggplot(data=tmp,aes(x=value,y=Updated_Value))+
    geom_point()+
@@ -210,6 +220,7 @@ test_that("Compare difference at lowest level",{
 
 tmp %>% filter(abs(Difference)>3)->high_value_diff
 max(abs(high_value_diff$Difference_Percent))
+max(abs(high_value_diff$Difference_Percent[high_value_diff$Difference_Percent != Inf]))
 
 tmp %>% filter(abs(Difference_Percent)>0.5)->high_percent_diff
 max(abs(high_percent_diff$Difference))
@@ -218,15 +229,12 @@ tmp %>% filter(abs(Difference_Percent)>1) %>% filter(abs(Difference)>1) -> Data_
 max(abs(Data_for_comparison$Difference))
 
 
-#tmp %>% filter(year==1990) %>% filter(iso=="idn")->Indonesia_anomaly
-#write.csv(Indonesia_anomaly,"Indonesia_anomaly.csv")
-
-tmp %>% filter(year==2015) %>% filter(iso=="ecu")->Ecuador_anomaly
 
 # Part 2: Carbon accounting for soil_carbon, vegetation carbon
 # the carbon outputs are based on year 2000 reference vegetation area
+# here compare only the commond land areas
 
-# land unit level in units of Mg C
+# land unit level (countryXglu) in units of Mg C
 
 Old_Carbon_Data %>% 
   inner_join(Original_LDS_Data %>% 
@@ -254,16 +262,31 @@ New_Total_Carbon %>%
   mutate(Difference=New_Carbon_Total-Old_Carbon_Total) %>% 
   mutate(Percent_Difference=(Difference/Old_Carbon_Total)*100)->Carbon_Comparison
 
-g<-ggplot(data=Carbon_Comparison[Carbon_Comparison$Old_Carbon_Total < 2e9,],aes(x=Old_Carbon_Total,y=New_Carbon_Total))+
+g<-ggplot(data=Carbon_Comparison,aes(x=Old_Carbon_Total,y=New_Carbon_Total))+
   geom_point()+
-  ggtitle("Comparing carbon outputs between old and new across all years")+
-  labs(subtitle = "This is a comparison at the lowest level i.e Year+ISO+GLU+SAGE_type+Hyde_type")+
+  ggtitle("Comparing carbon outputs between old and new for 2000")+
+  labs(subtitle = "This is a comparison at the land unit level in 2000 i.e countryXglu")+
   facet_wrap(~c_type)
 
 g
 
-Carbon_Comparison %>% filter(abs(Percent_Difference)>15) %>% filter(abs(Difference)>0)->Carbon
-Carbon_Comparison %>% filter(iso=="ecu") %>%filter(c_type=="soil_c")->Ecuador_example 
+
+g<-ggplot(data=Carbon_Comparison[Carbon_Comparison$Old_Carbon_Total < 2e9,],aes(x=Old_Carbon_Total,y=New_Carbon_Total))+
+  geom_point()+
+  ggtitle("Comparing carbon outputs between old and new for 2000")+
+  labs(subtitle = "This is a comparison at the land unit level in 2000 i.e countyXglu")+
+  facet_wrap(~c_type)
+
+g
+
+test_that("Compare difference at land unit (countryXglu) level",{
+  
+  expect_equal(Carbon_Comparison$Old_Carbon_Total,Carbon_Comparison$New_Carbon_Total, tolerance=1e0,info=paste("Differences at the lowest level are not reasonable"))
+  
+})
+
+Carbon_Comparison %>% filter(abs(Percent_Difference)>15) %>% filter(abs(Difference)>0)->Carbon_Land_Unit
+
 
 # by iso and glu and HYDE and SAGE cats in units of MgC/ha
 
@@ -284,13 +307,6 @@ Old_Carbon_Data %>%
  Old_Carbon = Old_Carbon[!is.na(Old_Carbon$Old_Carbon_Total),] 
  Old_Carbon$Old_Carbon_avg = Old_Carbon$Old_Carbon_Total / Old_Carbon$Land_value
 
-  
-  #group_by(iso,glu_code,LT_HYDE,LT_SAGE,c_type) -> t
-  #mutate(Old_Carbon_avg = sum(Old_Carbon_Total, na.rm=TRUE) / sum(Land_value, na.rm=TRUE)) %>%
-  #group_by(iso,glu_code,land_type,c_type) %>% 
-  #mutate(Old_Carbon_Total=sum(Old_Carbon_Total)) %>% 
-  #dplyr::select(iso,glu_code,LT_HYDE,LT_SAGE,c_type,Land_value,Old_Carbon_Total,Old_Carbon_avg) %>% 
-  #distinct()->Old_Total_Carbon
                                                                   
 New_Carbon_Data %>% 
   full_join(Updated_LDS_Data %>% 
@@ -309,30 +325,21 @@ New_Carbon_Data %>%
   New_Carbon = aggregate(. ~ iso + glu_code + c_type + LT_HYDE + LT_SAGE, t[,c("iso", "glu_code", "c_type", "LT_HYDE", "LT_SAGE", "New_Land_value", "New_Carbon_Total")], FUN=sum, na.action=na.pass)
   New_Carbon = New_Carbon[!is.na(New_Carbon$New_Carbon_Total),]
   New_Carbon$New_Carbon_avg = New_Carbon$New_Carbon_Total / New_Carbon$New_Land_value
-  
-  #group_by(iso,glu_code,LT_HYDE,LT_SAGE,c_type) %>% 
-  #mutate(New_Carbon_avg = sum(New_Carbon_Total, na.rm=TRUE) / sum(New_Land_value, na.rm=TRUE)) %>%
-  #group_by(iso,glu_code,land_type,c_type) %>% 
-  #mutate(New_Carbon_Total=sum(New_Carbon_Total)) %>% 
-  #dplyr::select(iso,glu_code,LT_HYDE,LT_SAGE,c_type,New_Land_value,New_Carbon_Total,New_Carbon_avg) %>%
-  #distinct()->New_Total_Carbon                                   
+                                 
 
 New_Carbon %>% 
   inner_join(Old_Carbon,by=c("iso","glu_code","LT_HYDE","LT_SAGE","c_type")) %>%
-  #mutate(New_Carbon_Total=ifelse(is.na(New_Carbon_Total),0,New_Carbon_Total)) %>%
-  
+  mutate(New_Carbon_Total=ifelse(is.na(New_Carbon_Total),0,New_Carbon_Total)) %>%
   mutate(Difference=New_Carbon_avg-Old_Carbon_avg) %>% 
   mutate(Percent_Difference=(Difference/Old_Carbon_avg)*100)->Carbon_Comparison
 
 
-
 g<-ggplot(data=Carbon_Comparison[Carbon_Comparison$Old_Carbon_Total > 0,],aes(x=Old_Carbon_avg,y=New_Carbon_avg))+
   geom_point()+
-  ggtitle("Comparing carbon outputs between old and new across all years")+
+  ggtitle("Comparing carbon outputs between old and new for 2000")+
   labs(subtitle = "This is a comparison at the lowest level i.e Year+ISO+GLU+SAGE_type+Hyde_type")+
   facet_wrap(~c_type)
 
 g
 
 Carbon_Comparison %>% filter(abs(Percent_Difference)>15) %>% filter(abs(Difference)>0)->Carbon
-Carbon_Comparison %>% filter(iso=="ecu") %>%filter(c_type=="soil_c")->Ecuador_example 

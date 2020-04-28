@@ -125,7 +125,7 @@
 #define NA_TEXT                  "-"            // if there is no iso3 or name for a country/territory
 #define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id; this is also used for the region-glu image
 #define ZERO_THRESH				1/1000000.0		// if a landtype area value is less than this, it is zero
-#define ROUND_TOLERANCE			1/1000000.0		// tolerance for checking sums and zeros
+#define ROUND_TOLERANCE			1/1000000.0		// tolerance for checking sums and zeros in read_protected and proc_lulc_area
 
 // working resolution is 5 arcmin (2160x4320), WGS84 spherical earth, lat-lon projection
 // the origin is the upper left corner at 90 Lat and -180 Lon
@@ -178,6 +178,8 @@ float **rand_order;		// the array to store the within-coarse-cell-index of the l
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
+//FILE *debug_file;
+//FILE *cell_file;
 
 // area and production arrays: now 3d arrays, dim1=country[NUM_FAO_CTRY], dim2=aez[ctry_aez_num], dim3=crop[NUM_SAGE_CROP]
 //  so the second dimension is variable, and it matches the aez list arrays below
@@ -539,7 +541,6 @@ typedef struct {
 	char rent_fname[MAXCHAR];				// file name for land rent output
     char mirca_irr_fname[MAXCHAR];			// file name for mirca irrigated crop area output
     char mirca_rfd_fname[MAXCHAR];			// file name for mirca rainfed crop area output
-    char nfert_fname[MAXCHAR];              // file name for nfert output
     char land_type_area_fname[MAXCHAR];     // file name for land type area output
     char refveg_carbon_fname[MAXCHAR];      // file name for reference veg carbon output
     char wf_fname[MAXCHAR];                 // file name for water footprint output
@@ -565,7 +566,6 @@ int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
-int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
@@ -597,8 +597,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
-int proc_nfert(args_struct in_args, rinfo_struct raster_info);
-int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
 

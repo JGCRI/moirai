@@ -123,12 +123,12 @@ int read_cropland_sage(args_struct in_args, rinfo_struct *raster_info) {
 			}
 		}
 	} // end i loop over all cells
-
-	// write the global area tracking value to the log file
-	fprintf(fplog, "\nGlobal sage cropland fraction tracking (summed fraction): read_cropland_sage():\n");
-	fprintf(fplog, "sage_cropland_lost = %f\n\n", sage_cropland_lost);
 	
 	if (in_args.diagnostics) {
+		// write the global area tracking value to the log file
+		fprintf(fplog, "\nGlobal sage cropland fraction tracking (summed fraction): read_cropland_sage():\n");
+		fprintf(fplog, "sage_cropland_lost = %f\n\n", sage_cropland_lost);
+		
 		if ((err = write_raster_float(cropland_area_sage, ncells, out_name, in_args))) {
 			fprintf(fplog, "Error writing file %s: read_cropland_sage()\n", out_name);
 			return err;

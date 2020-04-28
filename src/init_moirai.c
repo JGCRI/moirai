@@ -111,7 +111,6 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->rent_fname, '\0', MAXCHAR);
     memset(in_args->mirca_irr_fname, '\0', MAXCHAR);
     memset(in_args->mirca_rfd_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_fname, '\0', MAXCHAR);	// not in input file and not used
     memset(in_args->land_type_area_fname, '\0', MAXCHAR);
     memset(in_args->refveg_carbon_fname, '\0', MAXCHAR);
     memset(in_args->wf_fname, '\0', MAXCHAR);

@@ -86,14 +86,14 @@ int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args) 
         return ERROR_FILE;
     }
     // skip the header line
-    if(fscanf(fpin, "%*[^\n]\n") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_soil_carbon()\n", fname);
         return ERROR_FILE;
     }
     // read the records
     for (i = 0; i < NUM_SAGE_PVLT; i++) {
-        if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+        if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
             // get the carbon value
             if((err = get_float_field(rec_str, delim, 2, &soil_carbon_sage[i])) != OK) {
                 fprintf(fplog, "Error processing file %s: read_soil_carbon(); record=%i, column=2\n",

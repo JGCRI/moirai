@@ -134,7 +134,8 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 	}
 
 	// stop if header is not read properly
-	if(fscanf(fpin,"%*s%i%*[^\n]\n%*s%i%*[^\n]\n%*s%lf%*[^\n]\n%*s%lf%*[^\n]\n%*s%lf%*[^\n]\n%*s%i%*[^\n]\n",
+	//if(fscanf(fpin,"%*s%i%*[^\n]\n%*s%i%*[^\n]\n%*s%lf%*[^\n]\n%*s%lf%*[^\n]\n%*s%lf%*[^\n]\n%*s%i%*[^\n]\n",
+	if(fscanf(fpin,"%*s%i%*s%i%*s%lf%*s%lf%*s%lf%*s%i%*[^\r\n]\r\n",
 			  &ncols, &nrows, &xmin, &ymin, &res, &nodata) == EOF)
 	{
 		fprintf(stderr,"Failed to read file %s header:  read_hyde32()\n", fname);
@@ -199,7 +200,7 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 		}
 		
 		// skip the header
-		if(fscanf(fpin,"%*[^\n]\n%*[^\n]\n%*[^\n]\n%*[^\n]\n%*[^\n]\n%*[^\n]\n") == EOF)
+		if(fscanf(fpin,"%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n") == EOF)
 		{
 			fprintf(stderr,"Failed to read file %s header:  read_hyde32()\n", fname);
 			return ERROR_FILE;

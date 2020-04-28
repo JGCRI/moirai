@@ -66,7 +66,6 @@
         Land_type_area_ha.csv  - this replaces the Sage_Hyde15_Area.csv file
         Pot_veg_carbon_Mg_per_ha.csv - this replaces the level0 carbon files
         Water_footprint_m3.csv - this is the water footprint data
-        Nfert_kg.csv - no longer output because it is wrong, and it is not used by gcam
  
  It also writes these ancillary files (names can be changed in the LDS input file):
 	gcam-data-system/aglu-data/mappings/
@@ -227,13 +226,9 @@
  
  
  Data for the additional GIS processing:
-    protected area raster (not sure where it is from)
-        5 arcmin resolution, single byte integers, 1 = protected, 255 = not protected (only these 2 values)
-            ProArea_0408_ENVI.img
-    nitrogen addition (likely from potter 2010, but some sort of average of the different crops)
-        5 arcmin, but resampled from half-degree
-        these data are not used by GCAM, and while the original processing is included here, it is not correct
-            Nfert_003d.img
+    suitable/protected area data from epa
+ 		6 files, fraction of grid cell, see read_protectd for details
+        5 arcmin resolution
     potential vegetation carbon (above ground and roots)
         text file with values mapped to SAGE potential vegetation types, based on liturature search
             veg_carbon.csv
@@ -322,7 +317,7 @@ int main(int argc, const char * argv[]) {
 	
 	// initialize all of the arrays
 	if((error_code = init_moirai(&in_args))) {
-		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}
 	
@@ -361,7 +356,31 @@ int main(int argc, const char * argv[]) {
 	system(mkoutputpathcmd);
 	
 	fprintf(fplog, "\nProgram %s started at %s\n", CODENAME, get_systime());
+	
+	fprintf(fplog, "\nFor more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file\n");
 
+	/*
+	// create a file to check each lulc cell that is easy to read into r and compare area values
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_area.csv");
+	if ((debug_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(debug_file, "func,year,lulc_cell,rf_area,lu_area,land_area\n");
+	
+	// create a file for particular lu values for a given lulc cell
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_lulc_cell.csv");
+	if ((cell_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(cell_file, "func,lu_index,wg_index,lulc_index,land_area,rf_area,lu_area,u_area,c_area,p_area\n");
+	*/
+	 
     //////////
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
@@ -693,7 +712,6 @@ int main(int argc, const char * argv[]) {
 	}	
 
     // free some raster arrays
-    free(urban_area);
     free(region_gcam);
     free(sage_minus_hyde_land_area);
     free(glacier_water_area_hyde);
@@ -703,9 +721,10 @@ int main(int argc, const char * argv[]) {
     free(land_mask_hyde);
     free(land_mask_fao);
     free(land_mask_potveg);
-	free(land_mask_refveg);
-    free(land_mask_forest);
 	free(land_mask_lulc);
+	
+	    free(land_mask_forest);
+		free(land_mask_refveg);
     
 	// store the country/land rent region + aez lists
     // the arrays are allocated within write_glu_mapping()
@@ -720,13 +739,7 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
-    // allocate and read the protected pixel data
-    protected_thematic = calloc(NUM_CELLS, sizeof(short));
-    if(protected_thematic == NULL) {
-        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_thematic: main()\n", get_systime(), ERROR_MEM);
-        return ERROR_MEM;
-    }
+	
     //kbn 2020
     protected_EPA = calloc(NUM_EPA_PROTECTED, sizeof(float*));
     if(protected_EPA == NULL) {
@@ -741,21 +754,10 @@ int main(int argc, const char * argv[]) {
 		}
 	}
 
-
-
     if((error_code = read_protected(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
-    /***** deprecated
-    // process the nfert data
-    //  nfert grid is allocated/freed within proc_nfert()
-    if((error_code = proc_nfert(in_args, raster_info))) {
-        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
-        return error_code;
-    }
-     */
     
     // process the land type area data
     //  lu grids are allocated/freed within proc_land_type_area()
@@ -783,11 +785,11 @@ int main(int argc, const char * argv[]) {
     free(lt_cats);
     
     // free some rasters
+	free(urban_area);
 	free(cell_area);
 	free(land_area_hyde);
 	free(cell_area_hyde);
     free(land_cells_aez_new);
-    free(protected_thematic);
     //kbn 2020
     for (i = 0; i < NUM_EPA_PROTECTED; i++) {
 		free(protected_EPA[i]);
@@ -1182,6 +1184,9 @@ int main(int argc, const char * argv[]) {
     
 	fprintf(fplog, "\nSuccessful completion of program %s at %s\n", CODENAME, get_systime());
 	fclose(fplog);
+	
+	//fclose(debug_file);
+	//fclose(cell_file);
 	
     return OK;
 }	// end moirai_main()

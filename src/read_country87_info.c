@@ -85,14 +85,14 @@ int read_country87_info(args_struct in_args) {
 	}
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_country87_info()\n", fname);
 		return ERROR_FILE;
 	}
 	
 	// first count the records
-    while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords_reg_rent++;
     }
     
@@ -131,7 +131,7 @@ int read_country87_info(args_struct in_args) {
     rewind(fpin);
     
     // skip the header line
-    if(fscanf(fpin, "%*[^\n]\n") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_country87_info()\n", fname);
         return ERROR_FILE;
@@ -139,7 +139,7 @@ int read_country87_info(args_struct in_args) {
     
     // now read the records
     for (i = 0; i < NUM_GTAP_CTRY87; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			
 			// get the ctry87 integer code first
 			if((err = get_int_field(rec_str, delim, 1, &country87codes_gtap[i])) != OK) {
@@ -207,7 +207,7 @@ int read_country87_info(args_struct in_args) {
 	}
 
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_country87_info()\n", fname);
 		return ERROR_FILE;
@@ -215,7 +215,7 @@ int read_country87_info(args_struct in_args) {
 	
 	// read all the records
 	for (i = 0; i < NUM_FAO_CTRY; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			
 			// do not need to retrieve the fao code, the iso abbr, or the fao name
             // these have already been stored, and the length and order of the columns match

@@ -114,7 +114,7 @@ int read_lulc_info(args_struct in_args) {
 	}
 	
 	// skip the header lines
-	if(fscanf(fpin, "%*[^\n]\n%*[^\n]\n%*[^\n]\n%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
 		return ERROR_FILE;
@@ -122,7 +122,7 @@ int read_lulc_info(args_struct in_args) {
 	
     // count the records
 	nrecords = 0;
-    while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords++;
     }
     
@@ -151,7 +151,7 @@ int read_lulc_info(args_struct in_args) {
     rewind(fpin);
     
     // skip the header lines
-    if(fscanf(fpin, "%*[^\n]\n%*[^\n]\n%*[^\n]\n%*[^\n]\n") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
         return ERROR_FILE;
@@ -160,7 +160,7 @@ int read_lulc_info(args_struct in_args) {
 	// read the SAGE records
 	out_index = 0;
 	for (i = 0; i < NUM_SAGE_PVLT; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
             // get the integer code
             if((err = get_int_field(rec_str, delim, 1, &landtypecodes_sage[out_index])) != OK) {
                 fprintf(fplog, "Error processing file %s: read_lulc_info(); record=%i, column=1\n",
@@ -201,7 +201,7 @@ int read_lulc_info(args_struct in_args) {
 	}
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
 		return ERROR_FILE;
@@ -209,7 +209,7 @@ int read_lulc_info(args_struct in_args) {
 	
 	// count the records
 	nrecords = 0;
-	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+	while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 		nrecords++;
 	}
 	
@@ -238,7 +238,7 @@ int read_lulc_info(args_struct in_args) {
 	rewind(fpin);
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
 		return ERROR_FILE;
@@ -247,7 +247,7 @@ int read_lulc_info(args_struct in_args) {
 	// read the HYDE records
 	out_index = 0;
 	for (i = 0; i < NUM_HYDE_TYPES; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			// get the integer code
 			if((err = get_int_field(rec_str, delim, 1, &lutypecodes_hyde[out_index])) != OK) {
 				fprintf(fplog, "Error processing file %s: read_lulc_info(); record=%i, column=1\n",
@@ -288,7 +288,7 @@ int read_lulc_info(args_struct in_args) {
 	}
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
 		return ERROR_FILE;
@@ -296,7 +296,7 @@ int read_lulc_info(args_struct in_args) {
 	
 	// count the records
 	nrecords = 0;
-	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+	while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 		nrecords++;
 	}
 	
@@ -337,7 +337,7 @@ int read_lulc_info(args_struct in_args) {
 	rewind(fpin);
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_lulc_info()\n", fname);
 		return ERROR_FILE;
@@ -346,7 +346,7 @@ int read_lulc_info(args_struct in_args) {
 	// read the HYDE records
 	out_index = 0;
 	for (i = 0; i < NUM_LULC_TYPES; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			// get the lulc integer code
 			if((err = get_int_field(rec_str, delim, 1, &lulccodes[out_index])) != OK) {
 				fprintf(fplog, "Error processing file %s: read_lulc_info(); record=%i, column=1\n",

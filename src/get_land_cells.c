@@ -156,7 +156,7 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 		land_mask_hyde[i] = 0;
 		land_mask_fao[i] = 0;
 		land_mask_potveg[i] = 0;
-		land_mask_forest[i] = 0;
+		land_mask_refveg[i] = 0;
 		land_mask_forest[i] = 0;
         land_mask_ctryaez[i] = 0;
 		country87_gtap[i] = NODATA;

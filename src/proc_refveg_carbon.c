@@ -332,60 +332,56 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
             for (cur_lt_cat_ind = 0; cur_lt_cat_ind < num_lt_cats; cur_lt_cat_ind++) {
-				// round the area first to match the proc_land_type area output
+				// round the area first to match the proc_land_type area output categories
 				temp_float = (float) floor((double) 0.5 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind] * KMSQ2HA);
-                if (temp_float > 0) {
-					// don't need a loop here
-                    //for (i = 0; i < 2; i++) {
-                        // output only the carbon values - soil is the first index
-                        // average, convert to Mg/ha, and round at the end
-                        //if (i == soilc_ind) {
-                            // soil carbon
-                            temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] /
-                            refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
-                            outval_soilc = (float) floor((double) 0.5 + temp_float);
-                            // sum the total
-                            global_soilc = global_soilc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind];
-                            // write the value
-                            if (outval_soilc > 0) {
-                                fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-                                        lt_cats[cur_lt_cat_ind], "soil_c");
-                                fprintf(fpout,",%.0f", outval_soilc);
-                                nrecords++;
-                            }
-                        //} else if (i == vegc_ind) {
-                            // veg carbon
-                            temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] /
-                            refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
-                            outval_vegc = (float) floor((double) 0.5 + temp_float);
-                            // sum the total
-                            global_vegc = global_vegc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind];
-                            // write the value
-                            if (outval_vegc > 0) {
-                                fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-                                        lt_cats[cur_lt_cat_ind], "veg_c");
-                                fprintf(fpout,",%.0f", outval_vegc);
-                                nrecords++;
-                            }
-                        //} // end if soil else veg
-						
-                    //} // ond for i loop
-				
-                } // end if positive area value
-            } // end for land type loop
+				if (temp_float > 0) {
+					
+					// output only the carbon values - soil is the first index
+					// dived by area to get average, convert to Mg/ha, and round at the end
+					
+					// soil carbon
+					temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
+					outval_soilc = (float) floor((double) 0.5 + temp_float);
+					// sum the total
+					global_soilc = global_soilc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind];
+					// write the value
+					if (outval_soilc > 0) {
+						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+								lt_cats[cur_lt_cat_ind], "soil_c");
+						fprintf(fpout,",%.0f", outval_soilc);
+						nrecords++;
+					}
+					
+					// veg carbon
+					temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind];
+					outval_vegc = (float) floor((double) 0.5 + temp_float);
+					// sum the total
+					global_vegc = global_vegc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind];
+					// write the value
+					if (outval_vegc > 0) {
+						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+								lt_cats[cur_lt_cat_ind], "veg_c");
+						fprintf(fpout,",%.0f", outval_vegc);
+						nrecords++;
+					}
+					
+				} // end if positive area value
+			} // end for land type loop
         } // end for glu loop
     } // end for country loop
-    
+	
     fclose(fpout);
-    
+	
     fprintf(fplog, "Wrote file %s: proc_refveg_carbon(); records written=%i\n", fname, nrecords);
-    
+	
     // also write the total global carbon values to the log file
     // in Gg because the conversions cancel out
     fprintf(fplog, "\nGlobal reference vegetation carbon values, in Gg: proc_refveg_carbon()\n");
     fprintf(fplog, "Soil C = %f\n", global_soilc);
     fprintf(fplog, "Veg C = %f\n\n", global_vegc);
-    
+	
     free(soil_carbon_sage);
     free(veg_carbon_sage);
     for (i = 0; i < NUM_FAO_CTRY; i++) {

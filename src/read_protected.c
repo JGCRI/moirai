@@ -4,8 +4,30 @@
  read the protected/suitable data into protected_EPA[ncells][0-7]
  there are six files, and the 0 index is for land area with unkown suitability/protection, which does not appear to occur
  
+ The six input layers are:
+ L1: all suitable land (including existing cropland and protected area, excluding water and urban)
+ L2: L1 minus IUCN protected areas 1a, 1b, and 2
+ L3: L2 plus (deforested land in protected areas 1a, 1b, and 2); this is the epa default availability
+ L4: L2 minus protected areas 3-6
+ All_IUCN: all IUCN protected area (this may include water andor urban and all land cover types)
+ IUCN_1a_1b_2: IUCN protected areas 1a, 1b, 2 (this may include water andor urban and all land cover types)
+ 
  The input values are fractions of grid cell for the input data
+ L1-L4 include land only
  Data are converted to mutually exclusive fractions of land area for 8 categories
+ Suitable categories 2-5 contain only land
+ Unsuitable categories can contain water
+ High protection means IUCN categories 1a, 1b, and 2
+ Low protection means IUCN categories 3-6
+ 
+0 = Unknown; not currently present with current data
+1 = UnsuitableUnprotected
+2 = SuitableUnprotected
+3 = SuitableHighProtectionIntact
+4 = SuitbaleHighProtectionDeforested
+5 = SuitableLowProtection
+6 = UnsuitableHighProtection
+7 = UnsuitableLowProtection
  
  The epa data have been preprocessed to fractions of grid cell area using gdal
  
@@ -71,6 +93,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 	float land_check = 0.0;          // temporary value to check sum of protected land cat values
 	float tmp_sum = 0.0;          	// temporary value to sum fractions
 	float fact = 0.0;          		// used for scaling fractions
+	float tmp_float;				// for checking
     //kbn 2020-02-29 introduce temporary input arrays for all 6 suitability,protected area raster files
     float *L1_array;
     float *L2_array;
@@ -101,60 +124,6 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     raster_info->protected_ymin = ymin;
     raster_info->protected_ymax = ymax;
 	
-	/*
-	
-    // allocate the temp array
-    in_array = calloc(ncells, sizeof(unsigned char));
-    if(in_array == NULL) {
-        fprintf(fplog,"Failed to allocate memory for in_array: read_protected()\n");
-        return ERROR_MEM;
-    }
-    
-    
-    // create file name and open it
-    strcpy(fname, in_args.inpath);
-    strcat(fname, in_args.protected_fname);
-	
-    if((fpin = fopen(fname, "rb")) == NULL)
-    {
-        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
-        return ERROR_FILE;
-    }
-
-    // read the data and check for same size as the working grid
-    num_read = fread(in_array, insize, ncells, fpin);
-    fclose(fpin);
-    if(num_read != NUM_CELLS)
-    {
-        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
-                fname, num_read, NUM_CELLS);
-        return ERROR_FILE;
-    }
-
-    // put the data in a short array for storage and further processing
-    // also change the values to match the output land categories generation scheme
-    for (i = 0; i < ncells; i++) {
-        if (in_array[i] == 1) {
-            protected_thematic[i] = 1;
-        } else {
-            protected_thematic[i] = 2;
-        }
-    }
-	
-    // reads and stores input
-    //scanf("%d", ncells);
-    // displays output
-    
-    
-    if (in_args.diagnostics) {
-        if ((err = write_raster_short(protected_thematic, ncells, out_name, in_args))) {
-            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name);
-            return err;
-        }
-    }
-	
-	// code above for original file should be deleted -- also need to update the input file
-	 */
 	
     //kbn 2020-02-29 Start code to read in suitability and protected area raster files
     
@@ -334,34 +303,6 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
-	
-	/*
-   //7. Temporary hyde array
-   hyde_temp_array = calloc(ncells, sizeof(float));
-    if(hyde_temp_array == NULL) {
-        fprintf(fplog,"Failed to allocate memory for hyde_area_array: read_protected()\n");
-        return ERROR_MEM;
-    }
-    
-   strcpy(fname, in_args.inpath);
-   strcat(fname, in_args.land_area_hyde_fname);
-    
-    if((fpin = fopen(fname, "rb")) == NULL)
-    {
-        fprintf(fplog,"Failed to open file %s:  read_protected()\n", fname);
-        return ERROR_FILE;
-    }
-  	
-    // read the data and check for same size as the working grid
-    num_read = fread(hyde_temp_array, insize_IUCN, ncells, fpin);
-    fclose(fpin);
-    if(num_read != NUM_CELLS)
-    {
-        fprintf(fplog, "Error reading file %s: read_protected(); num_read=%i != NUM_CELLS=%i\n",
-                fname, num_read, NUM_CELLS);
-        return ERROR_FILE;
-    }
-	 */
 
 
    //kbn calc category data from input arrays
@@ -411,7 +352,6 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 				} else {
 					// this shouldn't happen because of preprocessing, but preprocessing missed a couple of cases
 					// but sometimes it happens due to rounding and other times due to small erroneous values
-					// try to fix this; but need to recheck for negatives
 					if (protected_EPA[j][i] > -ROUND_TOLERANCE) {
 						// just rounding error
 						protected_EPA[j][i] = 0;
@@ -453,7 +393,8 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 		land_check = protected_EPA[2][i] + protected_EPA[3][i] + protected_EPA[4][i] + protected_EPA[5][i];
 		tmp_check = land_check + protected_EPA[1][i] + protected_EPA[6][i] + protected_EPA[7][i];
 		
-		//Check if there is hyde area where there is no protected area.
+		// Check if there is hyde area where there is no protected area.
+		// so far this does not exist
 		if(tmp_check == 0 ){
 			if (land_area_hyde[i] > 0){
 				protected_EPA[0][i] = 1;
@@ -470,9 +411,12 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 		// Check to ensure grid cells add up to 1
 		// The fractions get rescaled below to land area, so this doesn't nee to be fixed here
 		// And this condition is currently always false
-		if((tmp_check + protected_EPA[0][i]) > (1 + ROUND_TOLERANCE))
+		tmp_sum = 1 + ROUND_TOLERANCE;
+		tmp_float = 1 - ROUND_TOLERANCE;
+		if((tmp_check + protected_EPA[0][i]) > (1 + ROUND_TOLERANCE) || (tmp_check + protected_EPA[0][i]) < (1 - ROUND_TOLERANCE))
 		{
-			fprintf(fplog, "Warning before land normalization: cell sum %f > 1 in cell=%i; read_protected()\n",tmp_check,i);
+			fprintf(fplog, "Error before land normalization: cell sum %f != 1+-tolerance in cell=%i; read_protected()\n",tmp_check + protected_EPA[0][i],i);
+			return ERROR_CALC;
 		}
 		
 		// fill non-land cells with nodata value, and normalize the rest to fraction of land area
@@ -529,7 +473,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 				
 				// need to assign rest of cats to land as necessary, proportionally
 				land_check = land_area_hyde[i] - tmp_sum * land_area_hyde[i];
-				if (land_check > 0 & land_area_hyde[i] > 0) {   // this shouldn't be negative as it is scaled above
+				if (land_check > 0 && land_area_hyde[i] > 0) {   // this shouldn't be negative as it is scaled above
 					tmp_sum = protected_EPA[1][i] + protected_EPA[6][i] + protected_EPA[7][i];
 					if (tmp_sum == 0) {
 						// this shouldn't happen cuz cat 1 is filled above if this sum is zero, but do it again in case
@@ -545,7 +489,8 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 						protected_EPA[6][i] = fact * protected_EPA[6][i];
 						protected_EPA[7][i] = fact * protected_EPA[7][i];
 					}
-				} else {
+				} else if (land_area_hyde[i] > 0) {
+					// reset these only if there is land and land_check is zero (other cats cover all land)
 					protected_EPA[1][i] = 0.0;
 					protected_EPA[6][i] = 0.0;
 					protected_EPA[7][i] = 0.0;
@@ -570,10 +515,12 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 			}
 			
 			// Check again to ensure grid cells add up to 1
-			// it is within rounding tolerance
-			if((tmp_check + protected_EPA[0][i]) > (1 + ROUND_TOLERANCE))
+			// currently it is always within rounding tolerance
+			tmp_sum = 1 + ROUND_TOLERANCE;
+			tmp_float = 1 - ROUND_TOLERANCE;
+			if((tmp_check + protected_EPA[0][i]) > (1 + ROUND_TOLERANCE) || (tmp_check + protected_EPA[0][i]) < (1 - ROUND_TOLERANCE))
 			{
-				fprintf(fplog, "Warning after land normalization: cell sum %f > 1 in cell=%i; read_protected()\n",tmp_check,i);
+				fprintf(fplog, "Warning after land normalization: cell sum %f != 1+-tolerance in cell=%i; read_protected()\n",tmp_check + protected_EPA[0][i],i);
 				return ERROR_CALC;
 			}
 			

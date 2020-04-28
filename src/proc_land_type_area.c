@@ -87,7 +87,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     // valid values in the hyde land area data set determine the land cells to process
     
     int i, j, k, m, n = 0;
-	//int p=0;
+	//int p=0;					// for running only one year for testing
 	int year_ind;               // the index for looping over the years
     int grid_ind;               // the index within the 1d grid of the current land cell
     int rv_ind;                 // the index of the current reference veg land type
@@ -120,20 +120,19 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 	
 	// used to determine working grid cell indices
 	int num_split = 0;		// number of working grid cells in one dimension of one lulc cell
-	//int num_lu_cells = 0;	// number of working grid cells in one lulc cell
 	int grid_y_ul;				// row for ul corner working grid cell in lulc cell
 	int grid_x_ul;				// col for ul corner working grid cell in lulc cell
 	double rem_dbl;				// used to get the remainder of a decimal number
 	double int_dbl;				// used to get the integer of a decimal number
 	
-	float *lulc_area;		// array for the lulc areas per type for a single lulc cell
-	float **lu_area;		// array for the lu areas determined for each lulc cell; dim1=NUM_LU_CELLS, dim2 = NUM_HYDE_TYPES
+	double *lulc_area;		// array for the lulc areas per type for a single lulc cell
+	double **lu_area;		// array for the lu areas determined for each lulc cell; dim1=NUM_LU_CELLS, dim2 = NUM_HYDE_TYPES
 	int *lu_indices;		// array for the working grid indices for the lu cells for a single lulc cell
-	float *refveg_area_out;		// array for the reference veg areas in each working grid cell, for a single lulc cell
+	double *refveg_area_out;		// array for the reference veg areas in each working grid cell, for a single lulc cell
 	int *refveg_them;		// array for the reference veg tyep values in each working grid cell, for a single lulc cell
     
-    float ****area_out;		// output table as 4-d array
-    float outval;           // the integer value to output
+    double ****area_out;		// output table as 4-d array
+    double outval;           // the integer value to output
     int rv_value;           // the reference veg value for the current land type category
 	
 	int lulc_year;			// current lulc year to read
@@ -145,12 +144,14 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     int cur_lt_cat_ind;     // current land type category index
     int nrecords = 0;       // count # of records written
 	
-	float *global_lulc_in;	// for tracking global area in
-	float *global_lt_out;	// for tracking global area out
-	float global_area_out;	// total land area out
-	float global_area_in;	// total land area in
+	double *global_lulc_in;	// for tracking global area in
+	double *global_lt_out;	// for tracking global area out
+	double global_area_out;	// total land area out
+	double global_area_in;	// total land area in
 	float temp_flt;
 	float temp_frac;
+	float rfarea_check;
+	float luarea_check;
 	
     int hyde_years[NUM_HYDE_YEARS]; // the years in the hyde historical lu files
    
@@ -232,18 +233,18 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 	}
 	
 	// for proc_lulc_area
-	lulc_area = calloc(NUM_LULC_TYPES, sizeof(float));
+	lulc_area = calloc(NUM_LULC_TYPES, sizeof(double));
 	if(lulc_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lulc_area: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	lu_area = calloc(NUM_LU_CELLS, sizeof(float*));
+	lu_area = calloc(NUM_LU_CELLS, sizeof(double*));
 	if(lu_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_area: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
 	for (i = 0; i < NUM_LU_CELLS; i++) {
-		lu_area[i] = calloc(NUM_HYDE_TYPES, sizeof(float));
+		lu_area[i] = calloc(NUM_HYDE_TYPES, sizeof(double));
 		if(lu_area[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_area[%i]: proc_land_type_area()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
@@ -254,7 +255,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_indices: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	refveg_area_out = calloc(NUM_LU_CELLS, sizeof(float));
+	refveg_area_out = calloc(NUM_LU_CELLS, sizeof(double));
 	if(refveg_area_out == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area_out: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
@@ -266,25 +267,25 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 	}
 	
 	// output
-    area_out = calloc(NUM_FAO_CTRY, sizeof(float***));
+    area_out = calloc(NUM_FAO_CTRY, sizeof(double***));
     if(area_out == NULL) {
         fprintf(fplog,"Failed to allocate memory for area_out: proc_land_type_area()\n");
         return ERROR_MEM;
     }
     for (i = 0; i < NUM_FAO_CTRY; i++) {
-        area_out[i] = calloc(ctry_aez_num[i], sizeof(float**));
+        area_out[i] = calloc(ctry_aez_num[i], sizeof(double**));
         if(area_out[i] == NULL) {
             fprintf(fplog,"Failed to allocate memory for area_out[%i]: proc_land_type_area()\n", i);
             return ERROR_MEM;
         }
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            area_out[i][j] = calloc(num_lt_cats, sizeof(float*));
+            area_out[i][j] = calloc(num_lt_cats, sizeof(double*));
             if(area_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for area_out[%i][%i]: proc_land_type_area()\n", i, j);
                 return ERROR_MEM;
             }
             for (k = 0; k < num_lt_cats; k++) {
-                area_out[i][j][k] = calloc(NUM_HYDE_YEARS, sizeof(float));
+                area_out[i][j][k] = calloc(NUM_HYDE_YEARS, sizeof(double));
                 if(area_out[i][j][k] == NULL) {
                     fprintf(fplog,"Failed to allocate memory for area_out[%i][%i][%i]: proc_land_type_area()\n", i, j, k);
                     return ERROR_MEM;
@@ -294,31 +295,35 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     } // end for i loop over fao country
 	
 	// for tracking global area
-	global_lt_out = calloc(NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES, sizeof(float));
+	global_lt_out = calloc(NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES, sizeof(double));
 	if(global_lt_out == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for global_lt_out: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	global_lulc_in = calloc(NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES, sizeof(float));
+	global_lulc_in = calloc(NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES, sizeof(double));
 	if(global_lulc_in == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for global_lulc_in: proc_land_type_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
 	
+	// swap these lines with the full for loop line to run a single year for testing
+	// and uncomment the p index declaration above
     // process each year
     //
-	// just do REF_YEAR for testing
-	//p = NOMATCH;
-	//for (m = 0; m < NUM_HYDE_YEARS; m++) {
-	//	if (hyde_years[m] == REF_YEAR) {
-	//		p = m;
-	//		break;
-	//	}
-	//}
-	//for (year_ind = p; year_ind < p+1; year_ind++) {
+	//just do REF_YEAR for testing
+	/*
+	p = NOMATCH;
+	for (m = 0; m < NUM_HYDE_YEARS; m++) {
+		if (hyde_years[m] == REF_YEAR) {
+			p = m;
+			break;
+		}
+	}
+	for (year_ind = p; year_ind < p+1; year_ind++) {
+	*/
 	for (year_ind = 0; year_ind < NUM_HYDE_YEARS; year_ind++) {
 		
-		fprintf(fplog,"\nCurrently processing Year: %i",year_ind);
+		fprintf(fplog,"\nCurrently processing Year: %i",year_ind+1);
 		if (in_args.diagnostics) {
 			fprintf(fplog, "\nYear %i: proc_land_type_area()\n", hyde_years[year_ind]);
 		}
@@ -347,6 +352,13 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			global_lt_out[j] = 0;
 			global_lulc_in[j] = 0;
 		}
+		
+		// initialize these each year, since all other variables are either read-in or initialized each loop
+		for (j = 0; j < NUM_CELLS; j++) {
+			refveg_area_grid[j] = 0;
+			refveg_them_out[j] = 0;
+		}
+		
 		//printf("Total cells are %i",ncells_lulc);
 		// loop over the coarse lulc data
 		for (i = 0; i < ncells_lulc; i++) {
@@ -362,7 +374,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			
 			// get lulc areas for this cell
 			for (j = 0; j < NUM_LULC_TYPES; j++) {
-				lulc_area[j] = lulc_temp_grid[j][i];
+				lulc_area[j] = (double) lulc_temp_grid[j][i];
 			}
 			
 			// aggregate the lulc land cover type areas to pot veg types for global area
@@ -389,19 +401,19 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			count = 0;
 			for (m = grid_y_ul; m < grid_y_ul + num_split; m++) {
 				for (n = grid_x_ul; n < grid_x_ul + num_split; n++) {
-					if (m == 490 && n == 2740) {
-						;
-					}
+					//if (m == 490 && n == 2740) {
+					//	;
+					//}
 					lu_indices[count] = m * NUM_LON + n;
 					temp_flt = urban_grid[lu_indices[count]];
-					lu_area[count][urban_ind] = urban_grid[lu_indices[count]];
+					lu_area[count][urban_ind] = (double) urban_grid[lu_indices[count]];
 					temp_flt = crop_grid[lu_indices[count]];
-					lu_area[count][crop_ind] = crop_grid[lu_indices[count]];
+					lu_area[count][crop_ind] = (double) crop_grid[lu_indices[count]];
 					temp_flt = pasture_grid[lu_indices[count]];
-					lu_area[count][pasture_ind] = pasture_grid[lu_indices[count]];
+					lu_area[count][pasture_ind] = (double) pasture_grid[lu_indices[count]];
 					for (j = NUM_HYDE_TYPES_MAIN; j < NUM_HYDE_TYPES; j++) {
 						temp_flt = lu_detail_grid[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
-						lu_area[count][j] = lu_detail_grid[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
+						lu_area[count][j] = (double) lu_detail_grid[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
 					}
 					refveg_area_out[count] = 0;
 					refveg_them[count] = 0;
@@ -423,13 +435,49 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 			
 			// add data to output array as appropriate
 			// don't need to store the updated grid data at all in the read in grids
-			//This loop ends at line 608
+			//This loop ends at line ~670
+			rfarea_check = 0;
+			luarea_check = 0;
 			for (j = 0; j < NUM_LU_CELLS; j++) {
 				
 				grid_ind = lu_indices[j];
 				// process only if there is land area
 				// also skip if not a valid economic country
-			    	
+				
+				// this is to output a map of the areas in the output data files, for a selected year
+				// note that the carbon output from proc_refveg_carbon is for year REF_YEAR only - it uses these same filters
+				// set cell to nodata if it is not a land cell
+				// note that some (330) artcic cells originally have zero land area
+				// additional cells are set to zero below if they are not included in the output calcs
+				//		they are not included in outputs if there is no aez or country 87 value
+				
+				if (land_area_hyde[grid_ind] != raster_info.land_area_hyde_nodata) {
+					crop_grid[grid_ind] = (float) lu_area[j][crop_ind];
+					pasture_grid[grid_ind] = (float) lu_area[j][pasture_ind];
+					urban_grid[grid_ind] = (float) lu_area[j][urban_ind];
+					for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
+						lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = (float) lu_area[j][m];
+					}
+					refveg_area_grid[grid_ind] = (float) refveg_area_out[j];
+					refveg_them_out[grid_ind] = refveg_them[j];
+					// this was used to check the REF_YEAR values here against calc_refveg_area
+					rfarea_check = rfarea_check + refveg_area_out[j];
+					luarea_check = luarea_check + lu_area[j][crop_ind] + lu_area[j][pasture_ind] + lu_area[j][urban_ind];
+					
+				} else {
+					crop_grid[grid_ind] = NODATA;
+					pasture_grid[grid_ind] = NODATA;
+					urban_grid[grid_ind] = NODATA;
+					for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
+						lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = NODATA;
+					}
+					refveg_area_grid[grid_ind] = NODATA;
+					refveg_them_out[grid_ind] = raster_info.potveg_nodata;
+				}
+				
+				//if (i == 63120) {
+				//	fprintf(cell_file, "proc_land_type_area,%i,%i,%i,%f,%lf,%lf,%lf,%lf,%lf\n", j, grid_ind, i, land_area_hyde[grid_ind], refveg_area_out[j], lu_area[j][crop_ind] + lu_area[j][pasture_ind] + lu_area[j][urban_ind], lu_area[j][0], lu_area[j][1], lu_area[j][2]);
+				//}
 
 				if (land_area_hyde[grid_ind] != raster_info.land_area_hyde_nodata && land_area_hyde[grid_ind] != 0) {
 					
@@ -465,6 +513,15 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 						
 						// skip if not a valid economic country
 						if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
+							// now update this year's grids to reflect that this cell is not included in the outputs
+							// set the areas to zero, but leave the refveg category as is
+							crop_grid[grid_ind] = 0;
+							pasture_grid[grid_ind] = 0;
+							urban_grid[grid_ind] = 0;
+							for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
+								lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = 0;
+							}
+							refveg_area_grid[grid_ind] = 0;
 							continue;
 						}
 						
@@ -527,13 +584,11 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								return ERROR_IND;
 							}
 							if (refveg_area_out[j] != NODATA) { // don't add if NODATA
-								temp_flt =(refveg_area_out[j]) * temp_frac;
+								tmp_dbl =(refveg_area_out[j]) * temp_frac;
 								area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] +((refveg_area_out[j]) * temp_frac);
 								
-								
-								
 								//if(j = 100){
-								//fprintf(fplog,"protected area is %i, reference area is %i, cur_lt_cat is %i",protected_EPA[k][j],refveg_area_out[j],cur_lt_cat);
+								//fprintf(fplog,"protected area is %i, reference area is %lf, cur_lt_cat is %i",protected_EPA[k][j],refveg_area_out[j],cur_lt_cat);
 								//}
 								
 								// sum the global out land type area
@@ -544,7 +599,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 							/*
 							if(countrycodes_fao[ctry_ind] == 58 && aez_val == 180) {
 								if(cur_lt_cat == 1007) {
-									fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: ra = %f, pf = %f \n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, refveg_area_out[j], temp_frac);
+									fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: ra = %lf, pf = %f \n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, refveg_area_out[j], temp_frac);
 									if (refveg_area_out[j] != refveg_area[grid_ind]) {
 										;
 									}
@@ -553,7 +608,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 									}
 								}
 								if(cur_lt_cat == 1303) {
-									fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: ra = %f, pf = %f \n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, refveg_area_out[j], temp_frac);
+									fprintf(fplog, "ctry %i, glu %i, lt %i, rv = %i, gi = %i: ra = %lf, pf = %f \n", countrycodes_fao[ctry_ind], aez_val, cur_lt_cat, rv_ind, grid_ind, refveg_area_out[j], temp_frac);
 									if (refveg_area_out[j] != refveg_area[grid_ind]) {
 										;
 									}
@@ -578,7 +633,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								return ERROR_IND;
 							}
 							if (lu_area[j][crop_ind] != raster_info.lu_nodata) { // don't add if nodata
-								temp_flt = lu_area[j][crop_ind];
+								tmp_dbl = lu_area[j][crop_ind];
 								area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + ((lu_area[j][crop_ind])* temp_frac);
 								// sum the global out land type area
 								// sage types plus one are first, then hyde types
@@ -599,7 +654,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								return ERROR_IND;
 							}
 							if (lu_area[j][pasture_ind] != raster_info.lu_nodata) { // don't add if nodata
-								temp_flt = lu_area[j][pasture_ind];
+								tmp_dbl = lu_area[j][pasture_ind];
 								area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + ((lu_area[j][pasture_ind]) * temp_frac);
 								// sum the global out land type area
 								// sage types plus one are first, then hyde types
@@ -621,7 +676,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								return ERROR_IND;
 							}
 							if (lu_area[j][urban_ind] != raster_info.lu_nodata) { // don't add if nodata
-								temp_flt = lu_area[j][urban_ind];
+								tmp_dbl = lu_area[j][urban_ind];
 								area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] + ((lu_area[j][urban_ind])* temp_frac);
 								// sum the global out land type area
 								// sage types plus one are first, then hyde types
@@ -630,69 +685,53 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 							
 							// sum the detailed lu categories also
 							for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
-								temp_flt = lu_area[j][m];
+								tmp_dbl = lu_area[j][m];
 								if (lu_area[j][m] != raster_info.lu_nodata) { // don't add if nodata
 									global_lt_out[m + NUM_SAGE_PVLT + 1] = global_lt_out[m + NUM_SAGE_PVLT + 1] + (lu_area[j][m])* temp_frac;
 								}
 							}
 							
-						} // end if valid glu cell
+						}//Finish k loop for protected areas
 						
-					} // end if valid land area
+					} // end if valid glu cell
 					
-					// store the updated grid data in the input arrays for each year in case they are to be written
-					// set cell to nodata if it is not a land cell
-					
-					if (land_area_hyde[grid_ind] != raster_info.land_area_hyde_nodata) {
-						crop_grid[grid_ind] = lu_area[j][crop_ind];
-						pasture_grid[grid_ind] = lu_area[j][pasture_ind];
-						urban_grid[grid_ind] = lu_area[j][urban_ind];
-						for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
-							lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = lu_area[j][m];
-						}
-						refveg_area_grid[grid_ind] = refveg_area_out[j];
-						refveg_them_out[grid_ind] = refveg_them[j];
-						
-					} else {
-						crop_grid[grid_ind] = NODATA;
-						pasture_grid[lu_indices[j]] = NODATA;
-						urban_grid[grid_ind] = NODATA;
-						for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
-							lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = NODATA;
-						}
-						refveg_area_grid[grid_ind] = NODATA;
-						refveg_them_out[grid_ind] = raster_info.potveg_nodata;
-					}
-					
-				}//Finish loop for protected areas	
+				} // end if valid land area
+				
 			} // end for j loop over the lu cells to store
+			
+			/*
+			if(rfarea_check != 0 || luarea_check != 0){
+				fprintf(fplog, "Check: year %i lulc cell %i refveg area %f lu area %f: proc_land_type_area()\n", hyde_years[year_ind], i, rfarea_check, luarea_check);
+				fprintf(debug_file, "proc_land_type_area,%i,%i,%f,%f,%f\n", hyde_years[year_ind], i, rfarea_check, luarea_check,rfarea_check + luarea_check);
+			}
+			 */
 			
 		} // end for i loop over the lulc cells
 		
 		if (in_args.diagnostics) {
 			// write the global area check to the log file
 			fprintf(fplog, "\nGlobal lulc area check for year %i: proc_land_type_area()\n", hyde_years[year_ind]);
-			fprintf(fplog, "Unknown: out =\t%f\n", global_lt_out[0]);
+			fprintf(fplog, "Unknown: out =\t%lf\n", global_lt_out[0]);
 			global_area_out = global_lt_out[0];
 			global_area_in = 0;
-			temp_flt = global_lt_out[0];
+			tmp_dbl = global_lt_out[0];
 			for (j = 1; j <= NUM_SAGE_PVLT; j++) {
-				fprintf(fplog, "%s: out =\t%f;\tin =\t%f\n", landtypenames_sage[j-1], global_lt_out[j], global_lulc_in[j]);
+				fprintf(fplog, "%s: out =\t%lf;\tin =\t%lf\n", landtypenames_sage[j-1], global_lt_out[j], global_lulc_in[j]);
 				global_area_out = global_area_out + global_lt_out[j];
-				temp_flt = global_lt_out[j];
+				tmp_dbl = global_lt_out[j];
 				global_area_in = global_area_in + global_lulc_in[j];
-				temp_flt = global_lulc_in[j];
+				tmp_dbl = global_lulc_in[j];
 			}
 			for (j = NUM_SAGE_PVLT + 1; j < NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES; j++) {
-				fprintf(fplog, "%s: out =\t%f;\tin =\t%f\n", lutypenames_hyde[j - NUM_SAGE_PVLT - 1], global_lt_out[j], global_lulc_in[j]);
+				fprintf(fplog, "%s: out =\t%lf;\tin =\t%lf\n", lutypenames_hyde[j - NUM_SAGE_PVLT - 1], global_lt_out[j], global_lulc_in[j]);
 				if (j < NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES_MAIN) {
 					global_area_out = global_area_out + global_lt_out[j];
-					temp_flt = global_lt_out[j];
+					tmp_dbl = global_lt_out[j];
 					global_area_in = global_area_in + global_lulc_in[j];
-					temp_flt = global_lulc_in[j];
+					tmp_dbl = global_lulc_in[j];
 				}
 			}
-			fprintf(fplog, "Global land area: out =\t%f;\tin =\t%f\n", global_area_out, global_area_in);
+			fprintf(fplog, "Global land area: out =\t%lf;\tin =\t%lf\n", global_area_out, global_area_in);
 		} // end if write diagnostics
 		
 		// write specified year's land cover/use grids if desired
@@ -766,10 +805,10 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
             for (cur_lt_cat_ind = 0; cur_lt_cat_ind < num_lt_cats; cur_lt_cat_ind++) {
 				for (year_ind = 0; year_ind < NUM_HYDE_YEARS; year_ind++) {
                     tmp_dbl = area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind];
-                    outval = (float) floor((double) 0.5 + area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] * KMSQ2HA);
+                    outval = floor(0.5 + area_out[ctry_ind][aez_ind][cur_lt_cat_ind][year_ind] * KMSQ2HA);
                     // output only positive values
                     if (outval > 0) {
-                        fprintf(fpout,"\n%s,%i,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+                        fprintf(fpout,"\n%s,%i,%i,%i,%.0lf", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
                                 lt_cats[cur_lt_cat_ind], hyde_years[year_ind], outval);
                         nrecords++;
                     } // end if value is positive

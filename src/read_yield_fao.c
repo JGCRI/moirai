@@ -171,8 +171,10 @@ int read_yield_fao(args_struct in_args) {
             
             // skip this record if the country or crop is not found
             if (ctry_ind == NOMATCH || crop_ind == NOMATCH) {
-                fprintf(fplog, "Warning: extra fao country %i or sage crop %i in file %s: read_yield_fao(); record=%li\n",
+				if (in_args.diagnostics) {
+					fprintf(fplog, "Warning: extra fao country %i or sage crop %i in file %s: read_yield_fao(); record=%li\n",
                         temp_ctry, temp_crop, fname, count_recs);
+				}
             }else {
                 // get the annual data
                 for (j = 0; j < NUM_FAO_YRS; j++) {

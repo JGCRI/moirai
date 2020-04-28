@@ -10,6 +10,9 @@
   return value:
   integer error code: OK = 0, otherwise a non-zero error code
 
+  Note that using \r\n with fscanf successfully catches all end of line combinations: \r, \n, \r\n
+ 	but only if there are no assignments!
+ 
   Created by Alan Di Vittorio on 10/13/15.
  
  Moirai Land Data System (Moirai) Copyright (c) 2019, The
@@ -64,15 +67,15 @@ int read_aez_new_info(args_struct in_args) {
         return ERROR_FILE;
     }
     
-    // skip the header line
-    if(fscanf(fpin, "%*[^\n]\n") == EOF)
+    // skip the header line - \r\n catches all three end of line combinations: \r, \n, or \r\n
+    if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_aez_new_info()\n", fname);
         return ERROR_FILE;
     }
     
     // count the records
-    while (fscanf(fpin, "%*[^\n]\n") != EOF) {
+    while (fscanf(fpin, "%*[^\r\n]\r\n") != EOF) {
         nrecords++;
     }
     
@@ -101,7 +104,7 @@ int read_aez_new_info(args_struct in_args) {
     rewind(fpin);
     
     // skip the header line
-    if(fscanf(fpin, "%*[^\n]\n") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_aez_new_info()\n", fname);
         return ERROR_FILE;
@@ -109,7 +112,7 @@ int read_aez_new_info(args_struct in_args) {
     
     // read the aez new info records
     for (i = 0; i < NUM_NEW_AEZ; i++) {
-        if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+        if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
             // get the intger code
             if((err = get_int_field(rec_str, delim, 1, &aez_codes_new[out_index])) != OK) {
                 fprintf(fplog, "Error processing file %s: read_aez_new_info(); record=%i, column=1\n",

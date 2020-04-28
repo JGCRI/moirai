@@ -101,8 +101,10 @@ int write_production_crop_aez(args_struct in_args) {
                     if (outval > 0) {
                         // check the harvested area for zero and negative values; write only if positive
                         if ((float) floor((double) 0.5 + harvestarea_crop_aez[ctry_index][aez_index][crop_index]) <= 0) {
-                            fprintf(fplog, "Discard production due to no harvested area: prod = %.0f and ha = 0: write_production_crop_aez(); ctrycode=%i,aezcode=%i, cropcode=%i\n", outval, countrycodes_fao[ctry_index], ctry_aez_list[ctry_index][aez_index],
+							if (in_args.diagnostics) {
+                            	fprintf(fplog, "Discard production due to no harvested area: prod = %.0f and ha = 0: write_production_crop_aez(); 	ctrycode=%i,aezcode=%i, cropcode=%i\n", outval, countrycodes_fao[ctry_index], ctry_aez_list[ctry_index][aez_index],
                                     cropcodes_sage[crop_index]);
+							}
 						} else {
 							fprintf(fpout,"\n%s,%i,%s,%.0f", countryabbrs_iso[ctry_index], ctry_aez_list[ctry_index][aez_index],
 									cropnames_gtap[crop_index], outval);
