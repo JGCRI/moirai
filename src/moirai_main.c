@@ -753,12 +753,34 @@ int main(int argc, const char * argv[]) {
 			return ERROR_MEM;
 		}
 	}
-
+    
+    
     if((error_code = read_protected(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
+    //kbn 2020/06/01 Add code for read_soil_c here
+    soil_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(soil_carbon_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 1; i < NUM_CARBON; i++) {
+		soil_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(soil_carbon_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
     
+    
+    if((error_code = read_soil_carbon(in_args, &raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    } 
+
+
+
     // process the land type area data
     //  lu grids are allocated/freed within proc_land_type_area()
     if((error_code = proc_land_type_area(in_args, raster_info))) {
@@ -795,6 +817,11 @@ int main(int argc, const char * argv[]) {
 		free(protected_EPA[i]);
 	}
 	free(protected_EPA);
+    //kbn 2020/06/01 Add code for soil carbon here
+    for (i = 1; i < NUM_CARBON; i++) {
+		free(soil_carbon_sage[i]);
+	}
+	free(soil_carbon_sage);
     free(potveg_thematic);
 	free(refveg_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {

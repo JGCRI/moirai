@@ -76,7 +76,8 @@
 #define MIN_SAGE_FOREST_CODE    1
 
 // counts of useful variables
-#define NUM_IN_ARGS							60							// number of input variables in the input file
+//kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
+#define NUM_IN_ARGS							66							// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -95,6 +96,7 @@
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
+#define NUM_CARBON              7              //Categories of carbon states (1- Weighted average, 2- Median, 3- Min, 4- Max, 5- Q1 carbon, 6 -Q3 ) 
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -256,7 +258,8 @@ int *land_mask_forest;                  // 1=forest; 0=no forest
 
 //kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7
 float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
-
+//kbn 2020-06-01 Changing soil carbon variable
+float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
@@ -512,6 +515,14 @@ typedef struct {
 	char IUCN_1a_1b_2_fname[MAXCHAR];      //IUCN 1a_1b_2 protected area raster
 	char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
 	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
+	//kbn 2020-06-01 Introducing file names for soil carbon
+	char soil_carbon_wavg_fname[MAXCHAR];
+	char soil_carbon_median_fname[MAXCHAR];
+	char soil_carbon_min_fname[MAXCHAR];
+	char soil_carbon_max_fname[MAXCHAR];
+	char soil_carbon_q1_fname[MAXCHAR];
+	char soil_carbon_q3_fname[MAXCHAR];
+
 
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
@@ -571,6 +582,8 @@ int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
 int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int *land_mask_lulc);
 int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float* crop_grid, float* pasture_grid, float* urban_grid, float** lu_detail);
+//kbn 2020-06-01 Changing soil carbon function below
+int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info);
 
 // read csv file functions
 int read_rent_orig(args_struct in_args);
@@ -587,7 +600,8 @@ int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
 int read_veg_carbon(char *fname, float *veg_carbon_sage);
 int read_water_footprint(char *fname, float *wf_grid);
-int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
+//shifting soil carbon function to the above
+//int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
 
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);

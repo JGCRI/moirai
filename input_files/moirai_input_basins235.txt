@@ -43,6 +43,13 @@ All_IUCN.bil                # ALL_IUCN_fname: protected pixels (thematic)
 1a_1b_2_processed.bil       # IUCN_1a_1b_2_fname: protected pixels (thematic)
 Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
 Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
+soil_carbon_weighted_average.bil    # soil_carbon_wavg_fname: weighted average carbon state
+soil_carbon_min.bil                 #soil_carbon_min_fname: minimum carbon state
+soil_carbon_median.bil              #soil_carbon_median_fname: median carbon state
+soil_carbon_max.bil                 #soil_carbon_max_fname: maximum carbon state
+soil_carbon_q1.bil                  #soil_carbon_q1_fname: q1 carbon state
+soil_carbon_q3.bil                  #soil_carbon_q3_fname: q3 carbon state    
+
 
 # input csv file names (without path)
 GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
