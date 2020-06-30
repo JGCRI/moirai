@@ -77,7 +77,7 @@
 
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
-#define NUM_IN_ARGS							66							// number of input variables in the input file
+#define NUM_IN_ARGS							72						// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -259,7 +259,9 @@ int *land_mask_forest;                  // 1=forest; 0=no forest
 //kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7
 float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
 //kbn 2020-06-01 Changing soil carbon variable
+//kbn 2020-06-29 Changing vegetation carbon variable
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
+float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
@@ -522,6 +524,13 @@ typedef struct {
 	char soil_carbon_max_fname[MAXCHAR];
 	char soil_carbon_q1_fname[MAXCHAR];
 	char soil_carbon_q3_fname[MAXCHAR];
+	//kbn 2020-06-30 Introducing file names for veg carbon
+	char veg_carbon_wavg_fname[MAXCHAR];
+	char veg_carbon_median_fname[MAXCHAR];
+	char veg_carbon_min_fname[MAXCHAR];
+	char veg_carbon_max_fname[MAXCHAR];
+	char veg_carbon_q1_fname[MAXCHAR];
+	char veg_carbon_q3_fname[MAXCHAR];
 
 
 	// input csv file names
@@ -584,7 +593,8 @@ int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int
 int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float* crop_grid, float* pasture_grid, float* urban_grid, float** lu_detail);
 //kbn 2020-06-01 Changing soil carbon function below
 int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info);
-
+//kbn 2020-06-01 Changing veg carbon function below
+int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info);
 // read csv file functions
 int read_rent_orig(args_struct in_args);
 int read_country87_info(args_struct in_args);
@@ -598,7 +608,7 @@ int read_production_fao(args_struct in_args);
 int read_yield_fao(args_struct in_args);
 int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
-int read_veg_carbon(char *fname, float *veg_carbon_sage);
+//int read_veg_carbon(char *fname, float *veg_carbon_sage);
 int read_water_footprint(char *fname, float *wf_grid);
 //shifting soil carbon function to the above
 //int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);

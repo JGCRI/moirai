@@ -49,6 +49,12 @@ soil_carbon_median.bil              #soil_carbon_median_fname: median carbon sta
 soil_carbon_max.bil                 #soil_carbon_max_fname: maximum carbon state
 soil_carbon_q1.bil                  #soil_carbon_q1_fname: q1 carbon state
 soil_carbon_q3.bil                  #soil_carbon_q3_fname: q3 carbon state    
+veg_carbon_wavg.bil                 # veg_carbon_wavg_fname: weighted average vegetation carbon state
+veg_carbon_min.bil                 #veg_carbon_min_fname: minimum vegetation carbon state
+veg_carbon_median.bil              #veg_carbon_median_fname: median vegetation carbon state
+veg_carbon_max.bil                 #veg_carbon_max_fname: maximum vegetation carbon state
+veg_carbon_q1.bil                  #veg_carbon_q1_fname: q1 vegetation carbon state
+veg_carbon_q3.bil                  #veg_carbon_q3_fname: q3 vegetation carbon state    
 
 
 # input csv file names (without path)

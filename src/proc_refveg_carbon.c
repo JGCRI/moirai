@@ -79,9 +79,19 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     
     //float* soil_carbon_grid;    // 1d array to store the soil carbon data; start up left corner, row by row; lon varies faster
     //float *soil_carbon_sage;     // array to store the veg c values for the 15 sage pot veg types and 3 land use types
-    float *veg_carbon_sage;     // array to store the veg c values for the 15 sage pot veg types and 3 land use types
+    //float *veg_carbon_sage;     // array to store the veg c values for the 15 sage pot veg types and 3 land use types
     float global_soilc = 0;         // total pot veg soil carbon
+    float global_soilc_median = 0;
+    float global_soilc_max = 0;
+    float global_soilc_min = 0;
+    float global_soilc_q1 = 0;
+    float global_soilc_q3 = 0;
     float global_vegc = 0;          // total pot veg veg carbon
+    float global_vegc_median = 0;
+    float global_vegc_max = 0;
+    float global_vegc_min = 0;
+    float global_vegc_q1 = 0;
+    float global_vegc_q3 = 0;
     float outval_soilc;                 // for the output values
     float outval_soilc_median;
     float outval_soilc_min;
@@ -89,6 +99,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     float outval_soilc_q1;
     float outval_soilc_q3;
     float outval_vegc;                 // for the output values
+    float outval_vegc_median;
+    float outval_vegc_min;
+    float outval_vegc_max;
+    float outval_vegc_q1;
+    float outval_vegc_q3;
     float temp_float;           // temporary float
     
     // output table as 4-d array
@@ -125,11 +140,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
         //fprintf(fplog,"Failed to allocate memory for soil_carbon_sage: proc_refveg_carbon()\n");
         //return ERROR_MEM;
     //}
-    veg_carbon_sage = calloc(NUM_SAGE_PVLT, sizeof(float));
-    if(veg_carbon_sage == NULL) {
-        fprintf(fplog,"Failed to allocate memory for veg_carbon_sage: proc_refveg_carbon()\n");
-        return ERROR_MEM;
-    }
+    //veg_carbon_sage = calloc(NUM_SAGE_PVLT, sizeof(float));
+    //if(veg_carbon_sage == NULL) {
+      //  fprintf(fplog,"Failed to allocate memory for veg_carbon_sage: proc_refveg_carbon()\n");
+      //  return ERROR_MEM;
+    //}
     
     refveg_carbon_out = calloc(NUM_FAO_CTRY, sizeof(float***));
     if(refveg_carbon_out == NULL) {
@@ -176,13 +191,13 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
         //return err;
     //}
     // read the veg c file
-    strcpy(fname, in_args.inpath);
-    strcat(fname, in_args.vegc_csv_fname);
-    if((err = read_veg_carbon(fname, veg_carbon_sage)) != OK)
-    {
-        fprintf(fplog, "Failed to read file %s for input: proc_refveg_carbon()\n",fname);
-        return err;
-    }
+    //strcpy(fname, in_args.inpath);
+    //strcat(fname, in_args.vegc_csv_fname);
+    //if((err = read_veg_carbon(fname, veg_carbon_sage)) != OK)
+    //{
+      //  fprintf(fplog, "Failed to read file %s for input: proc_refveg_carbon()\n",fname);
+       // return err;
+    //}
     
     // loop over the valid hyde land cells
     //  and skip it if no valid glu value or country value (country has to be mapped to ctry87)
@@ -263,7 +278,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             } else {
                 rv_value = refveg_thematic[grid_ind];
 				outval_soilc = 0;
-				outval_vegc = veg_carbon_sage[rv_ind];
+				outval_vegc = 0;
             }
 			
 			
@@ -323,11 +338,36 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				soil_carbon_sage[6][grid_ind] * refveg_area[grid_ind]*temp_frac;
 
 				// veg c
-                //kbn No carbon states for vegetation carbon yet. So keep these values at 1
+                //1. weighted average
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1] +
-				outval_vegc * refveg_area[grid_ind]*temp_frac;
+				veg_carbon_sage[1][grid_ind] * refveg_area[grid_ind]*temp_frac;
 				
+                //2. Median
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2] +
+				veg_carbon_sage[2][grid_ind] * refveg_area[grid_ind]*temp_frac;
+                 
+                //3. Min
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3] +
+				veg_carbon_sage[3][grid_ind] * refveg_area[grid_ind]*temp_frac;
+                
+                //4. Max
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4] +
+				veg_carbon_sage[4][grid_ind] * refveg_area[grid_ind]*temp_frac;
+                
+                //5. Q1
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5] +
+				veg_carbon_sage[5][grid_ind] * refveg_area[grid_ind]*temp_frac;
+
+                //6. Q3
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][6] =
+				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][6] +
+				veg_carbon_sage[6][grid_ind] * refveg_area[grid_ind]*temp_frac;
+
 				// area
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1] +
@@ -416,6 +456,12 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
 					// sum the total
 					global_soilc = global_soilc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1];
+                    global_soilc_median = global_soilc_median + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2];
+                    global_soilc_min = global_soilc_min + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3];
+                    global_soilc_max = global_soilc_max + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][4];
+                    global_soilc_q1 = global_soilc_q1 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5];
+                    global_soilc_q3 = global_soilc_q3 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][6];
+                    
 					// write the value
 					if (outval_soilc > 0) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
@@ -430,21 +476,47 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 					}
 					
 					// veg carbon
-					temp_float = KGMSQ2MGHA * refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1] /
+					temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1] /
 					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
 					outval_vegc = (float) floor((double) 0.5 + temp_float);
-					// sum the total
+					
+                    temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
+					outval_vegc_median = (float) floor((double) 0.5 + temp_float);
+                    
+                    temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
+					outval_vegc_min = (float) floor((double) 0.5 + temp_float);
+                    
+                    temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
+					outval_vegc_max = (float) floor((double) 0.5 + temp_float);
+
+                    temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
+					outval_vegc_q1 = (float) floor((double) 0.5 + temp_float);
+
+                    temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][6] /
+					refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][area_ind][1];
+					outval_vegc_q3 = (float) floor((double) 0.5 + temp_float);
+                    // sum the total
 					global_vegc = global_vegc + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1];
-					// write the value
+                    global_vegc_median = global_vegc_median + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2];
+                    global_vegc_min = global_vegc_min + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3];
+                    global_vegc_max = global_vegc_max + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4];
+                    global_vegc_q1 = global_vegc_q1 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5];
+                    global_vegc_q3 = global_vegc_q3 + refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][6];
+					
+                    // write the value
 					if (outval_vegc > 0) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 								lt_cats[cur_lt_cat_ind], "veg_c");
 						fprintf(fpout,",%.0f", outval_vegc);
-                        fprintf(fpout,",%.0f", 0);
-                        fprintf(fpout,",%.0f", 0);
-                        fprintf(fpout,",%.0f", 0);
-                        fprintf(fpout,",%.0f", 0);
-                        fprintf(fpout,",%.0f", 0);
+                        fprintf(fpout,",%.0f", outval_vegc_median);
+                        fprintf(fpout,",%.0f", outval_vegc_min);
+                        fprintf(fpout,",%.0f", outval_vegc_max);
+                        fprintf(fpout,",%.0f", outval_vegc_q1);
+                        fprintf(fpout,",%.0f", outval_vegc_q3);
 						nrecords++;
 					}
 					
@@ -456,16 +528,27 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     fclose(fpout);
 	
     fprintf(fplog, "Wrote file %s: proc_refveg_carbon(); records written=%i\n", fname, nrecords);
-	exit(0);
+	
 
     // also write the total global carbon values to the log file
     // in Gg because the conversions cancel out
     fprintf(fplog, "\nGlobal reference vegetation carbon values, in Gg: proc_refveg_carbon()\n");
     fprintf(fplog, "Soil C = %f\n", global_soilc);
+    fprintf(fplog, "Soil C Median = %f\n", global_soilc_median);
+    fprintf(fplog, "Soil C Min = %f\n", global_soilc_min);
+    fprintf(fplog, "Soil C Max = %f\n", global_soilc_max);
+    fprintf(fplog, "Soil C Q1 = %f\n", global_soilc_q1);
+    fprintf(fplog, "Soil C Q3 = %f\n", global_soilc_q3);
     fprintf(fplog, "Veg C = %f\n\n", global_vegc);
-	
+    fprintf(fplog, "Veg C Median = %f\n", global_vegc_median);
+    fprintf(fplog, "Veg C Min = %f\n", global_vegc_min);
+    fprintf(fplog, "Veg C Max = %f\n", global_vegc_max);
+    fprintf(fplog, "Veg C Q1 = %f\n", global_vegc_q1);
+    fprintf(fplog, "Veg C Q3 = %f\n", global_vegc_q3);
+
+	exit(0);
     //free(soil_carbon_sage);
-    free(veg_carbon_sage);
+    //free(veg_carbon_sage);
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             for (k = 0; k < num_lt_cats; k++) {

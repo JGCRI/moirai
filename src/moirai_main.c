@@ -778,7 +778,26 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     } 
-
+    
+    //kbn 2020/06/30 Add code for read_veg_c here
+    veg_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(veg_carbon_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 1; i < NUM_CARBON; i++) {
+		veg_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(veg_carbon_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    
+    if((error_code = read_veg_carbon(in_args, &raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    }
 
 
     // process the land type area data
@@ -822,6 +841,11 @@ int main(int argc, const char * argv[]) {
 		free(soil_carbon_sage[i]);
 	}
 	free(soil_carbon_sage);
+    //kbn 2020/06/30 Add code for veg carbon here
+    for (i = 1; i < NUM_CARBON; i++) {
+		free(veg_carbon_sage[i]);
+	}
+	free(veg_carbon_sage);
     free(potveg_thematic);
 	free(refveg_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {

@@ -91,8 +91,13 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->soil_carbon_max_fname, '\0', MAXCHAR);
 	memset(in_args->soil_carbon_q1_fname, '\0', MAXCHAR);
 	memset(in_args->soil_carbon_q3_fname, '\0', MAXCHAR);
-
-
+    //kbn 2020-06-30 Add new veg carbon states inputs here
+    memset(in_args->veg_carbon_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_q3_fname, '\0', MAXCHAR);
 	// input csv file names (without path)
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
