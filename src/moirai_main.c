@@ -288,8 +288,8 @@
 #include "moirai.h"
 
 int main(int argc, const char * argv[]) {
-    
-    int i, j;
+    int num_carbon_states = 5;
+    int i, j, k,l;
 	char fname[MAXCHAR];		// used to open files
 	args_struct in_args;		// data structure for holding the control input file info
 	rinfo_struct raster_info;	// data structure for storing raster input file specific info
@@ -773,6 +773,33 @@ int main(int argc, const char * argv[]) {
 		}
 	}
     
+    soil_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
+    if(soil_carbon_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        soil_carbon_array[i] = calloc(ctry_aez_num[i], sizeof(float***));
+        if(soil_carbon_array[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            soil_carbon_array[i][j] = calloc(num_lt_cats, sizeof(float**));
+            if(soil_carbon_array[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+            for (k = 0; k < num_lt_cats; k++) {
+                soil_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
+                if(soil_carbon_array[i][j][k] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }//The last dimension will be assigned in read_soil_carbon.c
+                // end for k loop over output values
+            }// end for j loop over aezs
+        }// end for j loop over glus
+     }// end for i loop over fao country 
     
     if((error_code = read_soil_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);

@@ -261,7 +261,8 @@ float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid 
 //kbn 2020-06-01 Changing soil carbon variable
 //kbn 2020-06-29 Changing vegetation carbon variable
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
-float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
+float *****soil_carbon_array; //dims to be defined later
+float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell 
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells

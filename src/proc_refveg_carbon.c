@@ -132,7 +132,8 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     char fname[MAXCHAR];        // current file name to write
     FILE *fpout;                // out file pointer
     float temp_frac;           //Create temporary fraction for protected areas
-    
+    int size=0;
+    int size_temp=0;
     // allocate arrays
     
     //soil_carbon_sage = calloc(NUM_SAGE_PVLT, sizeof(float));
@@ -145,7 +146,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
       //  fprintf(fplog,"Failed to allocate memory for veg_carbon_sage: proc_refveg_carbon()\n");
       //  return ERROR_MEM;
     //}
-    
+    //create a function for comparisons   
+    int cmpfunc (const void * a, const void * b) {
+   return ( *(int*)a - *(int*)b );
+}
+
     refveg_carbon_out = calloc(NUM_FAO_CTRY, sizeof(float***));
     if(refveg_carbon_out == NULL) {
         fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
@@ -306,36 +311,59 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				//kbn 2020 Updating below for protected area fractions
                 //kbn 2020-06-02 Updating below with revised calculation for carbon states
 				// soil c
+                //sort arrays 
+                qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2],(sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2])/sizeof(float)),sizeof(float),cmpfunc);
+                qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3],(sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3])/sizeof(float)),sizeof(float),cmpfunc);
+                qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4],(sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4])/sizeof(float)),sizeof(float),cmpfunc);
+                qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5],(sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5])/sizeof(float)),sizeof(float),cmpfunc);
+                qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6],(sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6])/sizeof(float)),sizeof(float),cmpfunc);
 
+                  
                 //1. weighted average
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1] +
 				soil_carbon_sage[1][grid_ind] * refveg_area[grid_ind]*temp_frac;
 
                 //2. Median
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2] =
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2] +
-				soil_carbon_sage[2][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				size= sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2])/sizeof(float);
+                size_temp=size/2;
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2][size_temp];
+                
+                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2] =
+				temp_float * refveg_area[grid_ind]*temp_frac;
 
                 //3. Min
+                size= sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3])/sizeof(float);
+                size_temp=size/2;
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3][0];
+                
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3] =
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3] +
-				soil_carbon_sage[3][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				temp_float * refveg_area[grid_ind]*temp_frac;
                 
                 //4. Max
+                size= sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4])/sizeof(float);
+                size_temp=size/2;
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4][size];
+                               
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][4] =
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][4] +
-				soil_carbon_sage[4][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				temp_float * refveg_area[grid_ind]*temp_frac;
 
                 //5. Q1
+                size= sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5])/sizeof(float);
+                size_temp=size*0.25;
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5][size_temp];
+
+
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5] =
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5] +
-				soil_carbon_sage[5][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				temp_float*refveg_area[grid_ind]*temp_frac;
 
                 //6. Q3
+               size= sizeof(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6])/sizeof(float);
+                size_temp=size*0.75;
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6][size_temp];
+
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][6] =
-				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][6] +
-				soil_carbon_sage[6][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				temp_float * refveg_area[grid_ind]*temp_frac;
 
 				// veg c
                 //1. weighted average
