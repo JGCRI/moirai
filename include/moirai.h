@@ -77,7 +77,7 @@
 
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
-#define NUM_IN_ARGS							72						// number of input variables in the input file
+#define NUM_IN_ARGS							78					// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -97,6 +97,7 @@
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              7              //Categories of carbon states (1- Weighted average, 2- Median, 3- Min, 4- Max, 5- Q1 carbon, 6 -Q3 ) 
+#define NUM_CARBON_ARRAY        7
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -110,7 +111,8 @@
 #define NUM_LU_CATS             4               // crop, pasture, urban, potential veg (pv code = 0)
 #define NUM_WF_CROPS            18              // number of water footprint crops
 #define NUM_WF_TYPES            4               // number of water footprint types (blue, green, gray, total)
-
+#define ARRAY_CELLS             1
+#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))  //define function to get size of array
 // conversion factors for output
 #define KMSQ2HA					100.0						// km^2 * KMSQ2HA = ha
 #define MSQ2KMSQ				(1/1000000.0)					// m^2 * MSQ2KMSQ = km^2
@@ -160,6 +162,7 @@
 #define ERROR_MEM				5							// error associated with failed memory allocation
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
+
 
 // variables for number of records based on input files
 int NUM_FAO_CTRY;                       // number of FAO/VMAP0 countries, including additions (see FAO_iso_VMAP0_ctry.csv)
@@ -261,7 +264,9 @@ float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid 
 //kbn 2020-06-01 Changing soil carbon variable
 //kbn 2020-06-29 Changing vegetation carbon variable
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
-float *****soil_carbon_array; //dims to be defined later
+int ****soil_carbon_array_cells;//These are the total number of cells contained within each array
+float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
+float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
 float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell 
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
@@ -532,7 +537,13 @@ typedef struct {
 	char veg_carbon_max_fname[MAXCHAR];
 	char veg_carbon_q1_fname[MAXCHAR];
 	char veg_carbon_q3_fname[MAXCHAR];
-
+    // 2020-08-08 Introducing file names for below ground biomass
+	char veg_BG_wavg_fname[MAXCHAR];
+	char veg_BG_median_fname[MAXCHAR];
+	char veg_BG_min_fname[MAXCHAR];
+	char veg_BG_max_fname[MAXCHAR];
+	char veg_BG_q1_fname[MAXCHAR];
+	char veg_BG_q3_fname[MAXCHAR];
 
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file

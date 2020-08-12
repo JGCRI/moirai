@@ -773,6 +773,35 @@ int main(int argc, const char * argv[]) {
 		}
 	}
     
+    soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int***));
+    if(soil_carbon_array_cells == NULL) {
+        fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        soil_carbon_array_cells[i] = calloc(ctry_aez_num[i], sizeof(int**));
+        if(soil_carbon_array_cells[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            soil_carbon_array_cells[i][j] = calloc(num_lt_cats, sizeof(int*));
+            if(soil_carbon_array_cells[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+                for (k=0 ; k < num_lt_cats; k++){
+                soil_carbon_array_cells[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(int));
+                if(soil_carbon_array_cells[i][j][k] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k,l);
+                    return ERROR_MEM;
+                } 
+                }
+             // end for k loop over output values
+            } // end for j loop over aezs
+        }
+    
+
     soil_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
     if(soil_carbon_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
@@ -791,16 +820,62 @@ int main(int argc, const char * argv[]) {
                 return ERROR_MEM;
             }
             for (k = 0; k < num_lt_cats; k++) {
-                soil_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
+                soil_carbon_array[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(float*));
                 if(soil_carbon_array[i][j][k] == NULL) {
                     fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
                     return ERROR_MEM;
                 }//The last dimension will be assigned in read_soil_carbon.c
-                // end for k loop over output values
+                for (l = 0; l < NUM_CARBON; l++) {
+                soil_carbon_array[i][j][k][l] = calloc(ARRAY_CELLS, sizeof(float));
+                if(soil_carbon_array[i][j][k][l] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }
+                }// end for k loop over output values
             }// end for j loop over aezs
         }// end for j loop over glus
      }// end for i loop over fao country 
     
+
+    veg_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
+    if(veg_carbon_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        veg_carbon_array[i] = calloc(ctry_aez_num[i], sizeof(float***));
+        if(veg_carbon_array[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            veg_carbon_array[i][j] = calloc(num_lt_cats, sizeof(float**));
+            if(veg_carbon_array[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+            for (k = 0; k < num_lt_cats; k++) {
+                veg_carbon_array[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(float*));
+                if(veg_carbon_array[i][j][k] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }//The last dimension will be assigned in read_soil_carbon.c
+                for (l = 0; l < NUM_CARBON; l++) {
+                veg_carbon_array[i][j][k][l] = calloc(ARRAY_CELLS, sizeof(float));
+                if(veg_carbon_array[i][j][k][l] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }
+                }// end for k loop over output values
+            }// end for j loop over aezs
+        }// end for j loop over glus
+     }// end for i loop over fao country
+
+
+
+
+
+
     if((error_code = read_soil_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -820,6 +895,9 @@ int main(int argc, const char * argv[]) {
 		}
 	}
     
+
+    
+
     
     if((error_code = read_veg_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
@@ -842,6 +920,38 @@ int main(int argc, const char * argv[]) {
         return error_code;
     }
     
+    
+    //free soil and veg carbon arrays
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+	           for(l=0; l<NUM_CARBON_ARRAY;l++){
+                   free(soil_carbon_array[i][j][k][l]);
+               }free(soil_carbon_array[i][j][k]);
+            }free(soil_carbon_array[i][j]);
+        }free(soil_carbon_array[i]);
+   }free(soil_carbon_array);
+
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+	           for(l=0; l<NUM_CARBON_ARRAY;l++){
+                   free(veg_carbon_array[i][j][k][l]);
+               }free(veg_carbon_array[i][j][k]);
+            }free(veg_carbon_array[i][j]);
+        }free(veg_carbon_array[i]);
+   }free(veg_carbon_array);
+  
+  for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+	           free(soil_carbon_array_cells[i][j][k]);
+            }free(soil_carbon_array_cells[i][j]);
+        }free(soil_carbon_array_cells[i]);
+   }free(soil_carbon_array_cells);
+
+
+
     // process the water footprint data
     //  needed arrays are allocated/freed within proc_water_footprint()
     if((error_code = proc_water_footprint(in_args, raster_info))) {
@@ -880,6 +990,7 @@ int main(int argc, const char * argv[]) {
 	}
 	free(lulc_input_grid);
     
+
     // allocate the arrays for all the fao input data (initialized to zero)
     yield_fao = calloc(NUM_FAO_CTRY * NUM_SAGE_CROP * NUM_FAO_YRS, sizeof(float));
     if(yield_fao == NULL) {

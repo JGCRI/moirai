@@ -82,7 +82,6 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     float *max_array;
     float *q1_array;
     float *q3_array;
-	float ****soil_carbon_array_cells;
     int err = OK;								// store error code from the dignostic write file
     char out_name1[] = "soil_carbon_wavg.bil";		// file name for output diagnostics raster file
     char out_name2[] = "soil_carbon_median.bil";
@@ -101,11 +100,19 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     int cur_lt_cat;             // current land type category
     int cur_lt_cat_ind;             // current land type category index
     int num_carbon_states = 5;
-    float memory_median=0;
-    float memory_min=0;
-    float memory_max=0;
-    float memory_q1=0;
-    float memory_q3=0;
+    int memory_median=0;
+    int memory_min=0;
+    int memory_max=0;
+    int memory_q1=0;
+    int memory_q3=0;
+    int median_ind=0;
+    int min_ind=0;
+    int max_ind=0;
+    int q1_ind=0;
+    int q3_ind=0;
+
+    
+
 
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
@@ -120,39 +127,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
    
     
     
-
-soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
-    if(soil_carbon_array_cells == NULL) {
-        fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
-        return ERROR_MEM;
-    }
-    for (i = 0; i < NUM_FAO_CTRY; i++) {
-        soil_carbon_array_cells[i] = calloc(ctry_aez_num[i], sizeof(float**));
-        if(soil_carbon_array_cells[i] == NULL) {
-            fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
-            return ERROR_MEM;
-        }
-        for (j = 0; j < ctry_aez_num[i]; j++) {
-            soil_carbon_array_cells[i][j] = calloc(num_lt_cats, sizeof(float*));
-            if(soil_carbon_array_cells[i][j] == NULL) {
-                fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
-                return ERROR_MEM;
-            }
-                for (k=0 ; k <= num_lt_cats; k++){
-                soil_carbon_array_cells[i][j][k] = calloc(NUM_CARBON, sizeof(float));
-                if(soil_carbon_array_cells[i][j][k] == NULL) {
-                    fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k,l);
-                    return ERROR_MEM;
-                } 
-                }
-             // end for k loop over output values
-            } // end for j loop over aezs
-        } // end for j loop over glus
-    
-   
-
- 
-    
+    //1. Start with weighted average
     wavg_array = calloc(ncells, sizeof(float));
     if(wavg_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -184,7 +159,9 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
+    
 
+    //2. Median soil carbon
     median_array = calloc(ncells, sizeof(float));
     if(median_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -210,7 +187,7 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
         return ERROR_FILE;
     }
 
-    //min
+    //3. Minimum soil carbon
     min_array = calloc(ncells, sizeof(float));
     if(min_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -236,7 +213,7 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
         return ERROR_FILE;
     }
 
-    //max
+    //4. Maximum soil carbon
     max_array = calloc(ncells, sizeof(float));
     if(max_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -262,7 +239,7 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
         return ERROR_FILE;
     }
 
-    //q1
+    //5. Q1 soil carbon
     q1_array = calloc(ncells, sizeof(float));
     if(q1_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -288,7 +265,7 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
         return ERROR_FILE;
     }
     
-    //q3
+    //6. Q3 soil carbon
     q3_array = calloc(ncells, sizeof(float));
     if(q3_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for L1_array: read_protected()\n");
@@ -315,7 +292,7 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
     } 
 
                 
-    
+    //fprintf(stdout, "\nSuccessfully starting first for loop in read_soil_c  at %s\n", grid_ind,ctry_ind,aez_ind,cur_lt_cat_ind, get_systime());
 
     //First loop to get the number of cells per array
      for (j = 0; j < ncells ; j++){//for each cell
@@ -367,6 +344,10 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
                     break;
                 }
             }// end for i loop to get aez index
+            if (aez_ind == NOMATCH) {
+                fprintf(fplog, "Failed to match aez %i to country %i: proc_refveg_carbon()\n",aez_val,ctry_code);
+                return ERROR_IND;
+            }
 
             // get index of sage pot veg; set value to 0 if unknown
             rv_ind = NOMATCH;
@@ -386,7 +367,13 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
 
             for (k=0; k< NUM_EPA_PROTECTED; k++){
 				// get index of land category
-				cur_lt_cat = rv_value * SCALE_POTVEG + k;
+				median_ind=0;
+                min_ind=0;
+                max_ind=0;
+                q1_ind=0;
+                q3_ind=0;
+
+                cur_lt_cat = rv_value * SCALE_POTVEG + k;
 				cur_lt_cat_ind = NOMATCH;
 				for (i = 0; i < num_lt_cats; i++) {
 					if (lt_cats[i] == cur_lt_cat) {
@@ -398,16 +385,65 @@ soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(float***));
 					fprintf(fplog, "Failed to match lt_cat %i: proc_refveg_carbon()\n", cur_lt_cat);
 					return ERROR_IND;
 				}
+                //assign the actual soil carbon numbers
+                soil_carbon_sage[1][grid_ind]=wavg_array[grid_ind];
+                soil_carbon_sage[2][grid_ind]=median_array[grid_ind];
+                soil_carbon_sage[3][grid_ind]=min_array[grid_ind];
+                soil_carbon_sage[4][grid_ind]=max_array[grid_ind];
+                soil_carbon_sage[5][grid_ind]=q1_array[grid_ind];
+                soil_carbon_sage[6][grid_ind]=q3_array[grid_ind];
 
-                //calculate the cells to hold within each array
-                if(median_array[grid_ind]>0){
-                    soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2] + 1;} 
-                if(min_array[grid_ind]>0){ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3] + 1;} 
-                if(max_array[grid_ind]>0){ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4] + 1;}
-                if(q1_array[grid_ind]>0){ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5] + 1;}
-                if(q3_array[grid_ind]>0){ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6] + 1;}
+                //calculate the number of cells to hold within each array
                 
-                
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2] + 1; 
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3] + 1; 
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4] + 1;
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5] + 1;
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6] + 1;
+             
+             //Convert this to an integer
+              memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]);
+              memory_min = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
+              memory_max = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
+              memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
+              memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]);   
+              
+            
+                //use the calculated number of cells to allocate memory for the soil_carbon_array. The number of cells won't change for veg_carbon so allocate the size of that array here as well. 
+                //Don't allocate 0 memory. If size is 0, then keep size at 1. This reduces problems during the free() calls later
+                if(memory_median>0){
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);  
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_median,sizeof(float));
+            
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_min,sizeof(float));
+            
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_max,sizeof(float));
+            
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q1,sizeof(float));
+            
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]);
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]=calloc(memory_q3,sizeof(float));
+
+
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);  
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_median,sizeof(float));
+            
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_min,sizeof(float));
+            
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_max,sizeof(float));
+            
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q1,sizeof(float));
+            
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]);
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]=calloc(memory_q3,sizeof(float));
+                }
+            //TODO Add some diagnostics here to print out numbers for user specified basins
 
             }//finish loop for protected areas
         }//finish loop for aez
@@ -420,33 +456,6 @@ if (in_args.diagnostics) {
             return ERROR_FILE;
         }
         }
-
-//Second loop for memory allocation
-for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++){//for each country
-                for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++){//for each aez within each country
-                     for (cur_lt_cat_ind = 0; cur_lt_cat_ind < num_lt_cats; cur_lt_cat_ind++){//for each land type
-                          n=0;//Setting n to 1 before we start looping over the cells so that we get a value from 0 to whatever for each array         
-                               
-                
-             //create memory for array  
-             memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]);
-             memory_min = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
-             memory_max = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
-             memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
-             memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]);
-            
-            //assign memory
-
-            if(memory_median>0) {soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_median,sizeof(float));}
-            if(memory_min>0) {soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_min,sizeof(float));}
-            if(memory_max>0) {soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_max,sizeof(float));}
-            if(memory_q1>0) {soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q1,sizeof(float));}
-            if(memory_q3>0) {soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]=calloc(memory_q3,sizeof(float));}
-
-            }//finish loop for land types
-        }//finish loop for aez
-    }//finish loop for countries
-
 if (in_args.diagnostics) {
         if ((err = write_raster_float(wavg_array, ncells, out_name3, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
@@ -454,126 +463,15 @@ if (in_args.diagnostics) {
         }
         }
 
-//final loop to create soil_carbon_array
-for (j = 0; j < ncells ; j++){//for each cell
-               //assign a grid index
-               grid_ind = land_cells_hyde[j];
-               
-               //assign aez and country code
-               aez_val = aez_bounds_new[grid_ind];
-               ctry_code = country_fao[grid_ind];
-
-               if (aez_val != -9999) {
-            // get the fao country index
-            ctry_ind = NOMATCH;
-            for (i = 0; i < NUM_FAO_CTRY; i++) {
-                if (countrycodes_fao[i] == ctry_code) {
-                    ctry_ind = i;
-                    break;
-                }
-            } // end for i loop to get ctry index
-            
-
-            // merge serbia and montenegro for scg record
-            if (ctry_code == mne_code || ctry_code == srb_code) {
-                ctry_code = scg_code;
-                ctry_ind = NOMATCH;
-                for (i = 0; i < NUM_FAO_CTRY; i++) {
-                    if (countrycodes_fao[i] == ctry_code) {
-                        ctry_ind = i;
-                        break;
-                    }
-                }
-                if (ctry_ind == NOMATCH) {
-                    // this should never happen
-                    fprintf(fplog, "Error finding scg ctry index: proc_refveg_carbon()\n");
-                    return ERROR_IND;
-                }
-            } // end if serbia or montenegro
-
-            if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
-				continue;
-			}
-
-            aez_ind = NOMATCH;
-            for (i = 0; i < ctry_aez_num[ctry_ind]; i++) {
-                if (ctry_aez_list[ctry_ind][i] == aez_val) {
-                    aez_ind = i;
-                    break;
-                }
-            }
-
-            // get index of sage pot veg; set value to 0 if unknown
-            rv_ind = NOMATCH;
-            for (i = 0; i < NUM_SAGE_PVLT; i++) {
-                if (refveg_thematic[grid_ind] == landtypecodes_sage[i]) {
-                    rv_ind = i;
-                    break;
-                }
-            }
-			// set the c values for this cell; use existing variables
-            if (rv_ind == NOMATCH) {
-                rv_value = 0;
-				}else {
-                rv_value = refveg_thematic[grid_ind];
-				
-            }
-
-            for (k=0; k< NUM_EPA_PROTECTED; k++){
-				//temporary fractions for protected areas
-				//temp_frac = protected_EPA[k][grid_ind];
-				
-				// get index of land category
-				cur_lt_cat = rv_value * SCALE_POTVEG + k;
-				cur_lt_cat_ind = NOMATCH;
-				for (i = 0; i < num_lt_cats; i++) {
-					if (lt_cats[i] == cur_lt_cat) {
-						cur_lt_cat_ind = i;
-						break;
-					}
-				}
-				if (cur_lt_cat_ind == NOMATCH) {
-					fprintf(fplog, "Failed to match lt_cat %i: proc_refveg_carbon()\n", cur_lt_cat);
-					return ERROR_IND;
-				}         
-                //Allocate the cells to hold within each array
-                soil_carbon_sage[1][grid_ind] = wavg_array[grid_ind];
-                soil_carbon_sage[2][grid_ind] = wavg_array[grid_ind];
-                soil_carbon_sage[3][grid_ind] = wavg_array[grid_ind];
-                soil_carbon_sage[4][grid_ind] = wavg_array[grid_ind];
-                soil_carbon_sage[5][grid_ind] = wavg_array[grid_ind];
-                soil_carbon_sage[6][grid_ind] = wavg_array[grid_ind];
-                
-                if(median_array[grid_ind]>0){
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2][grid_ind] = median_array[grid_ind];}
-              
-                if(min_array[grid_ind]>0){
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3][grid_ind] = min_array[grid_ind];}
-
-                if(max_array[grid_ind]>0){
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4][grid_ind] = max_array[grid_ind];}
-
-                if(q1_array[grid_ind]>0){
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5][grid_ind] = q1_array[grid_ind];}
-
-                if(q3_array[grid_ind]>0){
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6][grid_ind] = q3_array[grid_ind];}
-
-                 
-        
-
-
-            }//finish loop for protected areas
-        }//finish loop for aez
-    }//finish loop for cells
-
 
     if (in_args.diagnostics) {
         if ((err = write_raster_float(wavg_array, ncells, out_name4, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
             return ERROR_FILE;
         }
-        }    
+        }
+
+
 
     free(wavg_array);
     free(median_array);
@@ -582,6 +480,6 @@ for (j = 0; j < ncells ; j++){//for each cell
     free(q1_array);
     free(q3_array);
 
-    //exit(0);
+   // exit(0);
     return OK;
 }
