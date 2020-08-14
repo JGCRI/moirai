@@ -386,62 +386,66 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 					return ERROR_IND;
 				}
                 //assign the actual soil carbon numbers
-                soil_carbon_sage[1][grid_ind]=wavg_array[grid_ind];
-                soil_carbon_sage[2][grid_ind]=median_array[grid_ind];
-                soil_carbon_sage[3][grid_ind]=min_array[grid_ind];
-                soil_carbon_sage[4][grid_ind]=max_array[grid_ind];
-                soil_carbon_sage[5][grid_ind]=q1_array[grid_ind];
-                soil_carbon_sage[6][grid_ind]=q3_array[grid_ind];
+                soil_carbon_sage[0][grid_ind]=wavg_array[grid_ind];
+                soil_carbon_sage[1][grid_ind]=median_array[grid_ind];
+                soil_carbon_sage[2][grid_ind]=min_array[grid_ind];
+                soil_carbon_sage[3][grid_ind]=max_array[grid_ind];
+                soil_carbon_sage[4][grid_ind]=q1_array[grid_ind];
+                soil_carbon_sage[5][grid_ind]=q3_array[grid_ind];
 
                 //calculate the number of cells to hold within each array
                 
-                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2] + 1; 
-                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3] + 1; 
-                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4] + 1;
-                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5] + 1;
-                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6] + 1;
+                soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]+ 1; 
+                
              
              //Convert this to an integer
-              memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][2]);
-              memory_min = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
-              memory_max = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
-              memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
-              memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind][6]);   
+              memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
+              memory_min = (float) floor((double) 0.5+  soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
+              memory_max = (float) floor((double) 0.5+  soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
+              memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
+              memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);   
               
             
                 //use the calculated number of cells to allocate memory for the soil_carbon_array. The number of cells won't change for veg_carbon so allocate the size of that array here as well. 
                 //Don't allocate 0 memory. If size is 0, then keep size at 1. This reduces problems during the free() calls later
                 if(memory_median>0){
-                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);  
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_median,sizeof(float));
+                
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][0]);  
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][0]=calloc(memory_median,sizeof(float));
+                
+                
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][1]);  
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][1]=calloc(memory_median,sizeof(float));
+            
+                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_min,sizeof(float));
             
                 free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_min,sizeof(float));
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_max,sizeof(float));
             
                 free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_max,sizeof(float));
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_q1,sizeof(float));
             
                 free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q1,sizeof(float));
+                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q3,sizeof(float));
+
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][0]);  
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][0]=calloc(memory_median,sizeof(float));
+
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][1]);  
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][1]=calloc(memory_median,sizeof(float));
             
-                free(soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]);
-                soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]=calloc(memory_q3,sizeof(float));
-
-
-                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);  
-                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_median,sizeof(float));
+                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]);
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][2]=calloc(memory_min,sizeof(float));
             
                 free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]);
-                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_min,sizeof(float));
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][3]=calloc(memory_max,sizeof(float));
             
                 free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]);
-                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_max,sizeof(float));
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][4]=calloc(memory_q1,sizeof(float));
             
                 free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
-                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q1,sizeof(float));
-            
-                free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]);
-                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][6]=calloc(memory_q3,sizeof(float));
+                veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q3,sizeof(float));
                 }
             //TODO Add some diagnostics here to print out numbers for user specified basins
 

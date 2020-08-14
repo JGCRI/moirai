@@ -286,9 +286,10 @@
  **********/
 
 #include "moirai.h"
+#include <stdlib.h>
 
 int main(int argc, const char * argv[]) {
-    int num_carbon_states = 5;
+    
     int i, j, k,l;
 	char fname[MAXCHAR];		// used to open files
 	args_struct in_args;		// data structure for holding the control input file info
@@ -765,7 +766,7 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    for (i = 1; i < NUM_CARBON; i++) {
+    for (i = 0; i < NUM_CARBON; i++) {
 		soil_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
 		if(soil_carbon_sage[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
@@ -773,30 +774,23 @@ int main(int argc, const char * argv[]) {
 		}
 	}
     
-    soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int***));
+    soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int**));
     if(soil_carbon_array_cells == NULL) {
         fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
         return ERROR_MEM;
     }
     for (i = 0; i < NUM_FAO_CTRY; i++) {
-        soil_carbon_array_cells[i] = calloc(ctry_aez_num[i], sizeof(int**));
+        soil_carbon_array_cells[i] = calloc(ctry_aez_num[i], sizeof(int*));
         if(soil_carbon_array_cells[i] == NULL) {
             fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
             return ERROR_MEM;
         }
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            soil_carbon_array_cells[i][j] = calloc(num_lt_cats, sizeof(int*));
+            soil_carbon_array_cells[i][j] = calloc(num_lt_cats, sizeof(int));
             if(soil_carbon_array_cells[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
                 return ERROR_MEM;
             }
-                for (k=0 ; k < num_lt_cats; k++){
-                soil_carbon_array_cells[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(int));
-                if(soil_carbon_array_cells[i][j][k] == NULL) {
-                    fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k,l);
-                    return ERROR_MEM;
-                } 
-                }
              // end for k loop over output values
             } // end for j loop over aezs
         }
@@ -820,7 +814,7 @@ int main(int argc, const char * argv[]) {
                 return ERROR_MEM;
             }
             for (k = 0; k < num_lt_cats; k++) {
-                soil_carbon_array[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(float*));
+                soil_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
                 if(soil_carbon_array[i][j][k] == NULL) {
                     fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
                     return ERROR_MEM;
@@ -855,7 +849,7 @@ int main(int argc, const char * argv[]) {
                 return ERROR_MEM;
             }
             for (k = 0; k < num_lt_cats; k++) {
-                veg_carbon_array[i][j][k] = calloc(NUM_CARBON_ARRAY, sizeof(float*));
+                veg_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
                 if(veg_carbon_array[i][j][k] == NULL) {
                     fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
                     return ERROR_MEM;
@@ -887,18 +881,14 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    for (i = 1; i < NUM_CARBON; i++) {
+    for (i = 0; i < NUM_CARBON; i++) {
 		veg_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
 		if(veg_carbon_sage[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
 		}
 	}
-    
-
-    
-
-    
+        
     if((error_code = read_veg_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -920,40 +910,43 @@ int main(int argc, const char * argv[]) {
         return error_code;
     }
     
-    
+    fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
     //free soil and veg carbon arrays
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             for (k = 0; k < num_lt_cats; k++) {
-	           for(l=0; l<NUM_CARBON_ARRAY;l++){
+	           for(l=0; l< NUM_CARBON;l++){
                    free(soil_carbon_array[i][j][k][l]);
                }free(soil_carbon_array[i][j][k]);
             }free(soil_carbon_array[i][j]);
         }free(soil_carbon_array[i]);
    }free(soil_carbon_array);
 
+fprintf(stdout, "\n Freed soil carbon array  %s\n", get_systime());
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             for (k = 0; k < num_lt_cats; k++) {
-	           for(l=0; l<NUM_CARBON_ARRAY;l++){
+	           for(l=0; l<NUM_CARBON;l++){
                    free(veg_carbon_array[i][j][k][l]);
                }free(veg_carbon_array[i][j][k]);
             }free(veg_carbon_array[i][j]);
         }free(veg_carbon_array[i]);
    }free(veg_carbon_array);
-  
+
+ fprintf(stdout, "\n Freed veg carbon array  %s\n", get_systime()); 
   for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            for (k = 0; k < num_lt_cats; k++) {
-	           free(soil_carbon_array_cells[i][j][k]);
-            }free(soil_carbon_array_cells[i][j]);
+            free(soil_carbon_array_cells[i][j]);
         }free(soil_carbon_array_cells[i]);
    }free(soil_carbon_array_cells);
 
-
+fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
 
     // process the water footprint data
     //  needed arrays are allocated/freed within proc_water_footprint()
+ 
+ fprintf(stdout, "\n Start water footprint %s\n", get_systime());
+ 
     if((error_code = proc_water_footprint(in_args, raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -974,12 +967,12 @@ int main(int argc, const char * argv[]) {
 	}
 	free(protected_EPA);
     //kbn 2020/06/01 Add code for soil carbon here
-    for (i = 1; i < NUM_CARBON; i++) {
+    for (i = 0; i < NUM_CARBON; i++) {
 		free(soil_carbon_sage[i]);
 	}
 	free(soil_carbon_sage);
     //kbn 2020/06/30 Add code for veg carbon here
-    for (i = 1; i < NUM_CARBON; i++) {
+    for (i = 0; i < NUM_CARBON; i++) {
 		free(veg_carbon_sage[i]);
 	}
 	free(veg_carbon_sage);

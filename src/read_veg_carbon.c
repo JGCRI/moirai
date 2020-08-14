@@ -423,42 +423,42 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     for (i = 0; i < ncells; i++) {
         //above ground +below ground * scaling factor (0.1)
         //TODO: based on feedback, we may want to write out above and below ground biomass separately 
-        veg_carbon_sage[1][i] = (wavg_array[i]+wavg_bg_array[i])*0.1;
-        veg_carbon_sage[2][i] = (median_array[i]+median_bg_array[i])*0.1;
-        veg_carbon_sage[3][i] = (min_array[i]+min_bg_array[i])*0.1;
-        veg_carbon_sage[4][i] = (max_array[i]+max_bg_array[i])*0.1;
-        veg_carbon_sage[5][i] = (q1_array[i]+q1_bg_array[i])*0.1;
-        veg_carbon_sage[6][i] = (q3_array[i]+q3_bg_array[i])*0.1;
+        veg_carbon_sage[0][i] = (wavg_array[i]+wavg_bg_array[i])*0.1;
+        veg_carbon_sage[1][i] = (median_array[i]+median_bg_array[i])*0.1;
+        veg_carbon_sage[2][i] = (min_array[i]+min_bg_array[i])*0.1;
+        veg_carbon_sage[3][i] = (max_array[i]+max_bg_array[i])*0.1;
+        veg_carbon_sage[4][i] = (q1_array[i]+q1_bg_array[i])*0.1;
+        veg_carbon_sage[5][i] = (q3_array[i]+q3_bg_array[i])*0.1;
     }
 
    //Write diagnostics
     if (in_args.diagnostics) {
-        if ((err = write_raster_float(veg_carbon_sage[1], ncells, out_name1, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[0], ncells, out_name1, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
             return ERROR_FILE;
         }
         
-        if ((err = write_raster_float(veg_carbon_sage[2], ncells, out_name2, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[1], ncells, out_name2, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name2);
             return ERROR_FILE;
         }
         
-        if ((err = write_raster_float(veg_carbon_sage[3], ncells, out_name3, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[2], ncells, out_name3, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name3);
             return ERROR_FILE;
         }
 
-        if ((err = write_raster_float(veg_carbon_sage[4], ncells, out_name4, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[3], ncells, out_name4, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name4);
             return ERROR_FILE;
         }
 
-        if ((err = write_raster_float(veg_carbon_sage[5], ncells, out_name5, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[4], ncells, out_name5, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name5);
             return ERROR_FILE;
         }
 
-        if ((err = write_raster_float(veg_carbon_sage[6], ncells, out_name6, in_args))) {
+        if ((err = write_raster_float(veg_carbon_sage[5], ncells, out_name6, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name6);
             return ERROR_FILE;
         }

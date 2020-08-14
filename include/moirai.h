@@ -96,8 +96,7 @@
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
-#define NUM_CARBON              7              //Categories of carbon states (1- Weighted average, 2- Median, 3- Min, 4- Max, 5- Q1 carbon, 6 -Q3 ) 
-#define NUM_CARBON_ARRAY        7
+#define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -179,7 +178,7 @@ int NUM_LULC_TYPES;						// number of input lulc types
 // for downscaling the lulc data to the working grid
 int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
 float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
-
+float *****refveg_carbon_out;		// the potveg carbon out table; 4th dim is the two carbon density values and the area
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
@@ -264,7 +263,7 @@ float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid 
 //kbn 2020-06-01 Changing soil carbon variable
 //kbn 2020-06-29 Changing vegetation carbon variable
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
-int ****soil_carbon_array_cells;//These are the total number of cells contained within each array
+int ***soil_carbon_array_cells;//These are the total number of cells contained within each array
 float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
 float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
 float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell 
