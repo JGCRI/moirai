@@ -911,36 +911,16 @@ int main(int argc, const char * argv[]) {
     }
     
     fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
-    //free soil and veg carbon arrays
     for (i = 0; i < NUM_FAO_CTRY; i++) {
-        for (j = 0; j < ctry_aez_num[i]; j++) {
-            for (k = 0; k < num_lt_cats; k++) {
-	           for(l=0; l< NUM_CARBON;l++){
-                   free(soil_carbon_array[i][j][k][l]);
-               }free(soil_carbon_array[i][j][k]);
-            }free(soil_carbon_array[i][j]);
-        }free(soil_carbon_array[i]);
-   }free(soil_carbon_array);
-
-fprintf(stdout, "\n Freed soil carbon array  %s\n", get_systime());
-    for (i = 0; i < NUM_FAO_CTRY; i++) {
-        for (j = 0; j < ctry_aez_num[i]; j++) {
-            for (k = 0; k < num_lt_cats; k++) {
-	           for(l=0; l<NUM_CARBON;l++){
-                   free(veg_carbon_array[i][j][k][l]);
-               }free(veg_carbon_array[i][j][k]);
-            }free(veg_carbon_array[i][j]);
-        }free(veg_carbon_array[i]);
-   }free(veg_carbon_array);
-
- fprintf(stdout, "\n Freed veg carbon array  %s\n", get_systime()); 
-  for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             free(soil_carbon_array_cells[i][j]);
         }free(soil_carbon_array_cells[i]);
    }free(soil_carbon_array_cells);
 
 fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
+       
+     
+  
 
     // process the water footprint data
     //  needed arrays are allocated/freed within proc_water_footprint()
@@ -982,7 +962,30 @@ fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
 		free(lulc_input_grid[i]);
 	}
 	free(lulc_input_grid);
-    
+    //free soil and veg carbon arrays
+    //for (i = 0; i < NUM_FAO_CTRY; i++) {
+      //  for (j = 0; j < ctry_aez_num[i]; j++) {
+        //    for (k = 0; k < num_lt_cats; k++) {
+	      //     for(l=0; l< NUM_CARBON;l++){
+                   //fprintf(stdout, "\nStart freeing  %s\n", get_systime());
+            //       free(soil_carbon_array[i][j][k][l]);
+              // }free(soil_carbon_array[i][j][k]);
+            //}free(soil_carbon_array[i][j]);
+        //}free(soil_carbon_array[i]);
+   //}free(soil_carbon_array);
+
+fprintf(stdout, "\n Freed soil carbon array  %s\n", get_systime());
+    //for (i = 0; i < NUM_FAO_CTRY; i++) {
+      //  for (j = 0; j < ctry_aez_num[i]; j++) {
+        //    for (k = 0; k < num_lt_cats; k++) {
+	      //     for(l=0; l<NUM_CARBON;l++){
+            //       free(veg_carbon_array[i][j][k][l]);
+              // }free(veg_carbon_array[i][j][k]);
+            //}free(veg_carbon_array[i][j]);
+        //}free(veg_carbon_array[i]);
+   //}free(veg_carbon_array);
+
+ fprintf(stdout, "\n Freed veg carbon array  %s\n", get_systime());
 
     // allocate the arrays for all the fao input data (initialized to zero)
     yield_fao = calloc(NUM_FAO_CTRY * NUM_SAGE_CROP * NUM_FAO_YRS, sizeof(float));
