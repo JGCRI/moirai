@@ -12,6 +12,7 @@ library(dplyr)
 library(data.table)
 library(nngeo)
 library(smoothr)
+library(ggplot2)
 
 
 #Create directories to store files
@@ -19,6 +20,7 @@ dir.create("raster_files",showWarnings = FALSE)
 dir.create("mapping_files",showWarnings = FALSE)
 dir.create("raw_shape_files",showWarnings = FALSE)
 dir.create("gcam_boundaries_moirai_3p1_0p5arcmin_wgs84",showWarnings = FALSE)
+dir.create("validation_figs",showWarnings = FALSE)
 
 #Declare all variables
 Land_Data_Binary<-GLU<-GLU_Data<-shp_metadata<-shp_file<-shape_data<-shape_data_region<-shape_data_country<-Land_Data_Actual<-GLU_Data_Join<-
@@ -228,15 +230,7 @@ GCAM_region_names<-read.csv(gcam_region_name_file,skip = 6) %>% rename(Region_ID
 #Skip metadata rows when reading in csv
 ISO_GCAM_REG_ID<-read.csv(gcam_iso_reg_id_file,skip = 6) %>% rename(Region_ID=GCAM_region_ID)
 
-#Skip metadata rows when reading in csv
-consolidated_data<-read.csv(gcam_basin_data_file,skip = 7) %>%
-  mutate(iso=tolower(ISO)) %>%
-  left_join(ISO_GCAM_REG_ID, by=c("iso")) %>%
-  na.omit() %>%
-  distinct() %>%
-  rename(reg_nm=region_GCAM3,ctry_nm=country_name,basin_nm=Basin_name) %>%
-  select(GCAM_basin_ID,ISO_NUM,Region_ID,basin_nm,ctry_nm,reg_nm) %>%
-  rename(basin_id=GCAM_basin_ID,ctry_id=ISO_NUM,reg_id=Region_ID)
+
 
 shp_metadata<-as.data.frame(shp_metadata)
 
@@ -253,9 +247,11 @@ reg_data <- shp_metadata %>%
             mutate(key=reg_id) %>%
             distinct()
 
-basin_data<-consolidated_data %>%
-            select(basin_id,basin_nm) %>%
+#Skip metadata rows when reading in csv
+basin_data<-read.csv(gcam_basin_data_file,skip = 7) %>%
+            rename(basin_nm=Basin_name,basin_id=GCAM_basin_ID) %>%
             mutate(key=basin_id) %>%
+            select(key,basin_id,basin_nm) %>%
             distinct()
 
 ctry_basin_data<-read.csv("mapping_files/Ctry_basin_mapping.csv",stringsAsFactors = FALSE) %>%
@@ -301,6 +297,7 @@ if(grepl("combined",file_name)){
 
 if (grepl("country",file_name)){
   Final_shape_file %>% inner_join(ctry_data, by=c("key"))->Final_shape_file
+  #Check for NAs in country names
   tmpna<-Final_shape_file[is.na(Final_shape_file$ctry_nm),]
   # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
   if (length(tmpna)>10){
@@ -314,8 +311,10 @@ if (grepl("country",file_name)){
 
 if (grepl("glu_id",file_name)){
   Final_shape_file %>% inner_join(basin_data, by=c("key"))->Final_shape_file
+  #Check for NAs in basin names
   tmpna<-Final_shape_file[is.na(Final_shape_file$basin_nm),]
   # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
+
   if (length(tmpna)>10){
     print(paste0("Na values found in ",toString(i)))
           print(tmpna)
@@ -326,7 +325,7 @@ if (grepl("glu_id",file_name)){
 
 if (grepl("region_id",file_name)){
   Final_shape_file %>% inner_join(reg_data, by=c("key"))->Final_shape_file
-
+  #Check for NAs in region names
   tmpna<-Final_shape_file[is.na(Final_shape_file$reg_nm),]
   # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
   if (length(tmpna)>10){
@@ -336,12 +335,20 @@ if (grepl("region_id",file_name)){
 }
 
 if (grepl("ctry_basin",file_name)){
+
   Final_shape_file %>% inner_join(ctry_basin_data, by=c("key"))->Final_shape_file
   # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
+  #Check for NAs in country names
   tmpna<-Final_shape_file[is.na(Final_shape_file$ctry_nm),]
   if (length(tmpna)>10){
     print(paste0("Na values found in ",toString(i)))
           print(tmpna)
+  }
+  #Check for NAs in basin names
+  tmpna<-Final_shape_file[is.na(Final_shape_file$basin_nm),]
+  if (length(tmpna)>10){
+    print(paste0("Na values found in ",toString(i)))
+    print(tmpna)
   }
 
 }
@@ -349,6 +356,7 @@ if (grepl("ctry_basin",file_name)){
 
 
 if (grepl("reg_basin",file_name)){
+  #Check for NAs in region names
   Final_shape_file %>% inner_join(reg_basin_data, by=c("key"))->Final_shape_file
   # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
   tmpna<-Final_shape_file[is.na(Final_shape_file$reg_nm),]
@@ -357,18 +365,31 @@ if (grepl("reg_basin",file_name)){
           print(tmpna)
           print(length(tmpna))
   }
+  #Check for NAs in basin names
+  tmpna<-Final_shape_file[is.na(Final_shape_file$basin_nm),]
+  if (length(tmpna)>10){
+    print(paste0("Na values found in ",toString(i)))
+    print(tmpna)
+  }
 
 }
 
 if (grepl("reg_ctry",file_name)){
+
   Final_shape_file %>% inner_join(reg_ctry_data, by=c("key"))->Final_shape_file
-  # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
+  # Note that first 10 rows are metadata rows. Hence the code checks for rows higher than 10.
+  #Check for NAs in country names
   tmpna<-Final_shape_file[is.na(Final_shape_file$ctry_nm),]
   if (length(tmpna)>10){
     print(paste0("Na values found in ",toString(i)))
           print(tmpna)
   }
-
+  #Check for NAs in region names
+  tmpna<-Final_shape_file[is.na(Final_shape_file$reg_nm),]
+  if (length(tmpna)>10){
+    print(paste0("Na values found in ",toString(i)))
+    print(tmpna)
+  }
 }
 
 #Test for 2 exceptions: 3 sided polygons, self intersections
@@ -399,8 +420,55 @@ writeOGR(Final_shape_file, dsn = 'gcam_boundaries_moirai_3p1_0p5arcmin_wgs84', l
 
 }
 
-print("Completed generating rasters, vectors and mapping files.")
+#Generate validation plots
+
+basin_shp_file <- st_read("gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/basin_boundaries_moirai_landcells_3p1_0p5arcmin.shp")
+basin_shp_file$area<-st_area(basin_shp_file$geometry)*0.0001
 
 
+Land_raster<- raster("raster_files/gcam_glu_id_boundaries_moirai_land_cells_3p1_0p5arcmin.tif")
+Land_raster_data<-as.data.frame(rasterToPoints(Land_raster)) %>% rename(key=gcam_glu_id_boundaries_moirai_land_cells_3p1_0p5arcmin)
 
+moirai_raster<-raster(moirai_land_raster_path)
+moirai_land_data<-as.data.frame(rasterToPoints(moirai_raster))
 
+Land_raster_data %>%
+  left_join(moirai_land_data, by=c("x","y")) %>%
+  mutate(moirai_valid_land_area=if_else(is.na(moirai_valid_land_area),0,moirai_valid_land_area)) %>%
+  na.omit() %>%
+  group_by(key) %>%
+  mutate(land_area=sum(moirai_valid_land_area)) %>%
+  ungroup() %>%
+  select(key,land_area) %>%
+  distinct()->Land_raster_data_basin
+
+Land_raster_data_basin %>%
+  left_join(basin_shp_file %>% select(key,area),by=c("key")) %>%
+  mutate(basin_area=as.double(area*0.01)) %>%
+  mutate(Diff=land_area-basin_area) %>%
+  mutate(Percent_diff=(Diff/land_area)*100)->Data_for_Comparison
+
+g<-ggplot(Data_for_Comparison,aes(x=land_area,y=basin_area)) +
+   geom_point()+
+   xlab("Land area from moirai in ha")+
+   ylab("Area calculated from polygons")+
+   ggtitle("Scatterplot showing area calculated from polygons and actual area for all basins")
+
+scheme_basic <- theme_bw() +
+  theme(legend.text = element_text(size = 10, vjust = 0.5)) +
+  theme(legend.title = element_text(size = 10, vjust = 2)) +
+  theme(axis.text = element_text(size = 10)) +
+  theme(axis.title = element_text(size = 10, face = "bold")) +
+  theme(plot.title = element_text(size = 10, face = "bold", vjust = 1)) +
+  theme(plot.subtitle = element_text(size = 8, face = "bold", vjust = 1))+
+  theme(strip.text = element_text(size = 7))+
+  theme(strip.text.x = element_text(size = 8, face = "bold"))+
+  #theme(legend.position = "bottom")+
+  theme(legend.text = element_text(size = 10))+
+  theme(legend.title = element_text(size = 10,color = "black",face="bold"))+
+  theme(axis.text.x= element_text(angle=60,hjust=1))+
+  theme(legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+g+scheme_basic
+ggsave( paste0('validation_figs/Comparison_of_area_at_basin_level','.png'),width = 10, height = 6)
