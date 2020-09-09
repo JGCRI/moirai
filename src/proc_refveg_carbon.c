@@ -180,7 +180,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 for (l=0 ; l < num_out_vals; l++){
                 refveg_carbon_out[i][j][k][l] = calloc(NUM_CARBON, sizeof(float));
                 if(refveg_carbon_out[i][j][k][l] == NULL) {
-                    fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k,l);
+                    fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i][%i][%i]: proc_refveg_carbon()\n", i, j, k,l);
                     return ERROR_MEM;
                 } 
                 }// end l loop for carbon states
@@ -583,7 +583,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                     global_soilc_q3 = global_soilc_q3 + global_soil_temp;
                     
 					// write the value
-					if (outval_soilc > 0) {
+					if (outval_soilc > 0 && outval_soilc_median > 0 && outval_soilc_min > 0  && outval_soilc_max >0 && outval_soilc_q1 >0  &&  outval_soilc_q3 >0 ) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 								lt_cats[cur_lt_cat_ind], "soil_c (0-30 cms)");
 						fprintf(fpout,",%.0f", outval_soilc);
@@ -623,7 +623,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                     global_vegc_q3 = global_vegc_q3 + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
 					
                     // write the value
-					if (outval_vegc > 0) {
+					if (outval_vegc > 0 && outval_vegc_median>0 && outval_vegc_min>0 &&  outval_vegc_max>0 && outval_vegc_q1>0 && outval_vegc_q3>0 ) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 								lt_cats[cur_lt_cat_ind], "veg_c (above and below ground biomass)");
 						fprintf(fpout,",%.0f", outval_vegc);

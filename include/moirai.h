@@ -673,5 +673,7 @@ char *get_systime();
 int init_moirai(args_struct *in_args);
 int get_in_args(const char *fname, args_struct *in_args);
 int copy_to_destpath(args_struct in_args);
+// sorting function  that is used with qsort in proc_refveg_carbon.c
+int cmpfunc (const void * a, const void * b);
 
 #endif

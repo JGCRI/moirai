@@ -383,7 +383,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
 	}
 	free(rand_order);
   
-fprintf(stdout, "\nSuccessfully freed rand order %s\n", get_systime());  
+//fprintf(stdout, "\nSuccessfully freed rand order %s\n", get_systime());  
   
     //for (i = 0; i < NUM_FAO_CTRY; i++) {
       //  for (j = 0; j < ctry_aez_num[i]; j++) {
@@ -401,7 +401,7 @@ fprintf(stdout, "\nSuccessfully freed rand order %s\n", get_systime());
     //}
     //free(refveg_carbon_out);
 
-fprintf(stdout, "\nSuccessfully freed carbon ref veg carbon out at %s\n", get_systime());
+//fprintf(stdout, "\nSuccessfully freed carbon ref veg carbon out at %s\n", get_systime());
 
     free(bl_grid);
     free(gn_grid);
