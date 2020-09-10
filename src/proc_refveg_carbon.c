@@ -150,7 +150,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     
 
     //create a function for comparisons. This function will be used later with qsort    
-    int cmpfunc (const void * a, const void * b) {
+   int cmpfunc (const void * a, const void * b) {
    return ( *(float*)a - *(float*)b );
 }
 
@@ -361,18 +361,20 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
               if (cur_lt_cat_ind==cur_lt_cat_ind_temp){  
               //Calculate the size here
               soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp]=soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;
-                            
+
               
+             
+             //Now reduce the cells by 1
+             soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]-1;
+             //Make sure the number of cells is not 0              
+              //if(soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]==0){soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]==1;}
               //Convert the curent number of cells to an integer
+              //If number of cells is 10 we want to allocate from grid index 0-9. That's why we deduct 1 from below
               memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_min = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_max = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
-             
-             //Now reduce the cells by 1
-             soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]= memory_median-1;
-             
               
              //Now use that as the grid index both for soil dnd vegetation carbon
              soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][0][memory_median]=soil_carbon_sage[0][grid_ind];
@@ -401,6 +403,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 //size is the current size of the array
                 size=soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 
+
                 //sort the arrays based on size
                 qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][1],size,sizeof(float),cmpfunc);
                 qsort( soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2],size,sizeof(float),cmpfunc);
@@ -416,8 +419,8 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 qsort( veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5],size,sizeof(float),cmpfunc);
                 }
 
-
-                
+                //Recalculate size since we need the 'index' now not the size. 
+                size_max=size-1;
                 //1. weighted average
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] +
@@ -433,14 +436,14 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                 //3. Min
                 size_temp=size/2;
-                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][1];
-                
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][0];
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2] =
 				temp_float;
                 
                 //4. Max
                 size_temp=size/2;
-                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][size];
+                
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][size_max];
                                
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3] =
 				temp_float ;
@@ -475,14 +478,14 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                 //3. Min
                 size_temp=size/2;
-                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][1];
+                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][0];
                 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2] =
 				temp_float;
                 
                 //4. Max
                 size_temp=size/2;
-                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][size];
+                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][size_max];
                                
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3] =
 				temp_float ;
@@ -670,7 +673,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             free(soil_carbon_array_size[i][j]);
         }free(soil_carbon_array_size[i]);
    }free(soil_carbon_array_size);
-    fprintf(stdout, "\nSuccessfully freed soil carbon size array  at %s\n", get_systime());
+    //fprintf(stdout, "\nSuccessfully freed soil carbon size array  at %s\n", get_systime());
     
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
@@ -678,8 +681,22 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
         }free(refveg_carbon_area[i]);
     }free(refveg_carbon_area);
     
-    fprintf(stdout, "\nSuccessfully freed area array  at %s\n", get_systime());
-  fprintf(stdout, "\nSuccessfully completed proc_ref_veg_carbon %s\n", get_systime());
+    //fprintf(stdout, "\nSuccessfully freed area array  at %s\n", get_systime());
+  
+  for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+                for(l = 0; l < num_out_vals; l++){
+                free(refveg_carbon_out[i][j][k][l]);    
+                }
+                free(refveg_carbon_out[i][j][k]);
+            }
+            free(refveg_carbon_out[i][j]);
+        }
+        free(refveg_carbon_out[i]);
+    }
+    free(refveg_carbon_out);
+  //fprintf(stdout, "\nSuccessfully completed proc_ref_veg_carbon %s\n", get_systime());
     
     return OK;
     

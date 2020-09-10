@@ -382,27 +382,6 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
 		free(rand_order[i]);
 	}
 	free(rand_order);
-  
-//fprintf(stdout, "\nSuccessfully freed rand order %s\n", get_systime());  
-  
-    //for (i = 0; i < NUM_FAO_CTRY; i++) {
-      //  for (j = 0; j < ctry_aez_num[i]; j++) {
-        //    for (k = 0; k < num_lt_cats; k++) {
-          //      for(l = 0; l < num_out_vals; l++){
-            //    fprintf(stdout, "\n Country %i aez %i num_lt_cats %i num_out_val %i \n", i,j,k,l);
-                
-              //  free(refveg_carbon_out[i][j][k][l]);    
-                //}
-                //free(refveg_carbon_out[i][j][k]);
-            //}
-            //free(refveg_carbon_out[i][j]);
-        //}
-        //free(refveg_carbon_out[i]);
-    //}
-    //free(refveg_carbon_out);
-
-//fprintf(stdout, "\nSuccessfully freed carbon ref veg carbon out at %s\n", get_systime());
-
     free(bl_grid);
     free(gn_grid);
     free(gy_grid);
