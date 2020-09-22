@@ -71,7 +71,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     
     // valid values in the sage land area data set determine the land cells to process
     
-    int i, j, k,l = 0;
+    int i, j, k = 0;
     int crop_index;             // the index for looping over wf crops
     int err = OK;				// store error code from the write functions
     
@@ -97,7 +97,6 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     char fname[MAXCHAR];        // current file name to read, or write
     char tmp_str[MAXCHAR];		// stores a temporary string
     char diag_name[MAXCHAR];	// for diagnostic output names
-    int num_out_vals = 2;   // the number of values to output (soil c den, veg c den, area for averaging)
     FILE *fpout;                // out file pointer
     
     float wf_nodata = NODATA;  // wf binary file nodata value

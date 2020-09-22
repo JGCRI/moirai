@@ -783,6 +783,7 @@ int main(int argc, const char * argv[]) {
 		}
 	}
     
+    //Allocate the arrays to hold the number of cells
     soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int**));
     if(soil_carbon_array_cells == NULL) {
         fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
@@ -804,7 +805,7 @@ int main(int argc, const char * argv[]) {
             } // end for j loop over aezs
         }
     
-
+  //Allocate the main soil_carbon_array
     soil_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
     if(soil_carbon_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
@@ -839,7 +840,7 @@ int main(int argc, const char * argv[]) {
         }// end for j loop over glus
      }// end for i loop over fao country 
     
-
+    //Allocate the vegetation carbon arrays
     veg_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
     if(veg_carbon_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
@@ -878,7 +879,7 @@ int main(int argc, const char * argv[]) {
 
 
 
-
+    //Call the read soil carbon function
     if((error_code = read_soil_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -976,13 +977,12 @@ int main(int argc, const char * argv[]) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             for (k = 0; k < num_lt_cats; k++) {
 	           for(l=0; l< NUM_CARBON;l++){
-                   //fprintf(stdout, "\nStart freeing  %s\n", get_systime());
                    free(soil_carbon_array[i][j][k][l]);
                }free(soil_carbon_array[i][j][k]);
             }free(soil_carbon_array[i][j]);
         }free(soil_carbon_array[i]);
    }free(soil_carbon_array);
-   //fprintf(stdout, "\n Freed soil carbon array  %s\n", get_systime());
+   
 
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
@@ -994,9 +994,7 @@ int main(int argc, const char * argv[]) {
         }free(veg_carbon_array[i]);
    }free(veg_carbon_array);
   
- //fprintf(stdout, "\n Freed veg carbon array  %s\n", get_systime());
-
-
+ 
 
     // allocate the arrays for all the fao input data (initialized to zero)
     yield_fao = calloc(NUM_FAO_CTRY * NUM_SAGE_CROP * NUM_FAO_YRS, sizeof(float));

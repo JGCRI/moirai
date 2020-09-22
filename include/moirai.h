@@ -110,13 +110,14 @@
 #define NUM_LU_CATS             4               // crop, pasture, urban, potential veg (pv code = 0)
 #define NUM_WF_CROPS            18              // number of water footprint crops
 #define NUM_WF_TYPES            4               // number of water footprint types (blue, green, gray, total)
-#define ARRAY_CELLS             1
-#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))  //define function to get size of array
+
+
 // conversion factors for output
 #define KMSQ2HA					100.0						// km^2 * KMSQ2HA = ha
 #define MSQ2KMSQ				(1/1000000.0)					// m^2 * MSQ2KMSQ = km^2
 #define KGMSQ2MGHA              10.0                        // kg/m^2 * KGMSQ2MGHA = Mg/ha
 #define USD2MILUSD				(1/1000000.)0					// USD * USD2MILUSD = million USD
+#define VEG_CARBON_SCALER        0.1                            //scaling factor used by Spawn et al on veg carbon rasters. We need to multiply our values by this to get actual values.
 
 // conversion factors for inputs
 #define HGHA2TKMSQ				0.01			// conversion factor from hg / ha to t / km^2; FAOSTAT yield file
@@ -178,7 +179,7 @@ int NUM_LULC_TYPES;						// number of input lulc types
 // for downscaling the lulc data to the working grid
 int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
 float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
-float *****refveg_carbon_out;		// the potveg carbon out table; 4th dim is the two carbon density values and the area
+float *****refveg_carbon_out;		// the potveg carbon out table;4th dim is the state of carbon; 5th dim is the two carbon density values and the area
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
@@ -523,27 +524,27 @@ typedef struct {
 	char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
 	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
 	//kbn 2020-06-01 Introducing file names for soil carbon
-	char soil_carbon_wavg_fname[MAXCHAR];
-	char soil_carbon_median_fname[MAXCHAR];
-	char soil_carbon_min_fname[MAXCHAR];
-	char soil_carbon_max_fname[MAXCHAR];
-	char soil_carbon_q1_fname[MAXCHAR];
-	char soil_carbon_q3_fname[MAXCHAR];
+	char soil_carbon_wavg_fname[MAXCHAR];   //Soil carbon weighted average raster
+	char soil_carbon_median_fname[MAXCHAR]; //Soil carbon median raster
+	char soil_carbon_min_fname[MAXCHAR];    //Soil carbon minimum raster
+	char soil_carbon_max_fname[MAXCHAR];    //Soil carbon maximum raster
+	char soil_carbon_q1_fname[MAXCHAR];     //Soil carbon q1 raster
+	char soil_carbon_q3_fname[MAXCHAR];     //Soil carbon q3 raster
 	//kbn 2020-06-30 Introducing file names for veg carbon
-	char veg_carbon_wavg_fname[MAXCHAR];
-	char veg_carbon_median_fname[MAXCHAR];
-	char veg_carbon_min_fname[MAXCHAR];
-	char veg_carbon_max_fname[MAXCHAR];
-	char veg_carbon_q1_fname[MAXCHAR];
-	char veg_carbon_q3_fname[MAXCHAR];
+	char veg_carbon_wavg_fname[MAXCHAR];    //Above ground vegetation carbon weighted average raster
+	char veg_carbon_median_fname[MAXCHAR];  //Above ground vegetation carbon median raster
+	char veg_carbon_min_fname[MAXCHAR];     //Above ground vegetation carbon minimum raster
+	char veg_carbon_max_fname[MAXCHAR];     //Above ground vegetation carbon maximum raster
+	char veg_carbon_q1_fname[MAXCHAR];      //Above ground vegetation carbon q1 raster
+	char veg_carbon_q3_fname[MAXCHAR];      //Above ground vegetation carbon q3 raster 
     // 2020-08-08 Introducing file names for below ground biomass
-	char veg_BG_wavg_fname[MAXCHAR];
-	char veg_BG_median_fname[MAXCHAR];
-	char veg_BG_min_fname[MAXCHAR];
-	char veg_BG_max_fname[MAXCHAR];
-	char veg_BG_q1_fname[MAXCHAR];
-	char veg_BG_q3_fname[MAXCHAR];
-
+	char veg_BG_wavg_fname[MAXCHAR];        //Below ground vegetation carbon weighted averge raster
+	char veg_BG_median_fname[MAXCHAR];      //Below ground vegetation carbon median raster
+	char veg_BG_min_fname[MAXCHAR];         //Below ground vegetation carbon minimum raster 
+	char veg_BG_max_fname[MAXCHAR];         //Below ground vegetation carbon maximum raster
+	char veg_BG_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
+	char veg_BG_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
+ 
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
 	char country87_gtap_fname[MAXCHAR];		// file name only of the GTAP/GCAM ctry87 list
@@ -619,10 +620,8 @@ int read_production_fao(args_struct in_args);
 int read_yield_fao(args_struct in_args);
 int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
-//int read_veg_carbon(char *fname, float *veg_carbon_sage);
 int read_water_footprint(char *fname, float *wf_grid);
-//shifting soil carbon function to the above
-//int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
+
 
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);

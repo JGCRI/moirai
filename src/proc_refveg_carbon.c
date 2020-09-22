@@ -110,15 +110,14 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     float outval_vegc_q3;
     float temp_float;           // temporary float
     int ***soil_carbon_array_size; //temporary size of array, used to get the grid index
-    int memory_median=0;
-    int memory_min=0;
-    int memory_max=0;
-    int memory_q1=0;
-    int memory_q3=0;
-    int size_max=0;
+    int memory_median=0;           //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
+    int memory_min=0;              //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
+    int memory_max=0;              //These are the cell indices to be used for soil_carbon_array and veg_carbon_array      
+    int memory_q1=0;               //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
+    int memory_q3=0;               //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
+    int size_max=0;                //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
     float global_soil_temp=0;
     // output table as 4-d array
-    
     float ***refveg_carbon_area;        // the reference area for carbon calculation  
     int soilc_ind = 0;                  // index in output array
     int vegc_ind = 1;                   // index in output array
@@ -180,7 +179,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     
 
 
-
+  //Allocate carbon area here
    refveg_carbon_area = calloc(NUM_FAO_CTRY, sizeof(float**));
     if(refveg_carbon_out == NULL) {
         fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
@@ -201,7 +200,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             } // end for num_lt_cats
         } // end for j loop over aez
     
-
+    //Use this variable to calculate size of arrays since we cannot use Sizeof in a for loop
     soil_carbon_array_size = calloc(NUM_FAO_CTRY, sizeof(int**));
     if(soil_carbon_array_size == NULL) {
         fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
@@ -355,11 +354,11 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
               
              
              //Now reduce the cells by 1
+             //This ensures that we are always allocating in accordance with the size of the arrays and avoiding segmentation faults.
              soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]-1;
              //Make sure the number of cells is not 0              
-              //if(soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]==0){soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]==1;}
               //Convert the curent number of cells to an integer
-              //If number of cells is 10 we want to allocate from grid index 0-9. That's why we deduct 1 from below
+              //If number of cells is 10 we want to allocate from grid index 0-9. That's why we deduct 1 from above
               memory_median = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_min = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
               memory_max = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]);
@@ -409,7 +408,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 qsort( veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5],size,sizeof(float),cmpfunc);
                 }
 
-                //Recalculate size since we need the 'index' now not the size. 
+                //Recalculate size since we need the 'index' now not the size. This is an issue for the max array, q3 array. 
                 size_max=size-1;
                 //1. weighted average
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] =
@@ -536,7 +535,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 					// output only the carbon values - soil is the first index
 					// dived by area to get average, convert to Mg/ha, and round at the end
 					
-					// soil carbon
+					// soil carbon for each state
 					temp_float =  refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] /
 					refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind];
 					outval_soilc = (float) floor((double) 0.5 + temp_float);
@@ -557,25 +556,25 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                     temp_float =  refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5];
 					outval_soilc_q3 = (float) floor((double) 0.5 + temp_float);
 
-					// sum the total
-					global_soilc = global_soilc + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0]*100);
-                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100;
+					// sum the total. Need to multiply by 100 to convert km2 to ha
+					global_soilc = global_soilc + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0]*KMSQ2HA);
+                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_median = global_soilc_median + global_soil_temp;
                     
-                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100;
+                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_min = global_soilc_min + global_soil_temp;
 
                     
-                    global_soil_temp=refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100;
+                    global_soil_temp=refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][3]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_max = global_soilc_max + global_soil_temp;
                     
-                    global_soil_temp=refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][4]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100;
+                    global_soil_temp=refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][4]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_q1 = global_soilc_q1 + global_soil_temp;
                     
-                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100;
+                    global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_q3 = global_soilc_q3 + global_soil_temp;
                     
-					// write the value
+					// write the value only if weighted average is over 0 and all other values are 0 or above.
 					if (outval_soilc > 0 &&  outval_soilc_median >=0 && outval_soilc_min >=0 && outval_soilc_max >=0 &&  outval_soilc_q1 >=0  && outval_soilc_q3 >= 0 ) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 								lt_cats[cur_lt_cat_ind], "soil_c (0-30 cms)");
@@ -588,7 +587,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 						nrecords++;
 					}
 					
-					// veg carbon
+					// veg carbon for each state
 					temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][0] /
 					refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind];
 					outval_vegc = (float) floor((double) 0.5 + temp_float);
@@ -607,15 +606,15 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                     temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5];
 					outval_vegc_q3 = (float) floor((double) 0.5 + temp_float);
-                    // sum the total
-					global_vegc = global_vegc + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][0]*100);
-                    global_vegc_median = global_vegc_median + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
-                    global_vegc_min = global_vegc_min + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
-                    global_vegc_max = global_vegc_max + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
-                    global_vegc_q1 = global_vegc_q1 + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
-                    global_vegc_q3 = global_vegc_q3 + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*100);
+                    // sum the total. Need to multiply by 100 for converting land from km2 to ha
+					global_vegc = global_vegc + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][0]*KMSQ2HA);
+                    global_vegc_median = global_vegc_median + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
+                    global_vegc_min = global_vegc_min + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][2]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
+                    global_vegc_max = global_vegc_max + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][3]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
+                    global_vegc_q1 = global_vegc_q1 + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][4]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
+                    global_vegc_q3 = global_vegc_q3 + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
 					
-                    // write the value
+                    // write the value only if weighted average is over 0 and all other values are 0 or above.
 					if (outval_vegc > 0 &&  outval_vegc_median >=0 && outval_vegc_min >=0 && outval_vegc_max >=0 &&  outval_vegc_q1 >=0  && outval_vegc_q3 >= 0 ) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 								lt_cats[cur_lt_cat_ind], "veg_c (above and below ground biomass)");
@@ -653,7 +652,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     fprintf(fplog, "Veg C Q1 = %f\n", global_vegc_q1);
     fprintf(fplog, "Veg C Q3 = %f\n", global_vegc_q3);
     
-
+  //Free all arrays
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
             free(soil_carbon_array_size[i][j]);

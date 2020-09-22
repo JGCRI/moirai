@@ -1,19 +1,11 @@
 /**********
  read_soil_carbon.c
  
- read the soil carbon (kg/m^2) associated with sage pot veg cats
-    soil carbon is soil only; it does not include root carbon
-    data based on the previous level0 file
+ read the soil carbon (MgC/ha) associated with sage pot veg cats
+    soil carbon is soil only (for a depth of 0-30 cms); it does not include biomass carbon
+    data based on the gridded data for each state
     sage pot veg cats are 1-15
     
- NOTE: use the pot veg soil carbon table from literature
- the values are averages across different climate zones
- 
- NOTE: do not use the gridded data because it is for mixed land types
- 2014 revision of IGBP-DIS soil carbon characteristecs database
-    the text files have been converted to a binary image, with the two layers added together
-    so this is soil carbon for 0-100cm
- 
  arguments:
  char* fname:          file name to open, with path
  float* soil_carbon_sage:    the array to load the data into
@@ -53,12 +45,8 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     
     // use this function to input data to the working grid
     
-    // soil c data
-    // image file with one band (starts at upper left corner)
-    // 4 byte float
-    // 5 arcmin resolution, extent = (-180,180, -90, 90), ?WGS84?
-    // values are soil carbon (kg/m^2)
     
+    //Dimensions of the grid
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
     int ncells = nrows * ncols;		// number of input grid cells
@@ -72,23 +60,21 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     int i,j, k=0;
     int grid_ind;
     char fname[MAXCHAR];			// file name to open
-    //char rec_str[MAXRECSIZE];		// string to hold one record
-    //const char *delim = ",";		// delimiter string for space separated file
     FILE *fpin;
     int num_read;					// how many values read in
-    float *wavg_array;
-    float *median_array;
-    float *min_array;
-    float *max_array;
-    float *q1_array;
-    float *q3_array;
+    float *wavg_array;              //Arrays for each state of carbon
+    float *median_array;            //Arrays for each state of carbon
+    float *min_array;               //Arrays for each state of carbon
+    float *max_array;               //Arrays for each state of carbon
+    float *q1_array;                //Arrays for each state of carbon  
+    float *q3_array;                //Arrays for each state of carbon
     int err = OK;								// store error code from the dignostic write file
     char out_name1[] = "soil_carbon_wavg.bil";		// file name for output diagnostics raster file
-    char out_name2[] = "soil_carbon_median.bil";
-    char out_name3[] = "soil_carbon_min.bil";
-    char out_name4[] = "soil_carbon_max.bil";
-    char out_name5[] = "soil_carbon_q1.bil";
-    char out_name6[] = "soil_carbon_q3.bil";
+    char out_name2[] = "soil_carbon_median.bil";    // file name for output diagnostics raster file
+    char out_name3[] = "soil_carbon_min.bil";       // file name for output diagnostics raster file
+    char out_name4[] = "soil_carbon_max.bil";       // file name for output diagnostics raster file
+    char out_name5[] = "soil_carbon_q1.bil";        // file name for output diagnostics raster file
+    char out_name6[] = "soil_carbon_q3.bil";        // file name for output diagnostics raster file
     int scg_code = 186;         // fao code for serbia and montenegro
     int srb_code = 272;         // fao code for serbia
     int mne_code = 273;         // fao code for montenegro
@@ -99,14 +85,14 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     int ctry_ind;           // current country index in ctry_aez_list
     int cur_lt_cat;             // current land type category
     int cur_lt_cat_ind;             // current land type category index
-    int memory_median=0;
-    int memory_min=0;
-    int memory_max=0;
-    int memory_q1=0;
-    int memory_q3=0;
+    int memory_median=0;        // This is used to calculate memory to be allocated
+    int memory_min=0;           // This is used to calculate memory to be allocated 
+    int memory_max=0;           // This is used to calculate memory to be allocated
+    int memory_q1=0;            // This is used to calculate memory to be allocated 
+    int memory_q3=0;            // This is used to calculate memory to be allocated
     
     
-    //This just 
+    //This is just overwriting protected areas raster info. But does not matter as both arrays have similar domensions. 
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
     raster_info->protected_ncells = ncells;
@@ -139,10 +125,6 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
         return ERROR_FILE;
     }
 
-    
-    
-    
-    
     // read the data and check for same size as the working grid
     num_read = fread(wavg_array, insize, ncells, fpin);
     fclose(fpin);
@@ -436,13 +418,13 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
                 free(veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]);
                 veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind][5]=calloc(memory_q3,sizeof(float));
                 }
-            //TODO Add some diagnostics here to print out numbers for user specified basins
 
             }//finish loop for protected areas
         }//finish loop for aez
     }//finish loop for cells
 
 
+//Print all diagnostics
 if (in_args.diagnostics) {
         if ((err = write_raster_float(wavg_array, ncells, out_name1, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
@@ -485,7 +467,7 @@ if (in_args.diagnostics) {
         }
         }
 
-
+//Free arrays
     free(wavg_array);
     free(median_array);
     free(min_array);
@@ -493,7 +475,5 @@ if (in_args.diagnostics) {
     free(q1_array);
     free(q3_array);
     
-
-   // exit(0);
     return OK;
 }

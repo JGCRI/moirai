@@ -34,6 +34,8 @@
  also initialize the land mask arrays to 0
  
  the num_land_cells_#### variables are initialized in init_moirai.c
+
+ also gets the non land cells for regions, basins and countries
  
  recall that serbia and montenegro have separate raster fao code values but are processed merged
     so need to assign the proper gcam region based on the merged fao code

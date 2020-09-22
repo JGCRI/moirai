@@ -1,11 +1,11 @@
 /**********
  read_veg_carbon.c
  
- read the veg carbon text file (kg/m^2) associated with the sage potential vegetation categories
- data based on the previous level0 file
+ read the veg carbon input file (MgC/ha) associated with the sage potential vegetation categories
+ data based on the gridded inputs
  sage pot veg cats are 1-15
  
- veg carbon includes root carbon, in addition to above ground carbon
+ veg carbon includes above ground and below ground biomass
  
  arguments:
  char* fname:          file name to open, with path
@@ -43,14 +43,8 @@
 #include "moirai.h"
 
 int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
-    // use this function to input data to the working grid
     
-    // soil c data
-    // image file with one band (starts at upper left corner)
-    // 4 byte float
-    // 5 arcmin resolution, extent = (-180,180, -90, 90), ?WGS84?
-    // values are soil carbon (kg/m^2)
-    
+    //Grid dimensions
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
     int ncells = nrows * ncols;		// number of input grid cells
@@ -63,8 +57,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     
     int i;
     char fname[MAXCHAR];			// file name to open
-    //char rec_str[MAXRECSIZE];		// string to hold one record
-    //const char *delim = ",";		// delimiter string for space separated file
+    
     FILE *fpin;
     int num_read;					// how many values read in
     float *wavg_array;  //Temporary arrays for above ground biomass
@@ -82,12 +75,13 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
 	
     int err = OK;								// store error code from the dignostic write file
     char out_name1[] = "veg_carbon_wavg.bil";		// file name for output diagnostics raster file
-    char out_name2[] = "veg_carbon_median.bil";
-    char out_name3[] = "veg_carbon_min.bil";
-    char out_name4[] = "veg_carbon_max.bil";
-    char out_name5[] = "veg_carbon_q1.bil";
-    char out_name6[] = "veg_carbon_q3.bil";
+    char out_name2[] = "veg_carbon_median.bil";     // file name for output diagnostics raster file
+    char out_name3[] = "veg_carbon_min.bil";        // file name for output diagnostics raster file
+    char out_name4[] = "veg_carbon_max.bil";        // file name for output diagnostics raster file
+    char out_name5[] = "veg_carbon_q1.bil";         // file name for output diagnostics raster file
+    char out_name6[] = "veg_carbon_q3.bil";         // file name for output diagnostics raster file
     
+    //Similar to read_soil_carbon.c, this is just overwriting protected area raster info. But does not matter since both grids have same dimensions
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
     raster_info->protected_ncells = ncells;
@@ -97,7 +91,9 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     raster_info->protected_xmax = xmax;
     raster_info->protected_ymin = ymin;
     raster_info->protected_ymax = ymax;
+   
 
+   //1. Allocate weighted average array
     wavg_array = calloc(ncells, sizeof(float));
     if(wavg_array == NULL) {
         fprintf(fplog,"Failed to allocate memory for wavg_array: read_protected()\n");
@@ -422,13 +418,13 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
       //kbn calc category data from input arrays
     for (i = 0; i < ncells; i++) {
         //above ground +below ground * scaling factor (0.1)
-        //TODO: based on feedback, we may want to write out above and below ground biomass separately 
-        veg_carbon_sage[0][i] = (wavg_array[i]+wavg_bg_array[i])*0.1;
-        veg_carbon_sage[1][i] = (median_array[i]+median_bg_array[i])*0.1;
-        veg_carbon_sage[2][i] = (min_array[i]+min_bg_array[i])*0.1;
-        veg_carbon_sage[3][i] = (max_array[i]+max_bg_array[i])*0.1;
-        veg_carbon_sage[4][i] = (q1_array[i]+q1_bg_array[i])*0.1;
-        veg_carbon_sage[5][i] = (q3_array[i]+q3_bg_array[i])*0.1;
+        //TODO: based on feedback, we may want to write out above and below ground biomass separately. Currently we aggegate the two for speed. 
+        veg_carbon_sage[0][i] = (wavg_array[i]+wavg_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[1][i] = (median_array[i]+median_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[2][i] = (min_array[i]+min_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[3][i] = (max_array[i]+max_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[4][i] = (q1_array[i]+q1_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[5][i] = (q3_array[i]+q3_bg_array[i])*VEG_CARBON_SCALER;
     }
 
    //Write diagnostics
@@ -465,6 +461,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
         
         }
     
+    //Free arrays
     free(wavg_array);
     free(median_array);
     free(min_array);
@@ -477,7 +474,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     free(max_bg_array);
     free(q1_bg_array);
     free(q3_bg_array);
-    //exit(0);
+    
     
     return OK;
 }
