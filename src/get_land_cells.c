@@ -96,7 +96,6 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 	int i, j, k = 0;
 	int err = OK;				// store error code from the write functions
 	int fao_index;				// store the fao country index
-	
     int scg_code = 186;         // fao code for serbia and montenegro
     int srb_code = 272;         // fao code for serbia
     int mne_code = 273;         // fao code for montenegro
@@ -125,28 +124,88 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 	char out_name_ctry_out[] = "country_out.bil";	// output name for new country raster map
 	char out_name_ctryglu[] = "ctryglu_raster.bil"; // output name for new country/glu raster map
 	char out_name_regionglu[] = "regionglu_raster.bil"; // output name for new region/glu raster map
+	char out_name_glu[] = "glu_raster.bil"; // output name for new region/glu raster map
 	
-	int *ctryaez_raster;    // store the ctry+aez values as a raster file
-	int *regionaez_raster;    // store the gcam region+aez values as a raster file
-	int *country_out;    // store the output country codes as a raster file
 	
+	char out_name_region_noland[] = "region_gcam_out_noland.bil";	// output name for new gcam region raster map
+	char out_name_ctry_out_noland[] = "country_out_noland.bil";	// output name for new country raster map
+	char out_name_ctryglu_noland[] = "ctryglu_raster_noland.bil"; // output name for new country/glu raster map
+	char out_name_regionglu_noland[] = "regionglu_raster_noland.bil"; // output name for new region/glu raster map
+    char out_name_glu_noland[] = "glu_raster_noland.bil"; // output name for new region/glu raster map
+
+
+	float *ctryaez_raster;    // store the ctry+aez values as a raster file
+	float *regionaez_raster;    // store the gcam region+aez values as a raster file
+	float *region_raster;   // store the gcam region values as a raster file   
+	float *country_out;    // store the output country codes as a raster file
+	float *aez_out;       // store output basin codes as a raster file
+
+	float *ctryaez_raster_noland;    // store the ctry+aez values as a raster file
+	float *region_raster_noland;        // store the gcam region+aez values as a raster file
+	float *regionaez_raster_noland;    // store the gcam region+aez values as a raster file
+	float *country_out_noland;    // store the output country codes as a raster file
+	float *aez_out_noland;       // store output basin codes as a raster file
+
+	
+   
 	// allocate the raster arrays
-	ctryaez_raster = calloc(NUM_CELLS, sizeof(int));
+	ctryaez_raster = calloc(NUM_CELLS, sizeof(float));
 	if(ctryaez_raster == NULL) {
 		fprintf(fplog,"Failed to allocate memory for ctryaez_raster:  get_land_cells()\n");
 		return ERROR_MEM;
 	}
-	regionaez_raster = calloc(NUM_CELLS, sizeof(int));
+	regionaez_raster = calloc(NUM_CELLS, sizeof(float));
 	if(regionaez_raster == NULL) {
 		fprintf(fplog,"Failed to allocate memory for regionaez_raster:  get_land_cells()\n");
 		return ERROR_MEM;
 	}
-	country_out = calloc(NUM_CELLS, sizeof(int));
+	country_out = calloc(NUM_CELLS, sizeof(float));
 	if(country_out == NULL) {
 		fprintf(fplog,"Failed to allocate memory for country_out:  get_land_cells()\n");
 		return ERROR_MEM;
 	}
+
+    aez_out = calloc(NUM_CELLS, sizeof(float));
+	if(aez_out == NULL) {
+		fprintf(fplog,"Failed to allocate memory for aez_out:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+    
+	region_raster = calloc(NUM_CELLS, sizeof(float));
+	if(region_raster == NULL) {
+		fprintf(fplog,"Failed to allocate memory for aez_out:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
 	
+   ctryaez_raster_noland = calloc(NUM_CELLS, sizeof(float));
+	if(ctryaez_raster_noland == NULL) {
+		fprintf(fplog,"Failed to allocate memory for ctryaez_raster_noland:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	regionaez_raster_noland = calloc(NUM_CELLS, sizeof(float));
+	if(regionaez_raster_noland == NULL) {
+		fprintf(fplog,"Failed to allocate memory for regionaez_raster_noland:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	country_out_noland = calloc(NUM_CELLS, sizeof(float));
+	if(country_out_noland == NULL) {
+		fprintf(fplog,"Failed to allocate memory for country_out_noland:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+	region_raster_noland = calloc(NUM_CELLS, sizeof(float));
+	if(region_raster_noland == NULL) {
+		fprintf(fplog,"Failed to allocate memory for region_raster_noland:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+    
+	aez_out_noland = calloc(NUM_CELLS, sizeof(float));
+	if(aez_out_noland == NULL) {
+		fprintf(fplog,"Failed to allocate memory for aez_out_noland:  get_land_cells()\n");
+		return ERROR_MEM;
+	}
+
+
+
 	// loop over the all grid cells
 	for (i = 0; i < NUM_CELLS; i++) {
 		// initialize the land masks and country maps
@@ -162,9 +221,16 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 		country87_gtap[i] = NODATA;
         glacier_water_area_hyde[i] = NODATA;
         region_gcam[i] = NODATA;
+		region_raster[i] = NODATA;
+		region_raster_noland[i]= NODATA;
 		ctryaez_raster[i] = NODATA;
+		ctryaez_raster_noland[i] = NODATA;
 		regionaez_raster[i] = NODATA;
+		regionaez_raster_noland[i]= NODATA;
 		country_out[i] = NODATA;
+		country_out_noland[i] = NODATA;
+		aez_out[i]= NODATA;
+		aez_out_noland[i] = NODATA;
 		
 		// if valid original aez id value, then add cell index to land_mask_aez_orig
 		if (aez_bounds_orig[i] != raster_info.aez_orig_nodata) {
@@ -287,7 +353,7 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 					}
 				}	// end for j loop over fao ctry to find fao index for gtap 87 code
                 if (fao_index == NOMATCH) {
-                    fprintf(fplog, "Error determining fao country index for land cell: get_land_cells(); cellind = %i\n", i);
+                    fprintf(fplog, "Error determining fao country index for land cell: get_land_cells();country_fao %i; faoindex= %i; cellind = %i\n",country_fao[i],fao_index, i);
                     return ERROR_IND;
                 }
 			} else {
@@ -305,11 +371,14 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 				if (ctry2regioncodes_gcam[fao_index] != NOMATCH) {
 					region_gcam[i] = ctry2regioncodes_gcam[fao_index];
 				}
-				country_out[i] = country_fao[i];
+				// fill the aez image here 
+                 aez_out[i] =  (float) aez_bounds_new[i];
+				region_raster[i]= (float)ctry2regioncodes_gcam[fao_index];
+				country_out[i] = (float)country_fao[i];
 				// fill the ctry+aez image here
-				ctryaez_raster[i] = (int) country_fao[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+				ctryaez_raster[i] = (float) country_fao[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
 				// fill the region+aez image here
-				regionaez_raster[i] = ctry2regioncodes_gcam[fao_index] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+				regionaez_raster[i] =(float) ctry2regioncodes_gcam[fao_index] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
             } else {
 				// check for serbia and montenegro
 				if (countrycodes_fao[fao_index] == srb_code || countrycodes_fao[fao_index] == mne_code) {
@@ -322,47 +391,159 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 					}
 					country87_gtap[i] = ctry2ctry87codes_gtap[scg_index];
 					region_gcam[i] = ctry2regioncodes_gcam[scg_index];
-					country_out[i] = scg_code;
+					region_raster[i] =(float) ctry2regioncodes_gcam[scg_index];
+					// fill the aez image here 
+                   aez_out[i] =  (float) aez_bounds_new[i];
+					
+					country_out[i] = (float)scg_code;
 					// fill the ctry+aez image here
-					ctryaez_raster[i] = country_out[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+					ctryaez_raster[i] = (float)country_out[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
 					// fill the region+aez image here
-					regionaez_raster[i] = region_gcam[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+					regionaez_raster[i] = (float)region_gcam[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
 				} // end if serbia or montenegro
 			} // end else check for serbia or montenegro
 
 		}	// end if hyde and new glu land cell (if working land cell)
+        
+		//New code to get no_land cells  
+    	if (land_mask_hyde[i] != 1) {
+			// fao country index
+			if ((int) country_fao[i] != raster_info.country_fao_nodata) {
+				fao_index = NOMATCH;
+				for (j = 0; j < NUM_FAO_CTRY; j++) {
+                    if (countrycodes_fao[j] == (int) country_fao[i]) {
+						fao_index = j;
+						break;
+					}
+				}	// end for j loop over fao ctry to find fao index for gtap 87 code
+                if (fao_index == NOMATCH) {
+                    fprintf(fplog, "Error determining fao country index for land cell: get_land_cells();country_fao %i; faoindex= %i; cellind = %i\n",country_fao[i],fao_index, i);
+                    return ERROR_IND;
+                }
+			} else {
+				// this area lost is summed in fao_hyde_area_lost above
+				//fprintf(fplog, "Warning: No FAO country exists for this hyde land cell: get_land_cells(); cellind = %i\n", i);
+				continue;	// no country associated with these data so don't use this cell and go to the next one
+			}	// end if fao country else if gcam gis country else no country
+			
+            // store the ctry87 code and gcam region code and country out code in a raster
+			// also store the country code, the country/glu, and the region/glu
+            // leave the NOMATCH regions as the NODATA value
+			// the gcam region codes have already been restricted to valid ctry87 codes, but leave the check anyway
+            if (ctry2ctry87codes_gtap[fao_index] != NOMATCH) {
+				if (ctry2regioncodes_gcam[fao_index] != NOMATCH) {
+					region_raster_noland[i] = (float)ctry2regioncodes_gcam[fao_index];
+				}
+				country_out_noland[i] =(float) country_fao[i];
+                 // fill the aez image here 
+                 aez_out_noland[i] =  (float) aez_bounds_new[i]; 
+				// fill the ctry+aez image here
+				ctryaez_raster_noland[i] = (float) country_fao[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+				// fill the region+aez image here
+				regionaez_raster_noland[i] = (float)ctry2regioncodes_gcam[fao_index] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+            } else {
+				// check for serbia and montenegro
+				if (countrycodes_fao[fao_index] == srb_code || countrycodes_fao[fao_index] == mne_code) {
+					scg_index = NOMATCH;
+					for (k = 0; k < NUM_FAO_CTRY; k++) {
+						if (countrycodes_fao[k] == scg_code) {
+							scg_index = k;
+							break;
+						}
+					}
+					region_raster_noland[i] =(float) ctry2regioncodes_gcam[scg_index];
+					country_out_noland[i] = (float)scg_code;
+					aez_out_noland[i]=(float)aez_bounds_new[i];
+					// fill the ctry+aez image here
+					ctryaez_raster_noland[i] =(float) country_out_noland[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+					// fill the region+aez image here
+					regionaez_raster_noland[i] = (float)region_gcam[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
+					//fill aex image here
+
+				} // end if serbia or montenegro
+			} // end else check for serbia or montenegro
+
+		}	// end if hyde and new glu land cell (if working land cell)
+
+
+
+
+
+
 
 	}	// end for i loop over all cells
 	
 	// write the relevant maps with the overall land mask constraints
 	
     // write the new gcam region raster map
-    if ((err = write_raster_int(region_gcam, NUM_CELLS, out_name_region, in_args))) {
+	//land
+    if ((err = write_raster_float(region_raster, NUM_CELLS, out_name_region, in_args))) {
         fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_region);
         return err;
     }
+    //noland
+	if ((err = write_raster_float(region_raster_noland, NUM_CELLS, out_name_region_noland, in_args))) {
+        fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_region_noland);
+        return err;
+    }
+
 	// this is the map of found gtap 87 countries
+	
 	if ((err = write_raster_int(country87_gtap, NUM_CELLS, out_name_ctry87, in_args))) {
 		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry87);
 		return err;
 	}
 	// this is the country map
-	if ((err = write_raster_int(country_out, NUM_CELLS, out_name_ctry_out, in_args))) {
+	//land
+	if ((err = write_raster_float(country_out, NUM_CELLS, out_name_ctry_out, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry_out);
+		return err;
+	}
+	//noland
+	if ((err = write_raster_float(country_out_noland, NUM_CELLS, out_name_ctry_out_noland, in_args))) {
 		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctry_out);
 		return err;
 	}
 	
 	// country+aez raster file
-	if ((err = write_raster_int(ctryaez_raster, NUM_CELLS, out_name_ctryglu, in_args))) {
+	//land
+	if ((err = write_raster_float(ctryaez_raster, NUM_CELLS, out_name_ctryglu, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctryglu);
+		return err;
+	}
+	//noland
+	if ((err = write_raster_float(ctryaez_raster_noland, NUM_CELLS, out_name_ctryglu_noland, in_args))) {
 		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_ctryglu);
 		return err;
 	}
 	// region+aez raster file
-	if ((err = write_raster_int(regionaez_raster, NUM_CELLS, out_name_regionglu, in_args))) {
+	//land
+	if ((err = write_raster_float(regionaez_raster, NUM_CELLS, out_name_regionglu, in_args))) {
 		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_regionglu);
 		return err;
 	}
 	
+	//noland
+	if ((err = write_raster_float(regionaez_raster_noland, NUM_CELLS, out_name_regionglu_noland, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_regionglu);
+		return err;
+	}
+
+    // basin raster file
+	//land
+	if ((err = write_raster_float(aez_out, NUM_CELLS,out_name_glu, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_glu);
+		return err;
+	}
+	
+	//noland
+	if ((err = write_raster_float(aez_out_noland, NUM_CELLS, out_name_glu_noland, in_args))) {
+		fprintf(fplog, "Error writing file %s: get_land_cells()\n", out_name_glu_noland);
+		return err;
+	}
+
+
+
     // write the global area tracking values to the log file
     fprintf(fplog, "\nGlobal land area tracking (km^2): get_land_cells():\n");
     fprintf(fplog, "total_sage_land_area = %f\n", total_sage_land_area);
@@ -431,6 +612,13 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 	free(ctryaez_raster);
 	free(regionaez_raster);
 	free(country_out);
+	free(aez_out);
+	free(ctryaez_raster_noland);
+	free(region_raster_noland);
+	free(regionaez_raster_noland);
+	free(country_out_noland);
+	free(aez_out_noland);
+	free(region_raster);
 	
 	return OK;
 }

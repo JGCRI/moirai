@@ -229,12 +229,19 @@
     suitable/protected area data from epa
  		6 files, fraction of grid cell, see read_protectd for details
         5 arcmin resolution
-    potential vegetation carbon (above ground and roots)
-        text file with values mapped to SAGE potential vegetation types, based on liturature search
-            veg_carbon.csv
-    soil carbon for potential vegetation types (soil only)
-        text file with values mapped to SAGE potential vegetation types, based on liturature search
-            soil_carbon.csv
+potential vegetation carbon (above ground and below ground biomass)
+        6 different binary rasters representing 6 states of potential vegetation carbon (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
+        The input rasters are 5 arcmin binary files , 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
+        Data is scaled up by a factor of 0.1 in the raw data and is scaled down in our calculations
+        These are calculated using a fine resolution raster dataset from Spawn et al 2020    
+soil carbon (soil only for a depth of 0-30 cms)
+        6 different binary rasters representing 6 states of potential vegetation carbon (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
+        The input rasters are 5 arcmin binary files , 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
+        The user has the option to select these rasters from 3 different sources, namely, 
+        A) FAO Harmonized World Soil Database
+        B) Soil grids (mean soil  carbon )
+        C) Soil grids (95th percentile soil carbon)
+
  
  GTAP land use database R2.1V6.0:
 	gcam-data-system/aglu-data/level0/

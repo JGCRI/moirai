@@ -69,7 +69,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     double ymin = -90.0;			// latitude min grid boundary
     double ymax = 90.0;				// latitude max grid boundary
     int rv_ind;
-    int i,j, k, l, m,n=0;
+    int i,j, k=0;
     int grid_ind;
     char fname[MAXCHAR];			// file name to open
     //char rec_str[MAXRECSIZE];		// string to hold one record
@@ -99,21 +99,14 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     int ctry_ind;           // current country index in ctry_aez_list
     int cur_lt_cat;             // current land type category
     int cur_lt_cat_ind;             // current land type category index
-    int num_carbon_states = 5;
     int memory_median=0;
     int memory_min=0;
     int memory_max=0;
     int memory_q1=0;
     int memory_q3=0;
-    int median_ind=0;
-    int min_ind=0;
-    int max_ind=0;
-    int q1_ind=0;
-    int q3_ind=0;
-
     
-
-
+    
+    //This just 
     raster_info->protected_nrows = nrows;
     raster_info->protected_ncols = ncols;
     raster_info->protected_ncells = ncells;
@@ -138,8 +131,8 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
     // create file name and open it
     strcpy(fname, in_args.inpath);
     strcat(fname, in_args.soil_carbon_wavg_fname);
-    printf(in_args.soil_carbon_wavg_fname);
-    printf("printing");
+    
+    
     if((fpin = fopen(fname, "rb")) == NULL)
     {
         fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
@@ -367,11 +360,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 
             for (k=0; k< NUM_EPA_PROTECTED; k++){
 				// get index of land category
-				median_ind=0;
-                min_ind=0;
-                max_ind=0;
-                q1_ind=0;
-                q3_ind=0;
+				
 
                 cur_lt_cat = rv_value * SCALE_POTVEG + k;
 				cur_lt_cat_ind = NOMATCH;
@@ -455,13 +444,13 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 
 
 if (in_args.diagnostics) {
-        if ((err = write_raster_float(wavg_array, ncells, out_name2, in_args))) {
+        if ((err = write_raster_float(wavg_array, ncells, out_name1, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
             return ERROR_FILE;
         }
         }
 if (in_args.diagnostics) {
-        if ((err = write_raster_float(wavg_array, ncells, out_name3, in_args))) {
+        if ((err = write_raster_float(median_array, ncells, out_name2, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
             return ERROR_FILE;
         }
@@ -469,12 +458,32 @@ if (in_args.diagnostics) {
 
 
     if (in_args.diagnostics) {
-        if ((err = write_raster_float(wavg_array, ncells, out_name4, in_args))) {
+        if ((err = write_raster_float(min_array, ncells, out_name3, in_args))) {
             fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
             return ERROR_FILE;
         }
         }
 
+if (in_args.diagnostics) {
+        if ((err = write_raster_float(max_array, ncells, out_name4, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
+            return ERROR_FILE;
+        }
+        }
+
+if (in_args.diagnostics) {
+        if ((err = write_raster_float(q1_array, ncells, out_name5, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
+            return ERROR_FILE;
+        }
+        }
+
+if (in_args.diagnostics) {
+        if ((err = write_raster_float(q3_array, ncells, out_name6, in_args))) {
+            fprintf(fplog, "Error writing file %s: read_protected()\n", out_name1);
+            return ERROR_FILE;
+        }
+        }
 
 
     free(wavg_array);
@@ -483,6 +492,7 @@ if (in_args.diagnostics) {
     free(max_array);
     free(q1_array);
     free(q3_array);
+    
 
    // exit(0);
     return OK;
