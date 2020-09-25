@@ -18,12 +18,8 @@ create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
                               path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
                               basin_name = "Missouri_River_Basin",
                               carbon_year = 2010,
-                              carbon_raster_file_names = c("FAO_HWS_q1.bil",
-                                                           "FAO_HWS_q3.bil",
-                                                           "FAO_HWS_median.bil",
-                                                           "FAO_HWS_min.bil",
-                                                           "FAO_HWS_max.bil",
-                                                           "FAO_HWS_wavg.bil"),
+                              carbon_input_src_name = "soil_grids_95pct"
+                              ,
                               print_raster_progress_log =FALSE  
                               
   
@@ -45,7 +41,29 @@ create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
   theme(legend.background = element_blank(),
         legend.box.background = element_rect(colour = "black"))
 
-
+  if (carbon_input_src_name == "FAO_HWS"){
+  carbon_raster_file_names = c("FAO_HWS_q1.bil",
+                               "FAO_HWS_q3.bil",
+                               "FAO_HWS_median.bil",
+                               "FAO_HWS_min.bil",
+                               "FAO_HWS_max.bil",
+                               "FAO_HWS_wavg.bil")}
+  
+  if (carbon_input_src_name == "soil_grids_mean"){
+    carbon_raster_file_names = c("soil_carbon_q1.bil",
+                                 "soil_carbon_q3.bil",
+                                 "soil_carbon_median.bil",
+                                 "soil_carbon_min.bil",
+                                 "soil_carbon_max.bil",
+                                 "soil_carbon_wavg.bil")}
+  
+  if (carbon_input_src_name == "soil_grids_95pct"){
+    carbon_raster_file_names = c("soil_carbon_q1_95pct.bil",
+                                 "soil_carbon_q3_95pct.bil",
+                                 "soil_carbon_median_95pct.bil",
+                                 "soil_carbon_min_95pct.bil",
+                                 "soil_carbon_max_95pct.bil",
+                                 "soil_carbon_weighted_average_95pct.bil")}
 
 
 
@@ -118,7 +136,7 @@ g<-ggplot(data=data_for_plot,aes(x=value)) +
   geom_point(data=data_for_plot,aes(x=q1_value,y=plot_lim,color="q1_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=q3_value,y=plot_lim,color="q3_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=wavg,y=plot_lim,color="weighted_average"),show.legend = TRUE,size=3,alpha=0.9)+
-  ggtitle(paste0("Soil carbon distribution for ",toString(basin_name), " in Mgc/ha (0-30 cms depth), distribution from FAO HWS database"))+
+  ggtitle(paste0("Soil carbon distribution for ",toString(basin_name), " in Mgc/ha (0-30 cms depth), distribution from ", toString(carbon_input_src_name)))+
   labs(subtitle = "Colors represent initialization values from moirai outputs for each category")
 
 #Save distributions
@@ -243,5 +261,31 @@ create_carbon_plots_veg_carbon<-function(fig_dir  = "carbon_plots/",
   
   return(g)
   
+}
+
+get_raster_data_basin <- function(x,path_to_carbon_rasters="../indata/",
+                                  print_raster_progress_log=TRUE,
+                                  path_to_mapping = "../indata/GLU_ID_mapping.csv",
+                                  path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
+                                  basin_name = "Missouri_River_Basin"){
+  
+  carbon_data_raw<-NULL
+  carbon_raster_name <- x
+  mapping_data_basin <- read.csv(path_to_mapping)
+  mapping_names_basin <- read.csv(path_to_mapping_name)
+  
+  carbon_data_raw <- raster(paste0(path_to_carbon_rasters,carbon_raster_name))
+  carbon_data_raw <- as.data.table(rasterToPoints(carbon_data_raw))
+  carbon_data_raw %>% rename(value=gsub(".bil","",carbon_raster_name,)) %>%
+    filter(value>0) %>% 
+    inner_join(mapping_data_basin, by=c("x","y")) %>% 
+    inner_join(mapping_names_basin %>% rename(basin_id=GCAM_ID_1,basin_nm=Basin_na_1),by=c("basin_id")) %>% 
+    filter(basin_nm==basin_name)->carbon_data_clean      
+  
+  if(print_raster_progress_log==TRUE){
+    print(paste0("Done processing ", carbon_raster_name))
+  }
+  
+  return(carbon_data_clean)
 }
 
