@@ -254,7 +254,7 @@ create_carbon_plots_veg_carbon<-function(fig_dir  = "carbon_plots/",
     ggtitle(paste0("Vegetation carbon distribution for ",toString(basin_name), " in Mgc/ha, distribution is for above ground biomass"))+
     labs(subtitle = "Colors represent initialization values for above and below ground biomass from moirai outputs for each category")
   
-  
+  plot(g)
   ggsave( paste0('carbon_plots/Distribution_veg_c_',toString(basin_name),'.png'),width = 10, height = 6)
   
   print("Completed processing succesfully. Plots stored in the outputs folder")
