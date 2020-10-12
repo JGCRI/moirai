@@ -1,9 +1,3 @@
----
-output:
-  html_document: default
-  word_document: default
-  pdf_document: default
----
 # Diagnostics and exporation functions for  `moirai`  
 
 # Description:
