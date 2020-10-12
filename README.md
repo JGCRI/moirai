@@ -122,8 +122,8 @@ The Moirai LDS generates the following three files and copies them to a user-spe
 The Moirai LDS also generates these files (some of which were previously stored in either the deprecated …/aglu-data/GIS directory or …/aglu-data/level0, may have been previously produced from the old “GIS” code), and copies them to user-specified destination directory (e.g., `…/moirai/outputs/basins235/aglu-data`):
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
-* **Land_type_area_ha.csv** = land type area, country X GLU X land type X year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil/veg C (Megagrams per hectare)
+* **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cms)/veg C (above and below ground biomass) (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m3), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
