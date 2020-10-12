@@ -126,5 +126,4 @@ int write_production_crop_aez(args_struct in_args) {
 	fprintf(fplog, "Wrote file %s: write_production_crop_aez(); records written=%i != countries skipped=%i\n",
 			fname, nrecords, count_skip);
 	
-	return OK;
-}
+	return OK;}

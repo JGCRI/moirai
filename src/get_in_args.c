@@ -326,5 +326,4 @@ int get_in_args(const char *fname, args_struct *in_args) {
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

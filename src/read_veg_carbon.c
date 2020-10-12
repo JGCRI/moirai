@@ -476,5 +476,4 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     free(q3_bg_array);
     
     
-    return OK;
-}
+    return OK;}

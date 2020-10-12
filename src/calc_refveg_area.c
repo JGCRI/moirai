@@ -332,5 +332,4 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 	free(lu_area);
 	
 	
-	return OK;
-}
+	return OK;}

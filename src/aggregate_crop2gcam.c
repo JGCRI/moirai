@@ -218,5 +218,4 @@ int aggregate_crop2gcam(args_struct in_args) {
     free(diag_harvestarea_crop_aez_gcam);
     free(diag_production_crop_aez_gcam);
     
-	return OK;
-}
+	return OK;}

@@ -751,5 +751,4 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_a
 	free(refveg_type_area_sum);
 	free(type_area_resid);
 	
-	return OK;
-}
+	return OK;}

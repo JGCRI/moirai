@@ -136,7 +136,7 @@ g<-ggplot(data=data_for_plot,aes(x=value)) +
   geom_point(data=data_for_plot,aes(x=q1_value,y=plot_lim,color="q1_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=q3_value,y=plot_lim,color="q3_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=wavg,y=plot_lim,color="weighted_average"),show.legend = TRUE,size=3,alpha=0.9)+
-  ggtitle(paste0("Soil carbon distribution for ",toString(basin_name), " in Mgc/ha (0-30 cms depth), distribution from ", toString(carbon_input_src_name)))+
+  ggtitle(paste0("Soil carbon distribution for ",toString(basin_name), " in MgC/ha (0-30 cms depth), distribution from ", toString(carbon_input_src_name)))+
   labs(subtitle = "Colors represent initialization values from moirai outputs for each category")
 
 #Save distributions
@@ -251,7 +251,7 @@ create_carbon_plots_veg_carbon<-function(fig_dir  = "carbon_plots/",
     geom_point(data=data_for_plot,aes(x=q1_value,y=plot_lim,color="q1_value"),show.legend = TRUE,size=3,alpha=0.9)+
     geom_point(data=data_for_plot,aes(x=q3_value,y=plot_lim,color="q3_value"),show.legend = TRUE,size=3,alpha=0.9)+
     geom_point(data=data_for_plot,aes(x=wavg,y=plot_lim,color="weighted_average"),show.legend = TRUE,size=3,alpha=0.9)+
-    ggtitle(paste0("Vegetation carbon distribution for ",toString(basin_name), " in Mgc/ha, distribution is for above ground biomass"))+
+    ggtitle(paste0("Vegetation carbon distribution for ",toString(basin_name), " in MgC/ha, distribution is for above ground biomass"))+
     labs(subtitle = "Colors represent initialization values for above and below ground biomass from moirai outputs for each category")
   
   plot(g)

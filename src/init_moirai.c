@@ -144,5 +144,4 @@ int init_moirai(args_struct *in_args) {
 	num_land_cells_hyde = 0;			// the actual number of land cell indices in land_cells_hyde[]
     num_forest_cells = 0;				// the actual number of land cell indices in forest_cells[]
 	
-	return OK;
-}
+	return OK;}

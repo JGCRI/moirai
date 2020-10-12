@@ -176,5 +176,4 @@ int read_use_info_gtap(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

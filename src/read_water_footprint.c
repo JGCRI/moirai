@@ -84,5 +84,4 @@ int read_water_footprint(char *fname, float *wf_grid) {
         return ERROR_FILE;
     }
     
-    return OK;
-}
+    return OK;}

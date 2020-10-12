@@ -16,7 +16,7 @@
  to do: add the water footprint file
  
  arguments:
- args_struct in_args: the input file arguments
+ args_struct in_args: the input file argument
  
  return value:
  integer error code: OK = 0, otherwise a non-zero error code
@@ -177,5 +177,4 @@ int copy_to_destpath(args_struct in_args) {
         return ERROR_COPY;
     }
     
-    return OK;
-}
+    return OK;}

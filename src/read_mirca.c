@@ -115,5 +115,4 @@ int read_mirca(char *fname, float *mirca_grid) {
     
     fclose(fpin);
     
-    return OK;
-}
+    return OK;}

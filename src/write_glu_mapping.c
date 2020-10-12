@@ -582,5 +582,4 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
 	
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

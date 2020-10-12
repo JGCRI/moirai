@@ -475,5 +475,4 @@ if (in_args.diagnostics) {
     free(q1_array);
     free(q3_array);
     
-    return OK;
-}
+    return OK;}

@@ -622,5 +622,4 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 	free(aez_out_noland);
 	free(region_raster);
 	
-	return OK;
-}
+	return OK;}

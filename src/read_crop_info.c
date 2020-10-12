@@ -261,5 +261,4 @@ int read_crop_info(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

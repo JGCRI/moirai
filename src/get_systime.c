@@ -42,5 +42,4 @@ char *get_systime() {
 	tm_ptr = localtime(&lt);
 	strcpy(systime, asctime(tm_ptr));
 	
-	return systime;
-}
+	return systime;}

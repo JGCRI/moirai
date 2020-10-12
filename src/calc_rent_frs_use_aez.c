@@ -303,5 +303,4 @@ int calc_rent_frs_use_aez(args_struct in_args, rinfo_struct raster_info) {
 	free(lrout);
     free(rent_orig_per_area);
 	
-	return OK;
-}
+	return OK;}

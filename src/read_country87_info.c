@@ -275,5 +275,4 @@ int read_country87_info(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

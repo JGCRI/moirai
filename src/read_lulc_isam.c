@@ -208,5 +208,4 @@ int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid) {
 	}
 	free(temp_grid);
 	
-    return OK;
-}
+    return OK;}

@@ -243,5 +243,4 @@ int read_rent_orig(args_struct in_args) {
 
 	free(lrout);
 	
-	return OK;
-}
+	return OK;}

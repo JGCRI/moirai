@@ -465,5 +465,4 @@ int calc_rent_ag_use_aez(args_struct in_args, rinfo_struct raster_info) {
     free(diag_harvestsum);
     free(diag_pasture87_aez);
     
-    return OK;
-}
+    return OK;}

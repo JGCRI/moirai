@@ -68,5 +68,4 @@ int write_raster_short(short out_array[], int out_length, char *out_name, args_s
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

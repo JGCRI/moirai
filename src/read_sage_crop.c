@@ -268,5 +268,4 @@ int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_s
 	free(qual_harv);
 	free(qual_yield);
 
-	return OK;
-}
+	return OK;}

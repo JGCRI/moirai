@@ -763,5 +763,4 @@ int calc_harvarea_prod_out_crop_aez(args_struct in_args, rinfo_struct raster_inf
     free(diag_harvestarea_crop_aez);
     free(diag_pasturearea_aez);
     
-	return OK;
-}
+	return OK;}

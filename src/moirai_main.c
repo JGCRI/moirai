@@ -1382,5 +1382,4 @@ int main(int argc, const char * argv[]) {
 	//fclose(debug_file);
 	//fclose(cell_file);
 	
-    return OK;
-}	// end moirai_main()
+    return OK;}	// end moirai_main()

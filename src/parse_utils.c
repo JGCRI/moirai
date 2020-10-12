@@ -291,6 +291,5 @@ int is_num(char *str_field)
 			onechar++;
 		}
 	}
-	return 1;
-}
+	return 1;}
 

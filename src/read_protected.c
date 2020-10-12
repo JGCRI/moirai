@@ -579,5 +579,4 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
     free(ALL_IUCN_array);
 	
 
-    return OK;
-}
+    return OK;}

@@ -683,6 +683,4 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     free(refveg_carbon_out);
   
     
-    return err;
-    
-}
+    return err;}

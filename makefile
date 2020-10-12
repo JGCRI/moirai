@@ -37,7 +37,7 @@ INCDIRS = $(HDRDIR) $(NCHDRDIR)
 IFLAGS = $(INCDIRS:%=-I%)
 
 # For Linux
-CFLAGS =  -O3 -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
+CFLAGS =  -O3 -std=c11 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
 # CFLAGS = -fast -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
 # CFLAGS = -O3 -std=c99 -ffloat-store ${CFLAGS_GENERIC} # Use precise IEEE Floating Point
 #CFLAGS = -g -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # debugging with line/file reporting and 'standards' testing flags

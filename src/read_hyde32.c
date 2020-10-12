@@ -246,6 +246,5 @@ int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float*
 		fclose(fpin);
 	} // end k loop over hyde files
 	
-	return OK;
-}
+	return OK;}
 

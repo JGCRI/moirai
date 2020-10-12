@@ -165,5 +165,4 @@ int read_lu_hyde(args_struct in_args, int year, float* crop_grid, float* pasture
         return ERROR_FILE;
     }
     
-    return OK;
-}
+    return OK;}

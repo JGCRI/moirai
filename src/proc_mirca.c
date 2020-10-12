@@ -306,5 +306,4 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
     free(irr_out);
     free(rfd_out);
     
-    return OK;
-}
+    return OK;}

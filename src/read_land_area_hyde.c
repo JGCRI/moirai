@@ -110,5 +110,4 @@ int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info) {
 		}
 	}
 	
-	return OK;
-}
+	return OK;}

@@ -396,5 +396,4 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     }
     free(wf_out);
     
-    return OK;
-}
+    return OK;}
