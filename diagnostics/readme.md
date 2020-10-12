@@ -14,6 +14,7 @@ This folder contains a number of diagnostics scripts and functions that can be u
 (3) Verification and checks on land outputs
 
 Note: `moirai_diagnostics_vignette.rmd` provides examples of all of the functions for (2),(3). 
+
 # Generating spatial products using land outputs from moirai
 
 The script `generate_moirai_spatial.R` located in the diagnostics folder can be used to generate various spatial products using the outputs of the moirai LDS. 
@@ -32,13 +33,13 @@ Th plots below show outputs for basin boundaries(Figure 1) and country boundarie
 
 column names in outputs:
 
-(1)`key`: Unique identifier for feature
-(2)`reg_id`: Unique identifier for region (region number)
-(3)`ctry_id`:Uniqueidentifier for country (country number) 
-(4)`glu_id`: Uniqueidentifier for glu (basin number)
-(5)`reg_nm`: Region name 
-(6)`ctry_nm`: Country name
-(7)`glu_nm`: glu/basin name
+(1) `key`: Unique identifier for feature
+(2) `reg_id`: Unique identifier for region (region number)
+(3) `ctry_id`:Uniqueidentifier for country (country number) 
+(4) `glu_id`: Uniqueidentifier for glu (basin number)
+(5) `reg_nm`: Region name 
+(6) `ctry_nm`: Country name
+(7) `glu_nm`: glu/basin name
 
 
 In addition to the main outputs, the code also generates the following outputs in case required by the user:
@@ -138,10 +139,10 @@ One of the maain outputs of the moirai LDS is the land area by type (`Land_type_
 
 The following functions are available to the user,
 
-(1)`compare_iso_land_data`: This function compares new land outputs and older outputs (outputs from a previous model version of moirai) at the ISO or country level for each year.
-(2)`compare_iso_glu_land_data`: This function compares outputs at the country_basin boundary level for each year.
-(3)`compare_iso_glu_hyde_land_data`: This function compares outputs at the country_basin and hyde land use level for each year.
-(4)`compare_iso_glu_hyde_sage_land_data`: This function compares outputs at the country_basin hyde land use type and sage vegetation type level for each year. 
+(1) `compare_iso_land_data`: This function compares new land outputs and older outputs (outputs from a previous model version of moirai) at the ISO or country level for each year.
+(2) `compare_iso_glu_land_data`: This function compares outputs at the country_basin boundary level for each year.
+(3) `compare_iso_glu_hyde_land_data`: This function compares outputs at the country_basin and hyde land use level for each year.
+(4) `compare_iso_glu_hyde_sage_land_data`: This function compares outputs at the country_basin hyde land use type and sage vegetation type level for each year. 
 
 Note : If the differences found by the functions are above a user selected level of tolerance, an error message is automaticaly generated. 
 
@@ -157,3 +158,5 @@ The user can change a number of parameters to customize the functions. They are 
 (3)`print_difference_stats`: Setting this boolean to true will print out a summary of differences for the user which help identify the source of the difference (The specific ISO, GLU where the difference is coming from)
 (4)`path_to_LDS_Data` and `path_to_mapping_files` : These parameters allow the user to use specifc datasets and specific mapping files which enable comparisons of outputs between different versions of moirai. 
 
+# Other diagnostics
+There are four R scripts in `…/moirai/diagnostics` that generate a variety of figures. Make sure that `…/moirai/diagnostics` is the R working directory before running the scripts. Each script writes to a user-specified directory within the outputs directory. Set this diagnostic output directory within each script. Each script has a detailed description at the beginning, and comments identifying the relevant directories, files, and flags that the user can change to customize the outputs. To diagnose country-level harvested area and production outputs, use `plot_moirai_crop_ctry.r`. To diagnose land use region level harvested area and production outputs, use `plot_moirai_crop_rglu.r`. Note that the difference statistics and the KS tests in `plot_moirai_crop_rglu.r` are invalid when the geographic land units are not identical among the different data sets. To diagnose the land type area output, use `plot_moirai_land_type_area.r`. To diagnose the land rent output (at different aggregation levels), use `plot_moirai_landrent_glu.r`. Note that the difference statistics and KS tests in `plot_moirai_landrent_aez.r` are invalid when the geographic land units are not identical among the different data sets. 
