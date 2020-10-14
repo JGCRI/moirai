@@ -3,9 +3,9 @@
 # Description:
 This folder contains a number of diagnostics scripts and functions that can be used to verify, analyze and explore the outputs of the `moirai` LDS. There are 3 types of diagnostics and exploration outputs that can be currently generated from moirai 
 
-(1) Spatial products (shape files and rasters) based on moirai land data outputs
-(2) Analysis of carbon outputs (soil and vegetation)
-(3) Verification and checks on land outputs
+(1) Spatial products (shape files and rasters) based on moirai land data outputs;
+(2) Analysis of carbon outputs (soil and vegetation);
+(3) Verification and checks on land outputs.
 
 Note: `moirai_diagnostics_vignette.rmd` provides examples of all of the functions for (2),(3). 
 
