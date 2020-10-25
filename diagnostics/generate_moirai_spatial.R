@@ -28,13 +28,13 @@ get_and_standardize_raster <- function(raster_path= "spatial_input_files/country
   return(raster_binary)  
 } 
 
-
+dir.create("spatial_output_files",showWarnings = FALSE)
 #Create directories to store files
-dir.create("raster_files",showWarnings = FALSE)
-dir.create("mapping_files",showWarnings = FALSE)
-dir.create("raw_shape_files",showWarnings = FALSE)
-dir.create("gcam_boundaries_moirai_3p1_0p5arcmin_wgs84",showWarnings = FALSE)
-dir.create("validation_figs",showWarnings = FALSE)
+dir.create("spatial_output_files/raster_files",showWarnings = FALSE)
+dir.create("spatial_output_files/mapping_files",showWarnings = FALSE)
+dir.create("spatial_output_files/raw_shape_files",showWarnings = FALSE)
+dir.create("spatial_output_files/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84",showWarnings = FALSE)
+dir.create("spatial_output_files/validation_figs",showWarnings = FALSE)
 
 #Declare all variables
 Land_Data_Binary<-GLU<-GLU_Data<-shp_metadata<-shp_file<-shape_data<-shape_data_region<-shape_data_country<-Land_Data_Actual<-GLU_Data_Join<-
@@ -44,7 +44,7 @@ Land_Data_Binary<-GLU<-GLU_Data<-shp_metadata<-shp_file<-shape_data<-shape_data_
 #Declare parameters
 #TODO When writing the function, use these as parameters
 no_data_value_moirai <- -9999
-moirai_land_raster_path <-'spatial_input_files/moirai_valid_land_area.bsq'
+moirai_land_raster_path <-'spatial_input_files/valid_land_area.bil'
 moirai_projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 #Get all valid boundaries from moirai
 moirai_ctry_land <- 'spatial_input_files/country_out.bil'
@@ -166,7 +166,7 @@ nonland_cells_all_boundaries <- as.data.table(nonland_cells_all_boundaries)
 Land_Data_Actual <- (as.data.table(rasterToPoints(Land_Data_Binary)))
 
 #Check that we got all land cells
-tmp<-Land_Data_Actual %>% left_join(land_cells_all_boundaries)
+tmp<-Land_Data_Actual %>% filter(valid_land_area>0) %>% left_join(land_cells_all_boundaries,by=c("x","y"))
 tmpna<-tmp[is.na(tmp$Ctry_basin),]
 
 if(nrow(tmpna)>0){
@@ -195,13 +195,13 @@ for(i in raster_combinations){
   
   land_cells_all_boundaries %>% 
     dplyr::select(all_of(i),x,y) %>% 
-    rename(key=i) %>% 
+    rename(key=all_of(i)) %>% 
     mutate(key=as.integer(key)) %>% 
     distinct()->GLU_Data_Join     
   
   nonland_cells_all_boundaries %>% 
     dplyr::select(all_of(i),x,y) %>% 
-    rename(key=i) %>% 
+    rename(key=all_of(i)) %>% 
     mutate(key=as.integer(key)) %>% 
     distinct()->GLU_Data_Join_Noland    
   
@@ -213,7 +213,7 @@ for(i in raster_combinations){
     mutate(key=as.integer(key)) %>% 
     select(key,ctry_id,glu_id,reg_id,x,y)->mapping_data
   
-  write.csv(mapping_data,paste0("mapping_files/",toString(i),"_mapping.csv"),row.names = FALSE)
+  write.csv(mapping_data,paste0("spatial_output_files/mapping_files/",toString(i),"_mapping.csv"),row.names = FALSE)
   
   
   #Land
@@ -222,7 +222,7 @@ for(i in raster_combinations){
   GLU_raster <-raster(GLU_Data_Join)
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
-  writeRaster(GLU_raster, filename=tolower(paste0("raster_files/gcam_",toString(i),"_boundaries_moirai_land_cells_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
+  writeRaster(GLU_raster, filename=tolower(paste0("spatial_output_files/raster_files/gcam_",toString((i)),"_boundaries_moirai_land_cells_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
   
   #No land
   coordinates(GLU_Data_Join_Noland)<-~x+y
@@ -230,7 +230,7 @@ for(i in raster_combinations){
   GLU_raster <-raster(GLU_Data_Join_Noland)
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
-  writeRaster(GLU_raster, filename=tolower(paste0("raster_files/gcam_",toString(i),"_boundaries_moirai_no_land_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
+  writeRaster(GLU_raster, filename=tolower(paste0("spatial_output_files/raster_files/gcam_",toString((i)),"_boundaries_moirai_no_land_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
   
   #Combined
   GLU_Combined <- rbind(GLU_Data_Join_Noland,GLU_Data_Join)
@@ -238,7 +238,7 @@ for(i in raster_combinations){
   GLU_raster <-raster(GLU_Combined)
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
-  writeRaster(GLU_raster, filename=tolower(paste0("raster_files/gcam_",toString(i),"_boundaries_moirai_Combined_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
+  writeRaster(GLU_raster, filename=tolower(paste0("spatial_output_files/raster_files/gcam_",toString((i)),"_boundaries_moirai_Combined_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
   
   
   print(paste0("Done generating rasters for land ,no land and combined for ",toString(i)))
@@ -264,20 +264,20 @@ gdalpolygonize_path <- "/Library/Frameworks/GDAL.Framework/Programs/gdal_polygon
 use_osgeo <- TRUE
 
 
-raster_file_names <-list.files(path="raster_files", full.names=TRUE,pattern = ".tif")
+raster_file_names <-list.files(path="spatial_output_files/raster_files", full.names=TRUE,pattern = ".tif")
 
 for (i in raster_file_names){
   
   raster_name <- gsub(".tif","",i)
-  raster_name <- gsub("raster_files/","",raster_name)
+  raster_name <- gsub("spatial_output_files/raster_files/","",raster_name)
   
   #If OSGEO is installed use it or use gdal_polygonize.py instead. 
   if(use_osgeo){
     
-    system2(osgeopath,paste0("gdal_polygonize raster_files/",toString(raster_name),".tif raw_shape_files/",toString(raster_name),".shp key key"))
+    system2(osgeopath,paste0("gdal_polygonize spatial_output_files/raster_files/",toString(raster_name),".tif spatial_output_files/raw_shape_files/",toString(raster_name),".shp key key"))
   }else{
     
-    system2(pypath,paste0(gdalpolygonize_path,"raster_files/",toString(raster_name),".tif -f 'ESRI Shapefile' ", "raw_shape_files/",toString(raster_name),".shp key key"))    
+    system2(pypath,paste0(gdalpolygonize_path,"spatial_output_files/raster_files/",toString(raster_name),".tif -f 'ESRI Shapefile' ", "spatial_output_files/raw_shape_files/",toString(raster_name),".shp key key"))    
     
   }
   print(paste0("Completed processing shapefile- ",toString(raster_name),".shp"))
@@ -338,12 +338,12 @@ reg_ctry_data<-read.csv("mapping_files/Reg_Ctry_mapping.csv",stringsAsFactors = 
   distinct()
 
 #Get all filenames
-file_names<- list.files(path="raw_shape_files", full.names=TRUE,pattern = ".shp")
+file_names<- list.files(path="spatial_output_files/raw_shape_files", full.names=TRUE,pattern = ".shp")
 
 for (i in file_names){
   Final_shape_file<- shapefile(toString(i))
   
-  file_name<- gsub("raw_shape_files/","",i)
+  file_name<- gsub("spatial_output_files/raw_shape_files/","",i)
   file_name<-gsub("gcam_","",file_name)
   file_name<-gsub(".shp","",file_name)
   print(paste0("Completed processing ",toString(file_name)))
@@ -476,14 +476,14 @@ for (i in file_names){
   
   Final_shape_file <- as(Final_shape_file,"Spatial")
   Final_shape_file <- raster::aggregate(Final_shape_file,names(Final_shape_file))
-  writeOGR(Final_shape_file, dsn = 'gcam_boundaries_moirai_3p1_0p5arcmin_wgs84', layer = toString(file_name), driver = "ESRI Shapefile",overwrite_layer = TRUE)
+  writeOGR(Final_shape_file, dsn = 'spatial_output_files/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84', layer = toString(file_name), driver = "ESRI Shapefile",overwrite_layer = TRUE)
   
 }
 
 #Generate validation plots
 
 
-basin_shp_file <- st_read("gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/glu_boundaries_moirai_landcells_3p1_0p5arcmin.shp")
+basin_shp_file <- st_read("spatial_output_files/gcam_boundaries_moirai_3p1_0p5arcmin_wgs84/glu_boundaries_moirai_landcells_3p1_0p5arcmin.shp")
 basin_shp_file$geom_area<-st_area(basin_shp_file$geometry)*0.0001
 
 

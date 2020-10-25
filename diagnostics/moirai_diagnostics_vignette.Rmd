@@ -113,10 +113,10 @@ create_carbon_plots_soil(fig_dir  = "carbon_plots/",
 ```
 ```{r,fig.height=5,fig.width=10}
 
-#Create carbon distributions for veg carbon
+#Create carbon distributions for veg carbon (above ground biomass)
 
 
-create_carbon_plots_veg_carbon(
+create_carbon_plots_veg_carbon_above_ground(
   fig_dir  = "carbon_plots/",
                                    plot_lim = 1000, 
                                    path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
@@ -136,6 +136,27 @@ create_carbon_plots_veg_carbon(
                                    print_raster_progress_log =FALSE
 )
 
+
+```
+
+```{r}
+#Create carbon distributions for veg carbon (below ground biomass)
+
+
+create_carbon_plots_veg_carbon_below_ground(
+  fig_dir  = "carbon_plots/",
+                                   plot_lim = 1000, 
+                                   path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
+                                   path_to_carbon_rasters = "../indata/",
+                                   path_to_mapping = "../indata/GLU_ID_mapping.csv",
+                                   path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
+                                   path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
+                                   path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
+                                   basin_name = "Missouri_River_Basin",
+                                   carbon_year = 2010,
+                                   carbon_raster_file_names =c("veg_BG_weighted_average.bil",                                                                "veg_BG_q1.bil",                                                                             "veg_BG_carbon_median.bil",                                                                   "veg_BG_carbon_min.bil",                                                                      "veg_BG_carbon_q3.bil",                                                                         "veg_BG_carbon_max.bil"),
+                                   print_raster_progress_log =FALSE
+)
 
 ```
 

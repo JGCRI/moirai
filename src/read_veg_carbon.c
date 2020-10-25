@@ -425,6 +425,22 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
         veg_carbon_sage[3][i] = (max_array[i]+max_bg_array[i])*VEG_CARBON_SCALER;
         veg_carbon_sage[4][i] = (q1_array[i]+q1_bg_array[i])*VEG_CARBON_SCALER;
         veg_carbon_sage[5][i] = (q3_array[i]+q3_bg_array[i])*VEG_CARBON_SCALER;
+
+
+        above_ground_ratio[0][i] = wavg_array[i]/((wavg_array[i]+wavg_bg_array[i]));
+        above_ground_ratio[1][i] = median_array[i]/((median_array[i]+median_bg_array[i]));
+        above_ground_ratio[2][i] = min_array[i]/((min_array[i]+min_bg_array[i]));
+        above_ground_ratio[3][i] = max_array[i]/((max_array[i]+max_bg_array[i]));
+        above_ground_ratio[4][i] = q1_array[i]/((q1_array[i]+q1_bg_array[i]));
+        above_ground_ratio[5][i] = q3_array[i]/((q3_array[i]+q3_bg_array[i]));
+        
+        below_ground_ratio[0][i] = 1 - above_ground_ratio[0][i];  
+        below_ground_ratio[1][i] = 1 - above_ground_ratio[1][i];
+        below_ground_ratio[2][i] = 1 - above_ground_ratio[2][i];
+        below_ground_ratio[3][i] = 1 - above_ground_ratio[3][i];
+        below_ground_ratio[4][i] = 1 - above_ground_ratio[4][i];
+        below_ground_ratio[5][i] = 1 - above_ground_ratio[5][i];
+
     }
 
    //Write diagnostics

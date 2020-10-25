@@ -888,17 +888,46 @@ int main(int argc, const char * argv[]) {
     //kbn 2020/06/30 Add code for read_veg_c here
     veg_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
     if(veg_carbon_sage == NULL) {
-        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for veg_carbon_sage: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
     for (i = 0; i < NUM_CARBON; i++) {
 		veg_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
 		if(veg_carbon_sage[i] == NULL) {
-			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for veg_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
 		}
 	}
-        
+    
+    // Add above ground and below ground ratio for vegetation carbon
+    above_ground_ratio = calloc(NUM_CARBON, sizeof(float*));
+    if(above_ground_ratio == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for above_ground_ratio: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		above_ground_ratio[i] = calloc(NUM_CELLS, sizeof(float));
+		if(above_ground_ratio[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for above_ground_ratio[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    // Add above ground and below ground ratio for vegetation carbon
+    below_ground_ratio = calloc(NUM_CARBON, sizeof(float*));
+    if(below_ground_ratio == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for below_ground_ratio: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		below_ground_ratio[i] = calloc(NUM_CELLS, sizeof(float));
+		if(below_ground_ratio[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for below_ground_ratio[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+
+
     if((error_code = read_veg_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
@@ -966,6 +995,14 @@ int main(int argc, const char * argv[]) {
 		free(veg_carbon_sage[i]);
 	}
 	free(veg_carbon_sage);
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(above_ground_ratio[i]);
+	}
+	free(above_ground_ratio);
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(below_ground_ratio[i]);
+	}
+	free(below_ground_ratio);
     free(potveg_thematic);
 	free(refveg_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {

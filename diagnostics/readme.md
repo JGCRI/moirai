@@ -1,3 +1,8 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
 # Diagnostics and exporation functions for  `moirai`  
 
 # Description:
@@ -37,22 +42,24 @@ column names in outputs:
 
 
 In addition to the main outputs, the code also generates the following outputs in case required by the user:
-(1)raster files (.tif files) for each of the 18 files described above
-(2)mapping files (CSV files) for each of the 6 spatial boundaries 
-(3)raw shape files i.e. shapefiles without any metadata (in case user would like to add their own metadata)
-(4)diagnostics related to area calculated from the shape files.
+(1) raster files (.tif files) for each of the 18 files described above
+(2) mapping files (CSV files) for each of the 6 spatial boundaries 
+(3) raw shape files i.e. shapefiles without any metadata (in case user would like to add their own metadata)
+(4) diagnostics related to area calculated from the shape files.
 
 ## Inputs required
 
 All inputs required by the user are stored in the folder `spatial_input_files/` The inputs required and their usage is described below,
 
-(1) `moirai_valid_land_area.bsq` which is an old raster containing information on valid land area output by moirai. This is required for the purpose of validation.
+(1) `valid_land_area.bil` which is raster containing information on valid land area output by moirai. This is required for the purpose of validation.
 (2) `country_out.bil` and `country_out_noland.bil` which represent the the valid country boundaries with and without land cells respectively.
 (3) `glu_raster.bil` and `glu_raster_noland.bil` which represent the the valid basin/glu boundaries with and without land cells respectively.
 (4) `region_gcam_out.bil` and `region_gcam_out_noland.bil` which represent the the valid basin/glu boundaries with and without land cells respectively.
 (5) `GCAM_region_names.csv` which is used to fill in region names (metadata)
 (6) `FAO_iso_VMAP0_ctry.csv` which is used to fill in country names (metadata)
 (7) `Global235_CLM_5arcmin.csv` which is used to fill in basin names (metadata)
+
+### Note - To update spatial inputs, please copy files (1) to (4) from the `outputs/` directory. Files (5)-(7) are in the `indata` directory. Please copy in these input files as well, in case they have been modified. 
 
 
 ## Additional software required
@@ -99,18 +106,21 @@ Carbon numbers are presented for 6 states, namely weighted_average, median, mini
 These carbon outputs are stored in the file `Ref_veg_carbon_Mg_per_ha.csv` in the outputs folder. The user can explore results for any selected basin by using two functions namely,
 
 (1) `create_carbon_plots_soil()` to explore soil carbon outputs
-(2) `create_carbon_plots_veg_carbon()` to explore vegetation carbon outputs
-
+(2) `create_carbon_plots_veg_carbon_above_ground()` to explore above ground vegetation carbon outputs
+(3) `create_carbon_plots_veg_carbon_below_ground()` to explore below ground vegetation carbon outputs
 
 ## Description of outputs
 
 The functions generate plots which present a histogram describing the distribution of carbon data (the histogram is constructed using the input data) along with points that describe the final values of carbon for each state for the basin in question. Thus the plots present a comparison of the inputs and the outputs and allow the user to verify that the values for each state are reasonable for the basin. This may also be useful to users intersted in comparing carbon numbers with numbers from other datasets or the literature. 
 
-Figure 5 and 6 below present plots for soil and vegetation carbon for the Missouri basin from the latest outputs of moirai. 
+Figure 5 ,6 and 7 below present plots for soil and vegetation carbon for the Missouri basin from the latest outputs of moirai. 
 
 ![Figure 5: Distribution of soil carbon for the Missouri Basin](examples/Distribution_soil_c_Missouri_River_Basin.png)
 
-![Figure 6: Distribution of vegetation carbon for the Missouri Basin](examples/Distribution_veg_c_Missouri_River_Basin.png)
+![Figure 6: Distribution of above ground biomass (vegetation carbon) for the Missouri Basin](examples/Distribution_veg_c_Missouri_River_Basin.png)
+
+![Figure 7: Distribution of below ground biomass (vegetation carbon) for the Missouri Basin](examples/Dist_veg_c_BG_Missouri_River_Basin.png)
+
 
 Note : Where basin boundaries are distributed across two or more ISO's, the function will aggregate the numbers for each state of carbon, thus ensuring validity of the numbers.
 

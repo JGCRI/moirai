@@ -267,7 +267,10 @@ float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
 int ***soil_carbon_array_cells;//These are the total number of cells contained within each array
 float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
 float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
-float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell 
+float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
+//Add above and below ground ratio for vegetation carbon
+float **above_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
+float **below_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
