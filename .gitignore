@@ -28,3 +28,9 @@ examples/outputs/
 *.tif
 diagnostics/.RData
 diagnostics/.Rhistory
+*.bil
+*.xml
+*.hdr
+*.bil
+*.tif
+*.nc4
