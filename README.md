@@ -215,7 +215,7 @@ Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above a
 | Weighted average | 473                        | 393                   | 1019                             | 234                              | 88                               |
 | Median           | 435                        | 391                   | 971                              | 205                              | 73                               |
 | Minimum          | 2                          | 1                     | 296                              | 0.8                              | 1                                |
-| Maximum          | 697                        | 551                   | 278                              | 990                              | 633                              |
+| Maximum          | 697                        | 551                   | 2781                              | 990                              | 633                              |
 | Q1               | 284                        | 311                   | 814                              | 90                               | 31                               |
 | Q3               | 630                        | 468                   | 1182                             | 343                              | 134                              |
 
