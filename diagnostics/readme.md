@@ -59,7 +59,7 @@ All inputs required by the user are stored in the folder `spatial_input_files/` 
 (6) `FAO_iso_VMAP0_ctry.csv` which is used to fill in country names (metadata)
 (7) `Global235_CLM_5arcmin.csv` which is used to fill in basin names (metadata)
 
-### Note - To update spatial inputs, please copy files (1) to (4) from the `outputs/` directory. Files (5)-(7) are in the `indata` directory. Please copy in these input files as well, in case they have been modified. 
+### Note - To update spatial inputs, please copy files (1) to (4) from the `outputs/` directory to the `spatial_inputs/` directory. Files (5)-(7) are in the `indata/` directory. Please copy in these input files to the `spatial_inputs/` directory as well, in case they have been modified. 
 
 
 ## Additional software required
