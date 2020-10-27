@@ -1,4 +1,4 @@
-# 1. Scripts to get soil carbon data (Mgc/ha) from soil grids data for mean and 95th percentile 
+# 1. Scripts to get soil carbon data (MgC/ha) from soil grids data for mean and 95th percentile 
 
 ## Script names
 `get_soil_grids_mean.sh` and `get_soil_grids_95th_percentile.sh`
@@ -11,7 +11,7 @@ This script will download the soil grids data and then generate 6 separate .tif 
 
 ### Warning: The script takes 8 hours to generate the files for each bash script. This is just because of the size of the soil_grids data. 
 
-# 2. Scripts to get soil carbon data (Mgc/ha) from FAO Harmonized World Soil Database (FAOHWSD)
+# 2. Scripts to get soil carbon data (MgC/ha) from FAO Harmonized World Soil Database (FAOHWSD)
 
 ## Script names
 `get_FAO_HWS_data.sh`
@@ -28,7 +28,17 @@ This script will download the FAO HWSD data (in nc format) and then generate 6 s
 `warp_raster_to_moirai_crs.sh`
 
 ## Description
-This bash script is used to convert raw raster files to the moirai CRS so they can be used as inputs within the LDS  
+This bash script is used to convert raw raster files in GeoTiff(.tif) format to the moirai CRS so they can be used as inputs within the LDS  
 
+## Usage
+* In order to use the script replace the values `input.tif`,`output.tif` with the input file name and the desired output file name. Also replace `output.bil` with the desired output name to be used within the LDS.
+* The script "warps" the input file and converts the CRS, format, pizel size to the moirai grid CRS, format and pixel size (0.5 arc min). The moirai grid size parameters are as follows,
+
+(1) Number of rows and columns - 4320,2160
+(2) Extent - -180 -90 180 90 (The number of rows and columns and the extent will yield the 0.5 arc min pixel size)
+(3) CRS - WGS84 ("+proj=longlat +ellps=WGS84")
+
+* The output format is set to Float32
+* The rasters are warped using an average method.  
 
 
