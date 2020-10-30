@@ -13,6 +13,7 @@ library(data.table)
 library(nngeo)
 library(smoothr)
 library(ggplot2)
+library(rgeos)
 
 #Load helper function to get raster data
 get_and_standardize_raster <- function(raster_path= "spatial_input_files/country_out.bil",
@@ -97,15 +98,16 @@ gc()
 
 #bind columns. This will create multiple columns, but that is fine since these are all standardized rasters.
 #The test below checks that all values are identical.
-land_cells_all_boundaries <- bind_cols(GLU_land_data,country_land_data,region_land_data)  
+land_cells_all_boundaries <- dplyr::bind_cols(GLU_land_data,country_land_data,region_land_data,.name_repair = c("unique"))  
 
-if(!identical(land_cells_all_boundaries$x,land_cells_all_boundaries$x1,land_cells_all_boundaries$x2)){stop("rasters are mismatched")}
-if(!identical(land_cells_all_boundaries$y,land_cells_all_boundaries$y1,land_cells_all_boundaries$y2)){stop("rasters are mismatched")}
+if(!identical(land_cells_all_boundaries$x...1,land_cells_all_boundaries$x...4,land_cells_all_boundaries$x...7)){stop("rasters are mismatched")}
+if(!identical(land_cells_all_boundaries$y...2,land_cells_all_boundaries$y...5,land_cells_all_boundaries$y...8)){stop("rasters are mismatched")}
 
 rm(region_land_data,GLU_land_data,country_land_data)                             
 gc()
   
   land_cells_all_boundaries %>% 
+  dplyr::rename(x=x...1,y=y...2) %>% 
   dplyr::select(x,y,glu_raster,country_out,region_gcam_out) %>%
   filter(glu_raster != no_data_value_moirai, country_out != no_data_value_moirai,region_gcam_out != no_data_value_moirai) %>% 
   rename(Country=country_out,region_ID=region_gcam_out,GLU_ID=glu_raster) %>% 
@@ -144,13 +146,14 @@ gc()
 
 nonland_cells_all_boundaries <- bind_cols(GLU_noland_data,country_noland_data,region_noland_data)  
 
-if(!identical(nonland_cells_all_boundaries$x,nonland_cells_all_boundaries$x1,nonland_cells_all_boundaries$x2)){stop("rasters are mismatched")}
-if(!identical(nonland_cells_all_boundaries$y,nonland_cells_all_boundaries$y1,nonland_cells_all_boundaries$y2)){stop("rasters are mismatched")}
+if(!identical(nonland_cells_all_boundaries$x...1,nonland_cells_all_boundaries$x...4,nonland_cells_all_boundaries$x...7)){stop("rasters are mismatched")}
+if(!identical(nonland_cells_all_boundaries$y...2,nonland_cells_all_boundaries$y...5,nonland_cells_all_boundaries$y...8)){stop("rasters are mismatched")}
 
 rm(GLU_noland_data,country_noland_data,region_noland_data)
 gc()
   
   nonland_cells_all_boundaries %>% 
+  dplyr::rename(x=x...1,y=y...2) %>%  
   dplyr::select(x,y,glu_raster_noland,country_out_noland,region_gcam_out_noland) %>%
   filter(glu_raster_noland != no_data_value_moirai, country_out_noland != no_data_value_moirai,region_gcam_out_noland != no_data_value_moirai) %>% 
   rename(Country=country_out_noland,region_ID=region_gcam_out_noland,GLU_ID=glu_raster_noland) %>% 
@@ -313,7 +316,7 @@ basin_data<-read.csv(gcam_basin_data_file, stringsAsFactors = FALSE) %>%
   select(key,glu_id,glu_nm) %>%
   distinct()
 
-ctry_basin_data<-read.csv("mapping_files/Ctry_basin_mapping.csv",stringsAsFactors = FALSE) %>%
+ctry_basin_data<-read.csv("spatial_output_files/mapping_files/Ctry_basin_mapping.csv",stringsAsFactors = FALSE) %>%
   select(ctry_id,glu_id,key) %>%
   distinct() %>%
   left_join(ctry_data %>% select(ctry_id,ctry_nm),by=c("ctry_id")) %>%
@@ -321,7 +324,7 @@ ctry_basin_data<-read.csv("mapping_files/Ctry_basin_mapping.csv",stringsAsFactor
   select(glu_nm,ctry_nm,key,glu_id,ctry_id) %>%
   distinct()
 
-reg_basin_data<-read.csv("mapping_files/Reg_basin_mapping.csv",stringsAsFactors = FALSE) %>%
+reg_basin_data<-read.csv("spatial_output_files/mapping_files/Reg_basin_mapping.csv",stringsAsFactors = FALSE) %>%
   select(reg_id,glu_id,key) %>%
   distinct() %>%
   left_join(basin_data%>% select(glu_id,glu_nm),by=c("glu_id")) %>%
@@ -329,7 +332,7 @@ reg_basin_data<-read.csv("mapping_files/Reg_basin_mapping.csv",stringsAsFactors 
   select(key,glu_nm,reg_nm,glu_id,reg_id) %>%
   distinct()
 
-reg_ctry_data<-read.csv("mapping_files/Reg_Ctry_mapping.csv",stringsAsFactors = FALSE) %>%
+reg_ctry_data<-read.csv("spatial_output_files/mapping_files/Reg_Ctry_mapping.csv",stringsAsFactors = FALSE) %>%
   select(reg_id,ctry_id,key) %>%
   mutate(reg_id=as.integer(reg_id),ctry_id=as.integer(ctry_id)) %>%
   distinct() %>%
