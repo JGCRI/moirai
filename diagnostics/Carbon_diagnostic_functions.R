@@ -12,7 +12,7 @@ create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
                               plot_lim = 1000, 
                               path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
                               path_to_carbon_rasters = "../indata/",
-                              path_to_mapping = "../indata/GLU_ID_mapping.csv",
+                              path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                               path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                               path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
                               path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
@@ -68,7 +68,7 @@ create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
 
 
 #Read in data
-mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE)
+mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE) %>% rename(basin_id=glu_id)
 mapping_names <- read.csv(path_to_mapping_name)
 Carbon_data <- read.csv(path_to_carbon_data,skip=5,stringsAsFactors = FALSE)
 Land_data <- read.csv(path_to_land_data,skip=5,stringsAsFactors = FALSE)
@@ -151,7 +151,7 @@ create_carbon_plots_veg_carbon_above_ground<-function(fig_dir  = "carbon_plots/"
                                    plot_lim = 1000, 
                                    path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
                                    path_to_carbon_rasters = "../indata/",
-                                   path_to_mapping = "../indata/GLU_ID_mapping.csv",
+                                   path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                                    path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                                    path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
                                    path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
@@ -188,7 +188,7 @@ create_carbon_plots_veg_carbon_above_ground<-function(fig_dir  = "carbon_plots/"
   
   
   
-  mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE)
+  mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE) %>% rename(basin_id=glu_id)
   mapping_names <- read.csv(path_to_mapping_name)
   Carbon_data <- read.csv(path_to_carbon_data,skip=5,stringsAsFactors = FALSE)
   Land_data <- read.csv(path_to_land_data,skip=5,stringsAsFactors = FALSE)
@@ -268,7 +268,7 @@ create_carbon_plots_veg_carbon_below_ground<-function(fig_dir  = "carbon_plots/"
                                                       plot_lim = 1000, 
                                                       path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
                                                       path_to_carbon_rasters = "../indata/",
-                                                      path_to_mapping = "../indata/GLU_ID_mapping.csv",
+                                                      path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                                                       path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                                                       path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
                                                       path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
@@ -305,7 +305,7 @@ create_carbon_plots_veg_carbon_below_ground<-function(fig_dir  = "carbon_plots/"
   
   
   
-  mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE)
+  mapping_data <- read.csv(path_to_mapping,stringsAsFactors = FALSE) %>% rename(basin_id=glu_id)
   mapping_names <- read.csv(path_to_mapping_name)
   Carbon_data <- read.csv(path_to_carbon_data,skip=5,stringsAsFactors = FALSE)
   Land_data <- read.csv(path_to_land_data,skip=5,stringsAsFactors = FALSE)

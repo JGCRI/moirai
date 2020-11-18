@@ -4,7 +4,7 @@ library(testthat)
 library(ggplot2)
 
 ###### update this when done to not reflect my directory structure!!!!
-setwd("D:/MOIRAI_3.1_Final/moirai/diagnostics/")
+
 
 #Add fast group_by function
 fast_group_by<- function(df,by,colname="value",func= "sum"){
