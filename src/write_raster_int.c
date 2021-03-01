@@ -57,7 +57,7 @@ int write_raster_int(int out_array[], int out_length, char *out_name, args_struc
 		return ERROR_FILE;
 	}
 	
-	num_out = fwrite(out_array, sizeof(int), out_length, fpout);
+	num_out = (int) fwrite(out_array, sizeof(int), out_length, fpout);
 	
 	fclose(fpout);
 	

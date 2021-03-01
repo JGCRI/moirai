@@ -1,6 +1,13 @@
 ######
 # plot_moirai_crop_ctry.r
 #
+# There are only four variables that the user should set (lines 87-100)
+#   gtap:		TRUE=compare against GTAP input data; FALSE=compare against original version of the land data system
+#   papergray:	TRUE=plot grayscale figures; FALSE=plot color figures
+#   newdir:		The directory containing the moirai outputs to diagnose (can be either 235 basins or 18 aezs)
+#				If you have a custom glu file with > 235 units then increase num_aez in line 118 accordingly
+#   outdir:		The directory to write diagnostic figures to
+#
 # note that the Moirai land data system is sometimes labelled as "lds"
 #	and "Original" refers to GENAEZECON, the first version of the land data system, or GTAP,
 #		both of which use only 18 AEZs (the included data are for the original GTAP 18 AEZs)
@@ -45,7 +52,30 @@
 # column 2: crop code
 # columns 3 - 26: values for years 1993 - 2016 in order
 
-# this takes about 25 minutes to run with 235 moirai glus
+# this takes about 10 minutes to run with 235 moirai glus and about 10 minutes for 18 aezs
+
+# Created by Alan Di Vittorio
+ 
+# Moirai Land Data System (Moirai) Copyright (c) 2019, The
+# Regents of the University of California, through Lawrence Berkeley National
+# Laboratory (subject to receipt of any required approvals from the U.S.
+# Dept. of Energy).  All rights reserved.
+ 
+# If you have questions about your rights to use or distribute this software,
+# please contact Berkeley Lab's Intellectual Property Office at
+# IPO@lbl.gov.
+ 
+# NOTICE.  This Software was developed under funding from the U.S. Department
+# of Energy and the U.S. Government consequently retains certain rights.  As
+# such, the U.S. Government has been granted for itself and others acting on
+# its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit other to do
+# so.
+ 
+# This file is part of Moirai.
+ 
+# Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 library(stringr)
 
@@ -54,20 +84,21 @@ cat("started plot_moirai_crop_ctry.r at ",date(), "\n")
 # make sure that the working directory is .../moirai/diagnostics
 #setwd("./")
 
-# compare against gtap or older genaezecon output output
+# compare against gtap or older genaezecon output
 # comparing to another moirai lds output should be identical because the outputs are aggregated to country (unless a new source data set is used)
 gtap = TRUE
 
 # plot the paper figures in grayscale
 papergray = FALSE
 
-# this is the new data directory
-newdir = "../outputs/basins235_sage/"
-#newdir = "../outputs/aez_orig_sage/"
+# this is the new data directory (include final "/")
+newdir = "../example_outputs/basins235/"
+#newdir = "../example_outputs/aeZ_orig/"
 
-# recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_sage_stats_ctry_gtap/", sep="")
-#outdir = paste("./aez_orig_sage_stats_ctry_gtap/", sep="")
+# recommended outdir is in diagnostics because these are comparisons between cases  (include final "/")
+outdir = paste("./basins235_example_outputs_stats_ctry_gtap/", sep="")
+#outdir = paste("./aez_orig_example_outputs_stats_ctry_gtap/", sep="")
+
 dir.create(outdir, recursive = TRUE)
 
 # fao info

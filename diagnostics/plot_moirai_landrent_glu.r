@@ -1,6 +1,15 @@
 ######
 # plot_moirai_landrent_glu.r
 #
+# There are only six variables that the user should set (lines 101-116)
+#   AGGREGATE:	TRUE=group to the # of regions determined by REG32; FALSE=do not group, output at 87-country level
+#   REG32:		TRUE=use 32 gcam regions; FALSE=use 14 GCAM regions (this does not matter if GTAP==TRUE)
+#						also note that this must match the number of GCAM regions used as input to moirai
+#   papergray:	TRUE=plot grayscale figures; FALSE=plot color figures
+#   lrname:		The moirai land rent output filename to diagnose
+#   outdir:		The directory to write diagnostic figures to
+#   num_aez:		The number of output GLUs (235 or 18 or custom to match the outputs in lrname)
+#
 # note that the Moirai land data system is sometimes labelled as "lds"
 #	and "Original" refers to GENAEZECON, the first version of the land data system, which uses only 18 AEZs (the included data are for the original GTAP 18 AEZs)
 #
@@ -40,13 +49,13 @@
 # 	GENAEZECON/GTAP: next 18 columns are the climate aezs in order 1-18
 #	Moirai: there could be 18 columns or 235 columns for AEZs
 
-# gtap ctry87 to region mapping is inconsistent in these groups:
+# gtap ctry87 to gcam region mapping is inconsistent in these groups:
 #  xea, xer, xfa, xna, xsa, xsd, xse, xsm, xss, xsu
-#  for the most part, most of the countries in these groups go into one reigon (32 or 14)
+#  for the most part, most of the countries in these groups go into one region (32 or 14)
 #  a few cases are mixed, and most are consistent across 32 and 14 regions
 
 # NOTE:
-#  ks tests and difference stats are invalid when the aez numbers do not match
+#  ks tests and difference stats and scatterplot are invalid when the aez numbers do not match
 #  there are somewhat useful when looking at small shifts between the same number and numbering scheme of AEZs
 
 # modified oct 2015 to incorporate Moirai outputs with different numbers of AEZs
@@ -57,8 +66,30 @@
 
 # this script takes about 5 minutes for 18 moirai lds aezs
 
-# this script takes about 5 minutes for 235 moirai lds aezs
+# this script takes about 10 minutes for 235 moirai lds aezs
 
+# Created by Alan Di Vittorio
+ 
+# Moirai Land Data System (Moirai) Copyright (c) 2019, The
+# Regents of the University of California, through Lawrence Berkeley National
+# Laboratory (subject to receipt of any required approvals from the U.S.
+# Dept. of Energy).  All rights reserved.
+ 
+# If you have questions about your rights to use or distribute this software,
+# please contact Berkeley Lab's Intellectual Property Office at
+# IPO@lbl.gov.
+ 
+# NOTICE.  This Software was developed under funding from the U.S. Department
+# of Energy and the U.S. Government consequently retains certain rights.  As
+# such, the U.S. Government has been granted for itself and others acting on
+# its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit other to do
+# so.
+ 
+# This file is part of Moirai.
+ 
+# Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 library(stringr)
 
@@ -73,23 +104,25 @@ REG32 = TRUE
 
 papergray = FALSE
 
-# recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_sage_stats_landrent/", sep="")
-outdir = paste("./aez_orig_sage_stats_landrent/", sep="")
+# use moirai lds output for new aezs
+lrname = "../example_outputs/basins2352/MOIRAI_value_milUSD.csv"
+#lrname = "../exmaple_outputs/aez_orig/MOIRAI_value_milUSD.csv"
+
+# recommended outdir is in diagnostics because these are comparisons between cases (include final "/")
+outdir = paste("./basins235_exmaple_outputs_stats_landrent/", sep="")
+#outdir = paste("./aez_orig_example_outputs_stats_landrent/", sep="")
+
+num_aez = 235
+#num_aez = 18
+
 dir.create(outdir, recursive = TRUE)
 
-# input data files
+# other input data files
 
-# use moirai lds output for new aezs
-lrname = "../outputs/basins235_sage/MOIRAI_value_milUSD.csv"
-#lrname = "../outputs/aez_orig_sage/MOIRAI_value_milUSD.csv"
 # and compare with the genaez orignal aez output
 lrname_orig = "./GENAEZECON_value_milUSD.csv"
 # and compare with the gtap data
 lrname_gtap = "../indata/GTAP_value_milUSD.csv"
-
-#num_aez = 18
-num_aez = 235
 
 # input mapping files
 
@@ -819,14 +852,16 @@ for(j in 1:num_use) {
 	
 	###################################
 	#### adding these so need to test to make sure they work
-	# don't forget that the close of the j loop is below before regressin
-	# this may only work if the GLUs are identical
+	# don't forget that the close of the j loop is below before regression
+	# these work only if the GLUs are identical
 	
 	# scatter plots of land rent across the three data sets
 	
 	# pull the two orig outliers and the one gtap outlier from other crops to check it out
+	# nothing to note about this
 	# but don't pull them out below for the final results
-	if(j == 6) {
+	if(FALSE) {
+	#if(j == 6) {
 		bad_orig_inds = which(lr_ctry_orig[,j] > 3000000000)
 		bad_gtap_inds = which(lr_ctry_gtap[,j] > 3000000000)
 		

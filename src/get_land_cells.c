@@ -1,20 +1,27 @@
 /**********
  get_land_cells.c
  
- find and put the indices of land cells to process for harvested area and irrigated harvested area and land rent
-    into land_cells_sage[num_land_cells_sage] (based on sage land fraction data)
-
- find and put the indices of land cells to process for land type area and forest area
-    into land_cells_hyde[num_land_cells_hyde] (based on hyde land area, which is an effecive hyde land mask)
-    the hyde grid cell area matches the land area as a land mask
- 
  NOTE: the overall output land mask is determined by the intersection of hyde land, fao country, glu, and ctry87 (which determines whether an fao country is included in the output as an economic region)
  	So all the outputs are restricted to this overall mask, either spatially or thematically (the sage data are processed on the sage land base, then thematically assigned to the hyde land base)
- 	The diagnostic raster outputs are based on their original land masks, except these are based on the overall land mask:
- 	The gcam region, country, ctry87, and gcam region/glu raster outputs represent the overall land mask,
- 		based only on valid hyde X glu X country X ctry87 land cells
+ 	The diagnostic raster outputs are based on their original land masks, and the others are based on the overall land mask:
+ 	The gcam region, country, ctry87, and gcam region/glu, country/glu, glu, and valid land area raster outputs represent the overall land mask, based only on valid hyde land X glu X country X ctry87 land cells
+   The noland versions of these rasters include only the valid cells where there is not valid hyde land area (no valid hyde land X glu X country X ctry87)
  
- also store the land cells of the new aez data in land_cells_aez_new[num_land_cells_aez_new]
+ find and put the indices of land cells to process for harvested area and irrigated harvested area and water footprint
+   into land_cells_sage[num_land_cells_sage] (based on sage land fraction data)
+   these are used to aggregate the sage-based data from their land grid to the valid thematic boundaries
+      so some of the sage pixels that are outside the valid boundaries may be included in the outputs
+      but most of these pixels are along the arctic coast of eurasia
+ 
+ find and put the indices of land cells to process for land type area (also restricted to valid output mask)
+   into land_cells_hyde[num_land_cells_hyde] (based on hyde land area, which is an effecive hyde land mask)
+   the hyde grid cell area matches the land area as a land mask
+ 
+ store forest cells based on ref veg and hyde land cells, for forest land rent calculations
+   these are further restricted to valid output mask during processing
+ 
+ also store the land cells of the new aez data in land_cells_aez_new[num_land_cells_aez_new], which are used
+   to create mapping files; these are also processed to match the valid output mask
  
  land cells are those that do not contain a nodata value
  
@@ -382,7 +389,7 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 					region_raster[i]= (float)ctry2regioncodes_gcam[fao_index];
 				}
 				// fill the aez image here 
-                 aez_out[i] =  (float) aez_bounds_new[i];
+            aez_out[i] =  (float) aez_bounds_new[i];
 				
 				country_out[i] = (float)country_fao[i];
 				// fill the ctry+aez image here
@@ -404,7 +411,7 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 					region_raster[i] =(float) ctry2regioncodes_gcam[scg_index];
 					valid_land_area[i] = land_area_hyde[i];
 					// fill the aez image here 
-                   aez_out[i] =  (float) aez_bounds_new[i];
+               aez_out[i] =  (float) aez_bounds_new[i];
 					
 					country_out[i] = (float)scg_code;
 					// fill the ctry+aez image here
@@ -446,8 +453,8 @@ int get_land_cells(args_struct in_args, rinfo_struct raster_info) {
 					region_raster_noland[i] = (float)ctry2regioncodes_gcam[fao_index];
 				}
 				country_out_noland[i] =(float) country_fao[i];
-                 // fill the aez image here 
-                 aez_out_noland[i] =  (float) aez_bounds_new[i]; 
+            // fill the aez image here
+            aez_out_noland[i] =  (float) aez_bounds_new[i];
 				// fill the ctry+aez image here
 				ctryaez_raster_noland[i] = (float) country_fao[i] * FAOCTRY2GCAMCTRYAEZID + aez_bounds_new[i];
 				// fill the region+aez image here

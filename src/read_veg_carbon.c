@@ -118,7 +118,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(wavg_array, insize, ncells, fpin);
+    num_read = (int) fread(wavg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -138,7 +138,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(wavg_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(wavg_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -165,7 +165,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(median_array, insize, ncells, fpin);
+    num_read = (int) fread(median_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -191,7 +191,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(median_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(median_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -219,7 +219,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(min_array, insize, ncells, fpin);
+    num_read = (int) fread(min_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -245,7 +245,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(min_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(min_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -272,7 +272,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(max_array, insize, ncells, fpin);
+    num_read = (int) fread(max_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -298,7 +298,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(max_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(max_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -326,7 +326,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q1_array, insize, ncells, fpin);
+    num_read = (int) fread(q1_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -352,7 +352,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q1_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(q1_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -380,7 +380,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q3_array, insize, ncells, fpin);
+    num_read = (int) fread(q3_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -406,7 +406,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q3_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(q3_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {

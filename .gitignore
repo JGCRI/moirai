@@ -28,9 +28,9 @@ examples/outputs/
 *.tif
 diagnostics/.RData
 diagnostics/.Rhistory
-*.bil
 *.xml
-*.hdr
-*.bil
-*.tif
+*.tif
 *.nc4
+
+# exclude some other stuff
+ancillary/old/

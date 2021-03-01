@@ -735,7 +735,19 @@ int main(int argc, const char * argv[]) {
 	
 	    free(land_mask_forest);
 		free(land_mask_refveg);
-    
+   
+   // allocate space for hong kong and taiwan glu area tracking in write_glu_mapping
+   twn_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(twn_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for twn_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   hkg_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(hkg_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for hkg_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   
 	// store the country/land rent region + aez lists
     // the arrays are allocated within write_glu_mapping()
 	if((error_code = write_glu_mapping(in_args, raster_info))) {
@@ -1286,7 +1298,11 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
+   
+   // free the hong kong and taiwan glu area arrays
+   free(twn_glu_area);
+   free(hkg_glu_area);
+   
     // free the reglr+aez arrays
     for (i = 0; i < NUM_GTAP_CTRY87; i++) {
         free(reglr_aez_list[i]);

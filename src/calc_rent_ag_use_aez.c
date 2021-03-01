@@ -17,10 +17,11 @@
  1) Belgium and Luxembourg now have crop land rents
  2) Japan's pfb sector land rent is zero in the input gtap original land rent file
  
- note: hong kong and taiwan are still treated specially (they use vietnam shares) because that was the original method
- hong kong needs to be treated specially because it does not have production values and harvested area values
- actually, check this now
-	there are taiwan production values and harvested area values, so taiwan could be calculated on its own
+ note: hong kong and taiwan are still treated specially (they use glu fraction)
+   the original proposed method of using vietnam shares doesn't work because of potential non-matching of glus
+   and because even if they did match the different relative glu areas between countries makes this not a good metric
+ hong kong needs to be treated specially because it does not have production values and harvested area values, or prices
+ taiwan has production values and harvested area values, but no prices
  
  13 march 2015
  fixed the livestock land rent calc
@@ -72,7 +73,6 @@ int calc_rent_ag_use_aez(args_struct in_args, rinfo_struct raster_info) {
     int hkg_code = 25;		// hong kong ctry87 index  (code minus 1)
     int twn_code = 60;		// taiwan ctry87 index  (code minus 1)
     
-    int vnm_sum_ind;        // for holding the vietnam indices
     int diag_index;         // for a couple of 1d output diagnostic arrays
     int gro_sect = 3;		// the use code for the grain sector
     int ctl_sect = 9;		// the use code for the cattle, sheep, etc sector
@@ -363,22 +363,26 @@ int calc_rent_ag_use_aez(args_struct in_args, rinfo_struct raster_info) {
         for (use_ind = 0; use_ind < NUM_GTAP_USE; use_ind++) {
             for (aez_ind_reglr = 0; aez_ind_reglr < reglr_aez_num[reglr_ind]; aez_ind_reglr++) {
                 
-                // if hong kong or taiwan, use vietnam rent_use_aez and value_sum, but respective origrent87 values
-                // if production is zero elsewhere, the numerator will be zero, so the land rent will be zero
-                //	but need to check the denominator
-                // throw warnings in the log file to see where this happens
+               // if hong kong or taiwan, use valid glu land area to split respective origrent87 values
+               // the glu areas should be in the same order as the glu indices, since they are set in the same function
                 
                 j = reglr_ind * NUM_GTAP_USE + use_ind;
-                if (reglr_ind == hkg_ind || reglr_ind == twn_ind) {
-                    //vnm_rent_ind = vnm_ind * NUM_GTAP_USE * NUM_NEW_AEZ + use_ind * NUM_NEW_AEZ + aez_ind_reglr;
-                    vnm_sum_ind = vnm_ind * NUM_GTAP_USE + use_ind;
-                    // here the original for the country is split based on vietnam shares
-                    if (value_sum[vnm_sum_ind] == 0) {
+                if (reglr_ind == twn_ind) {
+                    // here the original for the country is split based on glu area
+                    if (twn_land_area == 0) {
                         rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] = 0;
                     }else {
                         rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] =
-                        rent_use_aez[vnm_ind][aez_ind_reglr][use_ind] * origrent87[j] / value_sum[vnm_sum_ind];
+                        twn_glu_area[aez_ind_reglr] * origrent87[j] / twn_land_area;
                     }
+                } else if(reglr_ind == hkg_ind) {
+                   // here the original for the country is split based on glu area
+                   if (hkg_land_area == 0) {
+                      rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] = 0;
+                   }else {
+                      rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] =
+                      hkg_glu_area[aez_ind_reglr] * origrent87[j] / hkg_land_area;
+                   }
                 }else {
                     if (value_sum[j] == 0) {
                         rent_use_aez[reglr_ind][aez_ind_reglr][use_ind] = 0;

@@ -77,7 +77,7 @@
 
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
-#define NUM_IN_ARGS							78					// number of input variables in the input file
+#define NUM_IN_ARGS						76					// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -194,16 +194,7 @@ float ***production_crop_aez;             // production output (metric tonnes), 
 //  so the second dimension is variable, and it matches the aez list arrays below
 float **pasturearea_aez;                 // pasture area (ha)
 // land rent output: dim1=land rent region[NUM_GTAP_CTRY87], dim2=aez[reglr_aez_num], dim3=use[NUM_GTAP_USE]
-float ***rent_use_aez;                    // land rent output (million USD), output a total on 10 digits
-
-// area and production output data arrays; aez varies fastest, then crop, then fao ctry
-//float *harvestarea_crop_aez;            // harvested area output (ha), output to nearest integer
-//float *production_crop_aez;             // production output (metric tonnes), output to nearest integer
-// associated to output data array - aez varies fastest, then fao ctry
-//float *pasturearea_aez;                 // pasture area (ha)
-// land rent output array
-// aez varies fastest, then use, then ctry87
-//float *rent_use_aez;                    // land rent output (million USD), output a total on 10 digits
+float ***rent_use_aez;                    // land rent output (million USD), output a total of 10 digits
 
 // lists of AEZs within fao country and land rent region and gcam region
 int **ctry_aez_list;                    // AEZ codes for each fao country - dim1=fao country, dim2=aez codes
@@ -216,12 +207,12 @@ int *reggcam_aez_num;                   // number of AEZs for each gcam region
 int num_lt_cats;        // the number of categories
 int *lt_cats;           // the list of categories
 
-// aggregated output data arrays; aez varies fastest, then crop/use, then gcam region
-// these two only in aggregate crop to gcam
-//float harvestarea_crop_aez_gcam[NUM_GCAM_RGN * NUM_SAGE_CROP * NUM_NEW_AEZ];	// harvested area output (ha)
-//float production_crop_aez_gcam[NUM_GCAM_RGN * NUM_SAGE_CROP * NUM_NEW_AEZ];	// production output (metric tonnes)
-// only in aggregate use to gcam
-//float rent_use_aez_gcam[NUM_GCAM_RGN * NUM_GTAP_USE * NUM_NEW_AEZ];			// land rent output (million USD)
+// variables to track taiwan and hong kong GLU areas for land rent separation
+// probably not more than 10 GLUs in each of these, but use NUM_ORIG_AEZ to allocate space for now
+float twn_land_area;                // total valid taiwan land area
+float hkg_land_area;                // total valid hong kong land area
+float *twn_glu_area;                // total valid taiwan glu area
+float *hkg_glu_area;                // total valid taiwan glu area
 
 // raster data as 1-d arrays; numlat * numlon, start at upper left corner, lon varies fastest [NUM_LAT X NUM_LON]
 // these are allocated and free dynamically as needed in moirai_main.c
@@ -566,8 +557,6 @@ typedef struct {
 	char harvestarea_fao_fname[MAXCHAR];	// file name only of FAO harvested area data
 	char prodprice_fao_fname[MAXCHAR];		// file name only of FAO producer price data
 	char convert_usd_fname[MAXCHAR];		// file name only of the usd conversion factors
-    char vegc_csv_fname[MAXCHAR];          // file name only of the veg c to pot veg file
-    char soilc_csv_fname[MAXCHAR];         // file name only of the soil c file
 
 	// output file names (without path)
 	char lds_logname[MAXCHAR];              // log file name for runtime output

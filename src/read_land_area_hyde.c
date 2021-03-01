@@ -94,7 +94,7 @@ int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info) {
     }
     
     // read the data
-    num_read = fread(land_area_hyde, insize, ncells, fpin);
+    num_read = (int) fread(land_area_hyde, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != ncells)
     {

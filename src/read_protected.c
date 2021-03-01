@@ -150,7 +150,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(L1_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(L1_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -179,7 +179,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(L2_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(L2_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -208,7 +208,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(L3_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(L3_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -237,7 +237,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(L4_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(L4_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -266,7 +266,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(ALL_IUCN_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(ALL_IUCN_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -295,7 +295,7 @@ int read_protected(args_struct in_args, rinfo_struct *raster_info) {
 
      	
     // read the data and check for same size as the working grid
-    num_read = fread(IUCN_1a_1b_2_array, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(IUCN_1a_1b_2_array, insize_IUCN, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
