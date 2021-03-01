@@ -3,10 +3,10 @@
 # Description:
 This folder contains a number of diagnostics scripts and functions that can be used to verify, analyze and explore the outputs of the `moirai` LDS. It is recommended to set the R working directory to this diagnostics folder as the default paths assume that this is the case. It is also recommended to change the diagnostic output directory names in the scripts/functions to uniquely identify the Moirai outputs being diagnosed. There are 4 types of diagnostics and exploration outputs that can be currently generated from moirai:
 
-(1) Spatial products (shape files and rasters) based on moirai land data outputs.
-(2) Analysis of carbon outputs (soil and vegetation).
-(3) Comparison of land area outputs from different versions.
-(4) Comprehensive crop, land rent, and land area output diagnostics.
+* (1) Spatial products (shape files and rasters) based on moirai land data outputs.
+* (2) Analysis of carbon outputs (soil and vegetation).
+* (3) Comparison of land area outputs from different versions.
+* (4) Comprehensive crop, land rent, and land area output diagnostics.
 
 Note: `moirai_diagnostics_vignette.rmd` provides examples of all of the functions for (2),(3).
 
