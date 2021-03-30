@@ -69,6 +69,7 @@
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
 #define REF_YEAR				2000
+#define REF_CARBON_YEAR			2010
 
 // the min and max forest codes for the SAGE raster data (see SAGE_PVLT.csv)
 // these assume that the forest codes are all consecutive with no others mixed in the enumeration
@@ -227,8 +228,10 @@ float *pasture_area;                    // pasture area for ref veg area calc an
 float *urban_area;                      // urban area for ref veg area calc for forest land rent calc (km^2)
 float **lu_detail_area;					// additional hyde data files with more detailed area (km^2); d1=hyde types
 float *refveg_area;                     // reference vegetation area for forest land rent calc (km^2)
+float *refcarbon_area;                     // reference vegetation area for carbon calculations
 int *potveg_thematic;                   // potential vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 int *refveg_thematic;                   // reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
+int *refvegcarbon_thematic;                   // reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 short *country_fao;                     // fao country codes (integer fao code values)
 float *cell_area;                       // total area of grid cell; calculated based on spherical earth (km^2)
 float *cell_area_hyde;                  // total area of hyde land grid cells; from hyde data set (km^2)
@@ -265,7 +268,6 @@ float **below_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
-
 // indices of land cells within the raster data; these are the only cells processed
 // these are allocated and free dynamically as needed in moirai_main.c
 // they are all 1d arrays of size NUM_CELLS, because it would add too much time to change their size at each additional cell
@@ -618,6 +620,7 @@ int read_water_footprint(char *fname, float *wf_grid);
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);
 int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info);
+int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info);
 int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val, int *value);
 int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 

@@ -34,3 +34,7 @@ diagnostics/.Rhistory
 
 # exclude some other stuff
 ancillary/old/
+diagnostics/basins235_example_outputs_spatial_output_files/
+example_outputs/basins235/*
+example_outputs/basins235/aglu-data/
+*.stackdump

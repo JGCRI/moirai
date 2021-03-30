@@ -25,6 +25,7 @@ library(ggplot2)
 library(dplyr)
 library(raster)
 library(data.table)
+library(rgdal)
 
 create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
                               plot_lim = 1000, 

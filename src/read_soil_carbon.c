@@ -327,7 +327,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
             // get index of sage pot veg; set value to 0 if unknown
             rv_ind = NOMATCH;
             for (i = 0; i < NUM_SAGE_PVLT; i++) {
-                if (refveg_thematic[grid_ind] == landtypecodes_sage[i]) {
+                if (refvegcarbon_thematic[grid_ind] == landtypecodes_sage[i]) {
                     rv_ind = i;
                     break;
                 }
@@ -336,7 +336,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
             if (rv_ind == NOMATCH) {
                 rv_value = 0;
 				}else {
-                rv_value = refveg_thematic[grid_ind];
+                rv_value = refvegcarbon_thematic[grid_ind];
 				
             }
 
@@ -357,6 +357,13 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 					return ERROR_IND;
 				}
                 //assign the actual soil carbon numbers
+               // Don't assign a value if the value is a NODATA value. 
+               
+               
+               
+
+
+                
                 soil_carbon_sage[0][grid_ind]=wavg_array[grid_ind];
                 soil_carbon_sage[1][grid_ind]=median_array[grid_ind];
                 soil_carbon_sage[2][grid_ind]=min_array[grid_ind];
@@ -375,8 +382,8 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
               memory_max = (float) floor((double) 0.5+  soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
               memory_q1 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);
               memory_q3 = (float) floor((double) 0.5+ soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind]);   
-              
-            
+               
+                
                 //use the calculated number of cells to allocate memory for the soil_carbon_array. The number of cells won't change for veg_carbon so allocate the size of that array here as well. 
                 //Don't allocate 0 memory. If size is 0, then keep size at 1. This reduces problems during the free() calls later
                 if(memory_median>0){

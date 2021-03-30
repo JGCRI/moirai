@@ -124,6 +124,8 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
     float temp_ag_ratio;
     float temp_bg_ratio;
     int ***soil_carbon_array_size; //temporary size of array, used to get the grid index
+    int ***soil_carbon_array_size_NODATA; //temporary size of array, used to get the grid index of the NODATA cells
+    int ***veg_carbon_array_size_NODATA; //temporary size of array, used to get the grid index of the NODATA cells
     int memory_median=0;           //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
     int memory_min=0;              //These are the cell indices to be used for soil_carbon_array and veg_carbon_array
     int memory_max=0;              //These are the cell indices to be used for soil_carbon_array and veg_carbon_array      
@@ -238,11 +240,54 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
         }
 
 
+    soil_carbon_array_size_NODATA = calloc(NUM_FAO_CTRY, sizeof(int**));
+    if(soil_carbon_array_size_NODATA == NULL) {
+        fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        soil_carbon_array_size_NODATA[i] = calloc(ctry_aez_num[i], sizeof(int*));
+        if(soil_carbon_array_size_NODATA[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            soil_carbon_array_size_NODATA[i][j] = calloc(num_lt_cats, sizeof(int));
+            if(soil_carbon_array_size_NODATA[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }   
+             // end for k loop over output values
+            } // end for j loop over aezs
+        } 
+    
+    veg_carbon_array_size_NODATA = calloc(NUM_FAO_CTRY, sizeof(int**));
+    if(veg_carbon_array_size_NODATA == NULL) {
+        fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        veg_carbon_array_size_NODATA[i] = calloc(ctry_aez_num[i], sizeof(int*));
+        if(veg_carbon_array_size_NODATA[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            veg_carbon_array_size_NODATA[i][j] = calloc(num_lt_cats, sizeof(int));
+            if(veg_carbon_array_size_NODATA[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }   
+             // end for k loop over output values
+            } // end for j loop over aezs
+        }
+
+
     
     // loop over the valid hyde land cells
     //  and skip it if no valid glu value or country value (country has to be mapped to ctry87)
     for (j = 0; j < num_land_cells_hyde; j++) {
-        
+    //for (j = 0; j < 10000; j++) {    
 
         grid_ind = land_cells_hyde[j];
         
@@ -304,7 +349,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
             // get index of sage pot veg; set value to 0 if unknown
             rv_ind = NOMATCH;
             for (i = 0; i < NUM_SAGE_PVLT; i++) {
-                if (refveg_thematic[grid_ind] == landtypecodes_sage[i]) {
+                if (refvegcarbon_thematic[grid_ind] == landtypecodes_sage[i]) {
                     rv_ind = i;
                     break;
                 }
@@ -317,7 +362,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 outval_vegc_bg = 0;
 				//fprintf(fplog, "Unknown ref veg, cell %i\n", grid_ind);
             } else {
-                rv_value = refveg_thematic[grid_ind];
+                rv_value = refvegcarbon_thematic[grid_ind];
 				outval_vegc_ag = 0;
                 outval_vegc_bg = 0;
             }
@@ -367,8 +412,16 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
               //Calculate the size here
               soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp]=soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;
 
-              
+              //Calculate the size of the NODATA cells
+
+              if(soil_carbon_sage[1][grid_ind] == NODATA && soil_carbon_sage[2][grid_ind] == NODATA && soil_carbon_sage[3][grid_ind] == NODATA && soil_carbon_sage[4][grid_ind] == NODATA && soil_carbon_sage[5][grid_ind] == NODATA){
+               soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp] = soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;   
+              }
              
+             if(veg_carbon_sage[1][grid_ind] == NODATA && veg_carbon_sage[2][grid_ind] == NODATA && veg_carbon_sage[3][grid_ind] == NODATA && veg_carbon_sage[4][grid_ind] == NODATA && veg_carbon_sage[5][grid_ind] == NODATA){
+               veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp] = veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;   
+              }
+
              //Now reduce the cells by 1
              //This ensures that we are always allocating in accordance with the size of the arrays and avoiding segmentation faults.
              soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]= soil_carbon_array_cells[ctry_ind][aez_ind][cur_lt_cat_ind_temp]-1;
@@ -427,21 +480,25 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 //Recalculate size since we need the 'index' now not the size. This is an issue for the max array, q3 array. 
                 size_max=size-1;
                 //1. weighted average
+                // Process only if the value is a non-NODATA value 
+               
+               if(soil_carbon_sage[0][grid_ind] != NODATA){
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] +
-				soil_carbon_sage[0][grid_ind] * refveg_area[grid_ind]*temp_frac;
+				soil_carbon_sage[0][grid_ind] * refcarbon_area[grid_ind]*temp_frac;
+               }
 
                 //2. Median
 				size= soil_carbon_array_size[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
-                size_temp=size/2;
+                size_temp=(size/2)+soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][1][size_temp];
                 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1] =
 				temp_float;
 
                 //3. Min
-                size_temp=size/2;
-                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][0];
+                size_temp= soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
+                temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][size_temp];
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][2] =
 				temp_float;
                 
@@ -454,7 +511,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				temp_float ;
 
                 //5. Q1
-                size_temp=size*0.25;
+                size_temp=(size*0.25) + soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][size_temp];
 
 
@@ -462,7 +519,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				temp_float;
 
                 //6. Q3
-                size_temp=size*0.75;
+                size_temp=size*0.75 + soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5][size_temp];
 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][5] =
@@ -470,22 +527,39 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
 				// veg c
                 //1. weighted average
+                // Process only if the value is a non-NODATA value
+                
+
+                //Initialize the ratios for above and below ground as zeroes
+                //temp_ag_ratio = 0;
+                //temp_bg_ratio = 0;
+                
+                
+                
+                if(veg_carbon_sage[0][grid_ind] != NODATA){
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0] +
-				veg_carbon_sage[0][grid_ind] * refveg_area[grid_ind] * temp_frac * above_ground_ratio[0][grid_ind];
+				veg_carbon_sage[0][grid_ind] * refcarbon_area[grid_ind] * temp_frac * above_ground_ratio[0][grid_ind];
 				
                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] =
 			   refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] +
-			   veg_carbon_sage[0][grid_ind] * refveg_area[grid_ind] * temp_frac * below_ground_ratio[0][grid_ind];
-                
-                //Calculate the above ground and below ground biomass ratios below for each country-aez-landuse-carbonstate category. This ratio is calculated on the basis of weighted average value,
+			   veg_carbon_sage[0][grid_ind] * refcarbon_area[grid_ind] * temp_frac * below_ground_ratio[0][grid_ind];
+               
+
+               //Calculate the above ground and below ground biomass ratios below for each country-aez-landuse-carbonstate category. This ratio is calculated on the basis of weighted average value,
                 // and is applied to each state. This is because the differences in the ratios (above/below) is similar for each state.
 
-                temp_ag_ratio = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0]/(refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0]+refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0]);
+                
+               
+               
+               
+               }
+            temp_ag_ratio = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0]/(refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0]+refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0]);
                 temp_bg_ratio = 1 - temp_ag_ratio;
                 
+                
                 //2. Median
-                size_temp=size/2;
+                size_temp=(size/2)+veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][1][size_temp];
                 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][1] =
@@ -494,8 +568,8 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][1] =
 				temp_float* temp_bg_ratio;
                 //3. Min
-                size_temp=size/2;
-                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][0];
+                size_temp=veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
+                temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][size_temp];
                 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][2] =
 				temp_float * temp_ag_ratio;
@@ -513,7 +587,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][3] =
 				temp_float * temp_bg_ratio;
                 //5. Q1
-                size_temp=size*0.25;
+                size_temp=(size*0.25)+veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][size_temp];
 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][4] =
@@ -523,7 +597,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				temp_float * temp_bg_ratio;
 
                 //6. Q3
-                size_temp=size*0.75;
+                size_temp=(size*0.75)+veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5][size_temp];
 
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][5] =
@@ -535,16 +609,16 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 				// area
 				refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind] =
 				refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind] +
-				refveg_area[grid_ind]*temp_frac;
+				refcarbon_area[grid_ind]*temp_frac;
 				
-				
+	          			
 			//fprintf(stdout, "\nSuccessfully processed cell %i country %i aez %i lt_cat %i size %d size_temp %d started at %s\n", grid_ind,ctry_ind,aez_ind,cur_lt_cat_ind,size,size_temp, get_systime());	
 			}	// end if valid aez cell
 		}   //end k loop for protected areas
 	}	// end for j loop over valid hyde land cells
 	
     // write the output file
-	
+	//fprintf(stdout, "\nSuccessfully processed all cells at %s\n", get_systime());
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.refveg_carbon_fname);
     fpout = fopen(fname,"w"); //float
@@ -596,6 +670,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
 					// sum the total. Need to multiply by 100 to convert km2 to ha
 					global_soilc = global_soilc + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0]*KMSQ2HA);
+
                     global_soil_temp= refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA;
                     global_soilc_median = global_soilc_median + global_soil_temp;
                     
@@ -667,6 +742,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
 
                     // sum the total. Need to multiply by 100 for converting land from km2 to ha
+                    if (outval_vegc_ag >= 0 &&  outval_vegc_ag_median >=0 && outval_vegc_ag_min >=0 && outval_vegc_ag_max >=0 &&  outval_vegc_ag_q1 >=0  && outval_vegc_ag_q3 >= 0 ) {
 					global_vegc_ag = global_vegc_ag + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0]*KMSQ2HA);
                     global_vegc_median_ag = global_vegc_median_ag + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][1]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
                     global_vegc_min_ag = global_vegc_min_ag + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][2]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
@@ -680,7 +756,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                     global_vegc_max_bg = global_vegc_max_bg + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][3]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
                     global_vegc_q1_bg = global_vegc_q1_bg + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][4]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
                     global_vegc_q3_bg = global_vegc_q3_bg + (refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][5]*refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind]*KMSQ2HA);
-
+                    }
 
                     // write the value only if weighted average is over 0 and all other values are 0 or above.
 					if (outval_vegc_ag > 0 &&  outval_vegc_ag_median >=0 && outval_vegc_ag_min >=0 && outval_vegc_ag_max >=0 &&  outval_vegc_ag_q1 >=0  && outval_vegc_ag_q3 >= 0 ) {

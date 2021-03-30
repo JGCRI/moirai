@@ -5,18 +5,18 @@
 
 # script settings are in lines 58-95
 # make sure that these entries are correct, particularly gcam_glu_data_file, use_osgeo, osgeopath, pypath, gdalpolygonize_path, and out_dir
- 
-# this script takes about 15-20 minutes to run 
- 
+
+# this script takes about 15-20 minutes to run
+
 # Moirai Land Data System (Moirai) Copyright (c) 2020, The
 # Regents of the University of California, through Lawrence Berkeley National
 # Laboratory (subject to receipt of any required approvals from the U.S.
 # Dept. of Energy).  All rights reserved.
- 
+
 # If you have questions about your rights to use or distribute this software,
 # please contact Berkeley Lab's Intellectual Property Office at
 # IPO@lbl.gov.
- 
+
 # NOTICE.  This Software was developed under funding from the U.S. Department
 # of Energy and the U.S. Government consequently retains certain rights.  As
 # such, the U.S. Government has been granted for itself and others acting on
@@ -24,9 +24,9 @@
 # Software to reproduce, distribute copies to the public, prepare derivative
 # works, and perform publicly and display publicly, and to permit other to do
 # so.
- 
+
 # This file is part of Moirai.
- 
+
 # Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 #Load libraries
@@ -45,15 +45,15 @@ library(rgeos)
 get_and_standardize_raster <- function(raster_path= "spatial_input_files/country_out.bil",
                                        crs_for_proj= "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
                                        raster_extent=NULL){
-  
+
   raster_binary<-NULL
-  
+
   raster_binary <- raster(raster_path)
   raster::projection(raster_binary)<-crs_for_proj
-  raster::extent(raster_binary)<-raster_extent  
-  
-  return(raster_binary)  
-} 
+  raster::extent(raster_binary)<-raster_extent
+
+  return(raster_binary)
+}
 
 ## this is a moirai output file for validation plots (this default is for 235 basin GLUs)
 moirai_land_type_area_file <- "spatial_input_files/Land_type_area_ha.csv"
@@ -148,7 +148,7 @@ GLU_land_data <- as.data.table(rasterToPoints(GLU_land_raster))
 rm(GLU_land_raster)
 gc()
 country_land_data <- as.data.table(rasterToPoints(country_land_raster))
-rm(country_land_raster) 
+rm(country_land_raster)
 gc()
 region_land_data <- as.data.table(rasterToPoints(region_land_raster))
 rm(region_land_raster)
@@ -156,19 +156,19 @@ gc()
 
 #bind columns. This will create multiple columns, but that is fine since these are all standardized rasters.
 #The test below checks that all values are identical.
-land_cells_all_boundaries <- dplyr::bind_cols(GLU_land_data,country_land_data,region_land_data,.name_repair = c("unique"))  
+land_cells_all_boundaries <- dplyr::bind_cols(GLU_land_data,country_land_data,region_land_data,.name_repair = c("unique"))
 
 if(!identical(land_cells_all_boundaries$x...1,land_cells_all_boundaries$x...4,land_cells_all_boundaries$x...7)){stop("rasters are mismatched")}
 if(!identical(land_cells_all_boundaries$y...2,land_cells_all_boundaries$y...5,land_cells_all_boundaries$y...8)){stop("rasters are mismatched")}
 
-rm(region_land_data,GLU_land_data,country_land_data)                             
+rm(region_land_data,GLU_land_data,country_land_data)
 gc()
-  
-  land_cells_all_boundaries %>% 
-  dplyr::rename(x=x...1,y=y...2) %>% 
+
+  land_cells_all_boundaries %>%
+  dplyr::rename(x=x...1,y=y...2) %>%
   dplyr::select(x,y,glu_raster,country_out,region_gcam_out) %>%
-  filter(glu_raster != no_data_value_moirai, country_out != no_data_value_moirai,region_gcam_out != no_data_value_moirai) %>% 
-  rename(country=country_out,region=region_gcam_out,glu=glu_raster) %>% 
+  filter(glu_raster != no_data_value_moirai, country_out != no_data_value_moirai,region_gcam_out != no_data_value_moirai) %>%
+  rename(country=country_out,region=region_gcam_out,glu=glu_raster) %>%
   mutate(ctry_glu=country*1000+glu,
          reg_glu=region*1000+glu,
          reg_ctry=region*1000+country)->land_cells_all_boundaries
@@ -196,25 +196,25 @@ GLU_noland_data <- as.data.table(rasterToPoints(GLU_no_land_raster))
 rm(GLU_no_land_raster)
 gc()
 country_noland_data <- as.data.table(rasterToPoints(country_no_land_raster))
-rm(country_no_land_raster) 
+rm(country_no_land_raster)
 gc()
 region_noland_data <- as.data.table(rasterToPoints(region_no_land_raster))
 rm(region_no_land_raster)
 gc()
 
-nonland_cells_all_boundaries <- bind_cols(GLU_noland_data,country_noland_data,region_noland_data)  
+nonland_cells_all_boundaries <- bind_cols(GLU_noland_data,country_noland_data,region_noland_data)
 
 if(!identical(nonland_cells_all_boundaries$x...1,nonland_cells_all_boundaries$x...4,nonland_cells_all_boundaries$x...7)){stop("rasters are mismatched")}
 if(!identical(nonland_cells_all_boundaries$y...2,nonland_cells_all_boundaries$y...5,nonland_cells_all_boundaries$y...8)){stop("rasters are mismatched")}
 
 rm(GLU_noland_data,country_noland_data,region_noland_data)
 gc()
-  
-  nonland_cells_all_boundaries %>% 
-  dplyr::rename(x=x...1,y=y...2) %>%  
+
+  nonland_cells_all_boundaries %>%
+  dplyr::rename(x=x...1,y=y...2) %>%
   dplyr::select(x,y,glu_raster_noland,country_out_noland,region_gcam_out_noland) %>%
-  filter(glu_raster_noland != no_data_value_moirai, country_out_noland != no_data_value_moirai,region_gcam_out_noland != no_data_value_moirai) %>% 
-  rename(country=country_out_noland,region=region_gcam_out_noland,glu=glu_raster_noland) %>% 
+  filter(glu_raster_noland != no_data_value_moirai, country_out_noland != no_data_value_moirai,region_gcam_out_noland != no_data_value_moirai) %>%
+  rename(country=country_out_noland,region=region_gcam_out_noland,glu=glu_raster_noland) %>%
   mutate(ctry_glu=country*1000+glu,
          reg_glu=region*1000+glu,
          reg_ctry=region*1000+country)->nonland_cells_all_boundaries
@@ -231,7 +231,7 @@ tmp<-Land_Data_Actual %>% filter(valid_land_area>0) %>% left_join(land_cells_all
 tmpna<-tmp[is.na(tmp$ctry_glu),]
 
 if(nrow(tmpna)>0){
-  
+
   stop("valid hyde land area does not match boundaries. Check the input data")
 }
 
@@ -252,31 +252,31 @@ gc()
 data_for_mapping<- bind_rows(land_cells_all_boundaries,nonland_cells_all_boundaries)
 
 for(i in raster_combinations){
-  
-  
-  land_cells_all_boundaries %>% 
-    dplyr::select(all_of(i),x,y) %>% 
-    rename(key=all_of(i)) %>% 
-    mutate(key=as.integer(key)) %>% 
-    distinct()->GLU_Data_Join     
-  
-  nonland_cells_all_boundaries %>% 
-    dplyr::select(all_of(i),x,y) %>% 
-    rename(key=all_of(i)) %>% 
-    mutate(key=as.integer(key)) %>% 
-    distinct()->GLU_Data_Join_Noland    
-  
-  
-  data_for_mapping %>% 
-    distinct() %>%
-    mutate(ctry_id=country,glu_id=glu,reg_id=region) %>% 
+
+
+  land_cells_all_boundaries %>%
+    dplyr::select(all_of(i),x,y) %>%
     rename(key=all_of(i)) %>%
-    mutate(key=as.integer(key)) %>% 
+    mutate(key=as.integer(key)) %>%
+    distinct()->GLU_Data_Join
+
+  nonland_cells_all_boundaries %>%
+    dplyr::select(all_of(i),x,y) %>%
+    rename(key=all_of(i)) %>%
+    mutate(key=as.integer(key)) %>%
+    distinct()->GLU_Data_Join_Noland
+
+
+  data_for_mapping %>%
+    distinct() %>%
+    mutate(ctry_id=country,glu_id=glu,reg_id=region) %>%
+    rename(key=all_of(i)) %>%
+    mutate(key=as.integer(key)) %>%
     dplyr::select(key,ctry_id,glu_id,reg_id,x,y)->mapping_data
-  
+
   write.csv(mapping_data,paste0(out_map_dir,toString(i),"_mapping.csv"),row.names = FALSE)
-  
-  
+
+
   #Land
   coordinates(GLU_Data_Join)<-~x+y
   gridded(GLU_Data_Join)<-TRUE
@@ -284,7 +284,7 @@ for(i in raster_combinations){
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
   writeRaster(GLU_raster, filename=tolower(paste0(out_rast_dir, "gcam_",toString((i)),"_boundaries_moirai_land_cells_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
-  
+
   #No land
   coordinates(GLU_Data_Join_Noland)<-~x+y
   gridded(GLU_Data_Join_Noland)<-TRUE
@@ -292,7 +292,7 @@ for(i in raster_combinations){
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
   writeRaster(GLU_raster, filename=tolower(paste0(out_rast_dir, "gcam_",toString((i)),"_boundaries_moirai_no_land_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
-  
+
   #Combined
   GLU_Combined <- rbind(GLU_Data_Join_Noland,GLU_Data_Join)
   gridded(GLU_Combined)<-TRUE
@@ -300,10 +300,10 @@ for(i in raster_combinations){
   raster::projection(GLU_raster)<-"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
   GLU_raster<-raster::extend(GLU_raster,Land_Data_Binary)
   writeRaster(GLU_raster, filename=tolower(paste0(out_rast_dir, "gcam_",toString((i)),"_boundaries_moirai_Combined_3p1_0p5arcmin.tif")), format="GTiff", overwrite=TRUE)
-  
-  
+
+
   print(paste0("Done generating rasters for land ,no land and combined for ",toString(i)))
-  
+
 } # end for i loop over output boundary combinations
 
 #Remove data to free space
@@ -317,17 +317,17 @@ rm(GLU_raster)
 raster_file_names <-list.files(path=out_rast_dir, full.names=FALSE, pattern = ".tif")
 
 for (i in raster_file_names){
-  
+
   raster_name <- gsub(".tif","",i)
-  
-  #If OSGEO is installed use it or use gdal_polygonize.py instead. 
+
+  #If OSGEO is installed use it or use gdal_polygonize.py instead.
   if(use_osgeo){
-    
+
     system2(osgeopath,paste0("gdal_polygonize ", out_rast_dir, toString(raster_name), ".tif ", out_raw_dir, toString(raster_name), ".shp key key"))
   }else{
-    
-    system2(pypath, paste0(gdalpolygonize_path,out_rast_dir, toString(raster_name), ".tif -f 'ESRI Shapefile' ", out_raw_dir, toString(raster_name), ".shp key key"))    
-    
+
+    system2(pypath, paste0(gdalpolygonize_path,out_rast_dir, toString(raster_name), ".tif -f 'ESRI Shapefile' ", out_raw_dir, toString(raster_name), ".shp key key"))
+
   }
   print(paste0("Completed processing shapefile- ",toString(raster_name),".shp"))
 }
@@ -339,10 +339,10 @@ for (i in raster_file_names){
 GCAM_region_names<-read.csv(gcam_region_name_file,skip = 4, stringsAsFactors = FALSE) %>% rename(reg_id=GCAM_region_ID,reg_nm=region)
 #Get additional metadata: basin_names
 #Skip metadata rows when reading in csv
-ISO_GCAM_REG_ID<-read.csv(gcam_iso_reg_id_file, stringsAsFactors = FALSE) %>% 
+ISO_GCAM_REG_ID<-read.csv(gcam_iso_reg_id_file, stringsAsFactors = FALSE) %>%
   rename(ctry_id=fao_code,ctry_nm=vmap0_name) %>%
-  dplyr::select(ctry_nm,ctry_id) %>% 
-  mutate(ctry_nm=if_else(ctry_id==186,"Serbia and Montenegro",ctry_nm)) %>% 
+  dplyr::select(ctry_nm,ctry_id) %>%
+  mutate(ctry_nm=if_else(ctry_id==186,"Serbia and Montenegro",ctry_nm)) %>%
   distinct()
 
 
@@ -405,46 +405,46 @@ file_names<- list.files(path=out_raw_dir, full.names=FALSE, pattern = ".shp")
 
 for (i in file_names){
   Final_shape_file<- shapefile(toString(paste0(out_raw_dir,i)))
-  
+
   file_name<-gsub("gcam_","",i)
   file_name<-gsub(".shp","",file_name)
   print(paste0("Completed processing ",toString(file_name)))
   Final_shape_file <- st_as_sf(Final_shape_file)
-  
+
   #If its a combined file,fill holes
   if(grepl("combined",file_name)){
-    
+
     Final_shape_file<-smoothr::fill_holes(Final_shape_file, threshold = hole_filling_threshold)
   }
-  
+
   if (grepl("country",file_name)){
     Final_shape_file %>% inner_join(ctry_data, by=c("key"))->Final_shape_file
     #Check for NAs in country names
     tmpna<-Final_shape_file[is.na(Final_shape_file$ctry_nm),]
     # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
     if (length(tmpna)>10){
-      
+
       print(paste0("Na values found in ",toString(i)))
       print(tmpna)
     }
-    
+
   } # end if grep country
-  
-  
+
+
   if (grepl("glu",file_name) & !grepl("ctry_glu",file_name) & !grepl("reg_glu",file_name)){
     Final_shape_file %>% inner_join(basin_data, by=c("key"))->Final_shape_file
     #Check for NAs in basin names
     tmpna<-Final_shape_file[is.na(Final_shape_file$glu_nm),]
     # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
-    
+
     if (length(tmpna)>10){
       print(paste0("Na values found in ",toString(i)))
       print(tmpna)
     }
-    
+
   } # end if grep glu and not ctry_glu or reg_glu
-  
-  
+
+
   if (grepl("region",file_name)){
     Final_shape_file %>% inner_join(reg_data, by=c("key"))->Final_shape_file
     #Check for NAs in region names
@@ -455,9 +455,9 @@ for (i in file_names){
       print(tmpna)
     }
   } # end if grep region
-  
+
   if (grepl("ctry_glu",file_name)){
-    
+
     Final_shape_file %>% inner_join(ctry_glu_data, by=c("key"))->Final_shape_file
     # Note that first 10 rows are meatadata rows. Hence the code checks for rows higher than 10.
     #Check for NAs in country names
@@ -472,10 +472,10 @@ for (i in file_names){
       print(paste0("Na values found in ",toString(i)))
       print(tmpna)
     }
-    
+
   } # end if grep ctry_glu
-  
-  
+
+
   if (grepl("reg_glu",file_name)){
     #Check for NAs in region names
     Final_shape_file %>% inner_join(reg_glu_data, by=c("key"))->Final_shape_file
@@ -492,11 +492,11 @@ for (i in file_names){
       print(paste0("Na values found in ",toString(i)))
       print(tmpna)
     }
-    
+
   } # end if grep reg_glu
-  
+
   if (grepl("reg_ctry",file_name)){
-    
+
     Final_shape_file %>% inner_join(reg_ctry_data, by=c("key"))->Final_shape_file
     # Note that first 10 rows are metadata rows. Hence the code checks for rows higher than 10.
     #Check for NAs in country names
@@ -512,31 +512,31 @@ for (i in file_names){
       print(tmpna)
     }
   } # end if grep reg_ctry
-  
+
   #Test for 2 exceptions: 3 sided polygons, self intersections
   exceptions<-st_is_valid(Final_shape_file,NA_on_exception = TRUE)
   na_exceptions<-exceptions[is.na(exceptions)]
   self_intersections <-exceptions[exceptions=="FALSE"]
-  
+
   if(length(na_exceptions)>0){
     print("Fixing invalid geometries")
     Final_shape_file<-st_make_valid(Final_shape_file)
-    
+
   }
-  
+
   if(length(self_intersections)>0){
     print("Fixing self intersections")
     Final_shape_file<-st_make_valid(Final_shape_file)
   }
-  
+
   #Final clean ups
   file_name <- gsub("land_cells","landcells",file_name)
   file_name <- gsub("no_land","noland",file_name)
-  
+
   Final_shape_file <- as(Final_shape_file,"Spatial")
   Final_shape_file <- raster::aggregate(Final_shape_file,names(Final_shape_file))
-  writeOGR(Final_shape_file, dsn = out_bndry_dir, layer = toString(file_name), driver = "ESRI Shapefile",overwrite_layer = TRUE)
-  
+  writeOGR(Final_shape_file, dsn = paste0(out_bndry_dir,toString(file_name),".shp"), layer = toString(file_name), driver = "ESRI Shapefile",overwrite_layer = TRUE)
+
 } # end i loop over raw files
 
 #Generate validation plots
@@ -545,13 +545,13 @@ for (i in file_names){
 basin_shp_file <- st_read(paste0(out_bndry_dir, "glu_boundaries_moirai_landcells_3p1_0p5arcmin.shp"))
 basin_shp_file$geom_area<-st_area(basin_shp_file$geometry)*0.0001
 
-Land_raster_data<-read.csv(moirai_land_type_area_file, skip = 5, stringsAsFactors = FALSE) %>% 
-  filter(year==2010) %>% 
-  group_by(glu_code) %>% 
-  mutate(land_area=sum(value)) %>% 
-  ungroup() %>% 
-  dplyr::select(glu_code,land_area) %>% 
-  rename(glu_id=glu_code) %>% 
+Land_raster_data<-read.csv(moirai_land_type_area_file, skip = 5, stringsAsFactors = FALSE) %>%
+  filter(year==2010) %>%
+  group_by(glu_code) %>%
+  mutate(land_area=sum(value)) %>%
+  ungroup() %>%
+  dplyr::select(glu_code,land_area) %>%
+  rename(glu_id=glu_code) %>%
   distinct()
 
 Land_raster_data %>%
@@ -564,7 +564,7 @@ Anomalies <- Data_for_Comparison %>% filter(Diff>0) %>% filter(Percent_diff>1)
 
 if(nrow(Anomalies)>0){
   print("Terrain area is higher than geometric area beyond the threshold. Please check the shapefiles")
-  
+
 }
 
 
