@@ -33,10 +33,10 @@ In the examples below we have set the `path_to_Original_LDS_Data` & `path_to_old
 ```{r,fig.height=5,fig.width=10}
 #Compare at the highest level (iso,year)
 
-compare_iso_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_Updated_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_old_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
-                                  path_to_new_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
+compare_iso_land_data(path_to_Original_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_Updated_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_old_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+                                  path_to_new_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
                                   error_tolerance= 0.01,
                                   create_land_plot=TRUE
                       )
@@ -46,10 +46,10 @@ compare_iso_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new
 
 #Compare at iso_glu_data
 
-compare_iso_glu_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_Updated_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_old_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
-                                  path_to_new_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
+compare_iso_glu_land_data(path_to_Original_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_Updated_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_old_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+                                  path_to_new_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
                      error_tolerance= 0.01)
 
   
@@ -58,10 +58,10 @@ compare_iso_glu_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test
 ```{r,fig.height=5,fig.width=10}
 #Compare at the iso,glu,year level
 
-compare_iso_glu_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_Updated_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_old_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
-                                  path_to_new_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
+compare_iso_glu_land_data(path_to_Original_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_Updated_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_old_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+                                  path_to_new_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
                      error_tolerance= 0.01,
                      create_land_plot=TRUE)
 ```
@@ -69,10 +69,10 @@ compare_iso_glu_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test
 ```{r,fig.height=5,fig.width=10}
 #Compare at the hyde level
 
-compare_iso_glu_hyde_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_Updated_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_old_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
-                                  path_to_new_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
+compare_iso_glu_hyde_land_data(path_to_Original_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_Updated_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_old_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+                                  path_to_new_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
                                           error_tolerance= 0.01,
                                          create_land_plot=TRUE,
                                          print_difference_stats=TRUE,
@@ -83,10 +83,10 @@ compare_iso_glu_hyde_land_data(path_to_Original_LDS_Data = "../outputs/basins235
 ```{r}
 #Compare at iso, glu_sage level
 
-compare_iso_glu_sage_land_data(path_to_Original_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_Updated_LDS_Data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
-                                  path_to_old_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
-                                  path_to_new_mapping = "../outputs/basins235_test_new_protected/MOIRAI_land_types.csv",
+compare_iso_glu_sage_land_data(path_to_Original_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_Updated_LDS_Data = "../example_outputs/basins235/Land_type_area_ha.csv",
+                                  path_to_old_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+                                  path_to_new_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
                                          error_tolerance= 0.01,
                                          create_land_plot=TRUE,
                                          print_difference_stats=TRUE,
@@ -105,7 +105,7 @@ create_carbon_plots_soil(fig_dir  = "carbon_plots/",
                               path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                               path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                               path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                              path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
+                              path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
                               glu_name = "Missouri_River_Basin",
                               carbon_year = 2016,
                               carbon_input_src_name = "soil_grids_95pct"
@@ -123,12 +123,12 @@ create_carbon_plots_soil(fig_dir  = "carbon_plots/",
 create_carbon_plots_veg_carbon_above_ground(
   fig_dir  = "carbon_plots/",
                                    plot_lim = 1000, 
-                                   path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
+                                   path_to_carbon_data = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
                                    path_to_carbon_rasters = "../indata/",
                                    path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                                    path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                                    path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                                   path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
+                                   path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
                                    glu_name = "Missouri_River_Basin",
                                    carbon_year = 2010,
                                    carbon_raster_file_names = c("veg_carbon_max.bil",
@@ -150,15 +150,15 @@ create_carbon_plots_veg_carbon_above_ground(
 create_carbon_plots_veg_carbon_below_ground(
   fig_dir  = "carbon_plots/",
                                    plot_lim = 1000, 
-                                   path_to_carbon_data = "../outputs/basins235_test_new_protected/Ref_veg_carbon_Mg_per_ha.csv",
+                                   path_to_carbon_data = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
                                    path_to_carbon_rasters = "../indata/",
                                    path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
                                    path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
                                    path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                                   path_to_land_data = "../outputs/basins235_test_new_protected/Land_type_area_ha.csv",
+                                   path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
                                    glu_name = "Missouri_River_Basin",
                                    carbon_year = 2010,
-                                   carbon_raster_file_names =c("veg_BG_carbon_wavg.bil",                                                                "veg_BG_carbon_q1.bil",                                                                             "veg_BG_carbon_median.bil",                                                                   "veg_BG_carbon_min.bil",                                                                      "veg_BG_carbon_q3.bil",                                                                         "veg_BG_carbon_max.bil"),
+                                   carbon_raster_file_names =c("veg_BG_carbon_weighted_average.bil",                                                                "veg_BG_carbon_q1.bil",                                                                             "veg_BG_carbon_median.bil",                                                                   "veg_BG_carbon_min.bil",                                                                      "veg_BG_carbon_q3.bil",                                                                         "veg_BG_carbon_max.bil"),
                                    print_raster_progress_log =FALSE
 )
 
