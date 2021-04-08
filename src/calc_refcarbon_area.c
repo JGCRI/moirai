@@ -4,22 +4,16 @@
  the main purpose of this function is to normalize the year 2010 land area info
   and to calculate the area of reference vegetation (used only for soil and vvegetation carbon) in year 2010 as:
     a combintion of the hyde land use data, the lulc data, and the sage potential veg data
-  and to store the pasture area for calculating animal sector land rent
- 
+  
  the base working grid will be based on hyde land area to be consistent with the historical data processing
  the cropland, pasture, and urban data read here are the year 2000 data from hyde32
  
  SAGE crop data processing for harvested area, irrigated harvested area, and production will still use sage land cells
-    land rent is then calculated from the output production and harvested area arrays
     with some additional pasture area info, which is independent, so can be from hyde
     with some additional forest area info, which is independent, and is calculated from this pot veg area
 
  the working area arrays should have been initialized to NODATA in get_land_cells()
 
- also store the forest cells based on the reference veg
- 
- this function does not check for valid country/glu
- 
  this function also sets the cell order for distribution of ref veg within coarse lulc cells,
  because this is the first time the hyde and lulc data are read.
  
