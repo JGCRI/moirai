@@ -269,6 +269,28 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 | Q1               | 284                        | 311                   | 814                              | 90                               | 31                               |
 | Q3               | 630                        | 468                   | 1182                             | 343                              | 134                              |
 
+* The table below summarizes global soil and vegetation carbon numbers by unmanaged land type in 2010 calculated in MOIRAI in Petagrams (Pg) using the soil_grids_95th_percentile dataset for soil carbon and the Spawn et al dataset for vegetation carbon. Note that Spawn et al. don't provide detailed information on vegetation carbon in the Tundra region, therefore the numbers for that particular land type in the table below may be unreliable.
+
+
+| Unmanaged land type                         | soil carbon (Petagrams) | vegetation carbon (above ground) | vegetation carbon (belowground) | Total |
+|---------------------------------------------|-------------------------|----------------------------------|---------------------------------|-------|
+| BorealDeciduousForest/Woodland              | 55                      | 12                               | 6                               | 73    |
+| BorealEvergreenForest/Woodland              | 126                     | 32                               | 14                              | 172   |
+| DenseShrubland                              | 38                      | 7                                | 6                               | 51    |
+| Desert                                      | 72                      | 0                                | 1                               | 73    |
+| Evergreen/DeciduousMixedForest/Woodland     | 2                       | 0                                | 0                               | 2     |
+| Grassland/Steppe                            | 225                     | 49                               | 23                              | 297   |
+| OpenShrubland                               | 123                     | 9                                | 8                               | 140   |
+| PolarDesert/Rock/Ice                        | 24                      | 1                                | 0                               | 25    |
+| Savanna                                     | 74                      | 24                               | 15                              | 113   |
+| TemperateBroadleafEvergreenForest/Woodland  | 10                      | 4                                | 1                               | 15    |
+| TemperateDeciduousForest/Woodland           | 41                      | 17                               | 6                               | 64    |
+| TemperateNeedleleafEvergreenForest/Woodland | 47                      | 19                               | 6                               | 72    |
+| TropicalDeciduousForest/Woodland            | 26                      | 9                                | 4                               | 39    |
+| TropicalEvergreenForest/Woodland            | 177                     | 151                              | 37                              | 365   |
+| Tundra                                      | 140                     | 6                                | 7                               | 153   |
+| Unknown                                     | 5                       | 1                                | 0                               | 6     |
+| Total                                       | 1183                    | 341                              | 134                             | 1658  |
 
 
 
