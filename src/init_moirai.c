@@ -123,8 +123,6 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->harvestarea_fao_fname, '\0', MAXCHAR);
 	memset(in_args->prodprice_fao_fname, '\0', MAXCHAR);
 	memset(in_args->convert_usd_fname, '\0', MAXCHAR);
-    memset(in_args->vegc_csv_fname, '\0', MAXCHAR);
-    memset(in_args->soilc_csv_fname, '\0', MAXCHAR);
 	// output file names (without path)
     memset(in_args->lds_logname, '\0', MAXCHAR);
     memset(in_args->harvestarea_fname, '\0', MAXCHAR);

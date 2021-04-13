@@ -71,12 +71,12 @@ int get_in_args(const char *fname, args_struct *in_args) {
 		if (cln_str[0] != '\0' && strncmp(comment, cln_str, 1) != 0) {
 			count++;
 			// strip off the comment, if it exists
-			length = strcspn(cln_str, comment);
+			length = (int) strcspn(cln_str, comment);
 			strncpy(fld_str, cln_str, length);
 			// set the input variable
 			switch (count) {
 				case 1:
-                    in_args->diagnostics = atoi(fld_str);
+               in_args->diagnostics = atoi(fld_str);
 					break;
 				case 2:
 					in_args->out_year_prod_ha_lr = atoi(fld_str);
@@ -99,7 +99,7 @@ int get_in_args(const char *fname, args_struct *in_args) {
 				case 8:
 					strcpy(in_args->outpath, fld_str);
 					break;
-                case 9:
+            case 9:
 					strcpy(in_args->sagepath, fld_str);
 					break;
 				case 10:
@@ -108,19 +108,19 @@ int get_in_args(const char *fname, args_struct *in_args) {
 				case 11:
 					strcpy(in_args->lulcpath, fld_str);
 					break;
-                case 12:
-                    strcpy(in_args->mircapath, fld_str);
-                    break;
-                case 13:
-                    strcpy(in_args->wfpath, fld_str);
-                    break;
-                case 14:
-                    strcpy(in_args->ldsdestpath, fld_str);
-                    break;
-                case 15:
-                    strcpy(in_args->mapdestpath, fld_str);
-                    break;
-                case 16:
+            case 12:
+               strcpy(in_args->mircapath, fld_str);
+               break;
+            case 13:
+               strcpy(in_args->wfpath, fld_str);
+               break;
+            case 14:
+               strcpy(in_args->ldsdestpath, fld_str);
+               break;
+            case 15:
+               strcpy(in_args->mapdestpath, fld_str);
+               break;
+            case 16:
 					strcpy(in_args->cell_area_fname, fld_str);
 					break;
 				case 17:
@@ -142,26 +142,26 @@ int get_in_args(const char *fname, args_struct *in_args) {
 					strcpy(in_args->country_fao_fname, fld_str);
 					break;
 				case 23:
-                    strcpy(in_args->L1_fname, fld_str);
-                    break;
+               strcpy(in_args->L1_fname, fld_str);
+               break;
 				case 24:
-                    strcpy(in_args->L2_fname, fld_str);
-                    break;	
+               strcpy(in_args->L2_fname, fld_str);
+               break;
 				case 25:
-                    strcpy(in_args->L3_fname, fld_str);
-                    break;
+               strcpy(in_args->L3_fname, fld_str);
+               break;
 				case 26:
-                    strcpy(in_args->L4_fname, fld_str);
-                    break;
+               strcpy(in_args->L4_fname, fld_str);
+               break;
 				case 27:
-                    strcpy(in_args->ALL_IUCN_fname, fld_str);
-                    break;	
+               strcpy(in_args->ALL_IUCN_fname, fld_str);
+               break;
 				case 28:
-                    strcpy(in_args->IUCN_1a_1b_2_fname, fld_str);
-                    break;
+               strcpy(in_args->IUCN_1a_1b_2_fname, fld_str);
+               break;
 				case 29:
-                    strcpy(in_args->nfert_rast_fname, fld_str);
-                    break;
+               strcpy(in_args->nfert_rast_fname, fld_str);
+               break;
 				case 30:
 					strcpy(in_args->cropland_sage_fname, fld_str);
 					break;
@@ -231,10 +231,10 @@ int get_in_args(const char *fname, args_struct *in_args) {
 				case 52:
 					strcpy(in_args->country_all_fname, fld_str);
 					break;
-                case 53:
-                    strcpy(in_args->aez_new_info_fname, fld_str);
-                    break;
-                case 54:
+            case 53:
+               strcpy(in_args->aez_new_info_fname, fld_str);
+               break;
+            case 54:
 					strcpy(in_args->countrymap_iso_gcam_region_fname, fld_str);
 					break;
 				case 55:
@@ -270,45 +270,39 @@ int get_in_args(const char *fname, args_struct *in_args) {
 				case 65:
 					strcpy(in_args->convert_usd_fname, fld_str);
 					break;
-                case 66:
-                    strcpy(in_args->vegc_csv_fname, fld_str);
-                    break;
+            case 66:
+               strcpy(in_args->lds_logname, fld_str);
+               break;
 				case 67:
-					strcpy(in_args->soilc_csv_fname, fld_str);
-					break;
-                case 68:
-                    strcpy(in_args->lds_logname, fld_str);
-                    break;
-				case 69:
 					strcpy(in_args->harvestarea_fname, fld_str);
 					break;
-				case 70:
+				case 68:
 					strcpy(in_args->production_fname, fld_str);
 					break;
-				case 71:
+				case 69:
 					strcpy(in_args->rent_fname, fld_str);
 					break;
-                case 72:
-                    strcpy(in_args->mirca_irr_fname, fld_str);
-                    break;
-                case 73:
-                    strcpy(in_args->mirca_rfd_fname, fld_str);
-                    break;
-                case 74:
-                    strcpy(in_args->land_type_area_fname, fld_str);
-                    break;
-                case 75:
-                    strcpy(in_args->refveg_carbon_fname, fld_str);
-                    break;
-                case 76:
-                    strcpy(in_args->wf_fname, fld_str);
-                    break;
-                case 77:
-                    strcpy(in_args->iso_map_fname, fld_str);
-                    break;
-                case 78:
-                    strcpy(in_args->lt_map_fname, fld_str);
-                    break;
+            case 70:
+               strcpy(in_args->mirca_irr_fname, fld_str);
+               break;
+            case 71:
+               strcpy(in_args->mirca_rfd_fname, fld_str);
+               break;
+            case 72:
+               strcpy(in_args->land_type_area_fname, fld_str);
+               break;
+            case 73:
+               strcpy(in_args->refveg_carbon_fname, fld_str);
+               break;
+            case 74:
+               strcpy(in_args->wf_fname, fld_str);
+               break;
+            case 75:
+               strcpy(in_args->iso_map_fname, fld_str);
+               break;
+            case 76:
+               strcpy(in_args->lt_map_fname, fld_str);
+               break;
 					
                     
 				default:

@@ -88,7 +88,7 @@ int read_country_fao(args_struct in_args, rinfo_struct *raster_info) {
 	}
 	
 	// read the data
-	num_read = fread(country_fao, insize, ncells, fpin);
+	num_read = (int) fread(country_fao, insize, ncells, fpin);
 	fclose(fpin);
 	if(num_read != ncells)
 	{

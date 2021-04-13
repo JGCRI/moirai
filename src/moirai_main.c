@@ -592,6 +592,13 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+
+    refcarbon_area = calloc(NUM_CELLS, sizeof(float));
+    if(refcarbon_area == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+
     region_gcam = calloc(NUM_CELLS, sizeof(int));
     if(region_gcam == NULL) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for region_gcam: main()\n", get_systime(), ERROR_MEM);
@@ -679,6 +686,12 @@ int main(int argc, const char * argv[]) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
+
+    refvegcarbon_thematic = calloc(NUM_CELLS, sizeof(int));
+	if(refvegcarbon_thematic == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
 	
     // allocate some arrays to keep track of valid raster cells
     land_cells_aez_new = calloc(NUM_CELLS, sizeof(int));
@@ -720,7 +733,11 @@ int main(int argc, const char * argv[]) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}	
-
+    
+    if((error_code = calc_refcarbon_area(in_args, raster_info))) {
+		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		return error_code;
+	}
     // free some raster arrays
     free(region_gcam);
     free(sage_minus_hyde_land_area);
@@ -735,7 +752,19 @@ int main(int argc, const char * argv[]) {
 	
 	    free(land_mask_forest);
 		free(land_mask_refveg);
-    
+   
+   // allocate space for hong kong and taiwan glu area tracking in write_glu_mapping
+   twn_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(twn_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for twn_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   hkg_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(hkg_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for hkg_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   
 	// store the country/land rent region + aez lists
     // the arrays are allocated within write_glu_mapping()
 	if((error_code = write_glu_mapping(in_args, raster_info))) {
@@ -1005,6 +1034,7 @@ int main(int argc, const char * argv[]) {
 	free(below_ground_ratio);
     free(potveg_thematic);
 	free(refveg_thematic);
+    free(refvegcarbon_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {
 		free(lulc_input_grid[i]);
 	}
@@ -1264,6 +1294,7 @@ int main(int argc, const char * argv[]) {
     free(aez_bounds_new);
     free(aez_bounds_orig);
     free(refveg_area);
+    free(refcarbon_area);
     free(country87_gtap);
     free(forest_cells);
     free(land_cells_hyde);
@@ -1286,7 +1317,11 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
+   
+   // free the hong kong and taiwan glu area arrays
+   free(twn_glu_area);
+   free(hkg_glu_area);
+   
     // free the reglr+aez arrays
     for (i = 0; i < NUM_GTAP_CTRY87; i++) {
         free(reglr_aez_list[i]);

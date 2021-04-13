@@ -118,7 +118,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(wavg_array, insize, ncells, fpin);
+    num_read = (int) fread(wavg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -138,7 +138,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(wavg_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(wavg_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -165,7 +165,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(median_array, insize, ncells, fpin);
+    num_read = (int) fread(median_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -191,7 +191,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(median_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(median_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -219,7 +219,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(min_array, insize, ncells, fpin);
+    num_read = (int) fread(min_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -245,7 +245,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(min_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(min_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -272,7 +272,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(max_array, insize, ncells, fpin);
+    num_read = (int) fread(max_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -298,7 +298,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(max_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(max_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -326,7 +326,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q1_array, insize, ncells, fpin);
+    num_read = (int) fread(q1_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -352,7 +352,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q1_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(q1_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -380,7 +380,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q3_array, insize, ncells, fpin);
+    num_read = (int) fread(q3_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -406,7 +406,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     }
 
     // read the data and check for same size as the working grid
-    num_read = fread(q3_bg_array, insize, ncells, fpin);
+    num_read = (int) fread(q3_bg_array, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -419,6 +419,58 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
     for (i = 0; i < ncells; i++) {
         //above ground +below ground * scaling factor (0.1)
         //TODO: based on feedback, we may want to write out above and below ground biomass separately. Currently we aggegate the two for speed. 
+        // First, check if we have only below ground data
+        if(wavg_array[i] == NODATA && wavg_bg_array[i] != NODATA ){
+        veg_carbon_sage[0][i] = (wavg_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[1][i] = (median_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[2][i] = (min_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[3][i] = (max_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[4][i] = (q1_bg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[5][i] = (q3_bg_array[i])*VEG_CARBON_SCALER;
+
+        above_ground_ratio[0][i] = 0;
+        above_ground_ratio[1][i] = 0;
+        above_ground_ratio[2][i] = 0;
+        above_ground_ratio[3][i] = 0;
+        above_ground_ratio[4][i] = 0;
+        above_ground_ratio[5][i] = 0;
+       
+
+        // Now, check if we have only above ground data
+        }else if(wavg_bg_array[i] == NODATA && wavg_array[i] != NODATA){
+        veg_carbon_sage[0][i] = (wavg_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[1][i] = (median_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[2][i] = (min_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[3][i] = (max_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[4][i] = (q1_array[i])*VEG_CARBON_SCALER;
+        veg_carbon_sage[5][i] = (q3_array[i])*VEG_CARBON_SCALER;
+
+        above_ground_ratio[0][i] = 1;
+        above_ground_ratio[1][i] = 1;
+        above_ground_ratio[2][i] = 1;
+        above_ground_ratio[3][i] = 1;
+        above_ground_ratio[4][i] = 1;
+        above_ground_ratio[5][i] = 1;
+        
+        //Now, check if we don't have both. Assume that the ratio is 0.5. It won't be used in the actual processing.
+        }else if(wavg_bg_array[i] == NODATA && wavg_array[i] == NODATA){
+        veg_carbon_sage[0][i] = -9999;
+        veg_carbon_sage[1][i] = -9999;
+        veg_carbon_sage[2][i] = -9999;
+        veg_carbon_sage[3][i] = -9999;
+        veg_carbon_sage[4][i] = -9999;
+        veg_carbon_sage[5][i] = -9999;
+
+        above_ground_ratio[0][i] = 0.5;
+        above_ground_ratio[1][i] = 0.5;
+        above_ground_ratio[2][i] = 0.5;
+        above_ground_ratio[3][i] = 0.5;
+        above_ground_ratio[4][i] = 0.5;
+        above_ground_ratio[5][i] = 0.5;
+        
+
+        //Now, if we have both data,
+        }else{
         veg_carbon_sage[0][i] = (wavg_array[i]+wavg_bg_array[i])*VEG_CARBON_SCALER;
         veg_carbon_sage[1][i] = (median_array[i]+median_bg_array[i])*VEG_CARBON_SCALER;
         veg_carbon_sage[2][i] = (min_array[i]+min_bg_array[i])*VEG_CARBON_SCALER;
@@ -426,14 +478,19 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
         veg_carbon_sage[4][i] = (q1_array[i]+q1_bg_array[i])*VEG_CARBON_SCALER;
         veg_carbon_sage[5][i] = (q3_array[i]+q3_bg_array[i])*VEG_CARBON_SCALER;
 
-
         above_ground_ratio[0][i] = wavg_array[i]/((wavg_array[i]+wavg_bg_array[i]));
         above_ground_ratio[1][i] = median_array[i]/((median_array[i]+median_bg_array[i]));
         above_ground_ratio[2][i] = min_array[i]/((min_array[i]+min_bg_array[i]));
         above_ground_ratio[3][i] = max_array[i]/((max_array[i]+max_bg_array[i]));
         above_ground_ratio[4][i] = q1_array[i]/((q1_array[i]+q1_bg_array[i]));
         above_ground_ratio[5][i] = q3_array[i]/((q3_array[i]+q3_bg_array[i]));
+        }
+
+
+
         
+        
+        //Below ground should be 1 - above ground.
         below_ground_ratio[0][i] = 1 - above_ground_ratio[0][i];  
         below_ground_ratio[1][i] = 1 - above_ground_ratio[1][i];
         below_ground_ratio[2][i] = 1 - above_ground_ratio[2][i];
@@ -441,6 +498,7 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
         below_ground_ratio[4][i] = 1 - above_ground_ratio[4][i];
         below_ground_ratio[5][i] = 1 - above_ground_ratio[5][i];
 
+         
     }
 
    //Write diagnostics

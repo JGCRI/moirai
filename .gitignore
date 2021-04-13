@@ -28,9 +28,13 @@ examples/outputs/
 *.tif
 diagnostics/.RData
 diagnostics/.Rhistory
-*.bil
 *.xml
-*.hdr
-*.bil
-*.tif
+*.tif
 *.nc4
+
+# exclude some other stuff
+ancillary/old/
+diagnostics/basins235_example_outputs_spatial_output_files/
+example_outputs/basins235/*
+example_outputs/basins235/aglu-data/
+*.stackdump

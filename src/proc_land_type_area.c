@@ -42,7 +42,10 @@
  	using the sage potential vegetation categories
  
  input units are km^2
- output units are in ha - rounded to the nearest integer
+ 
+ raster output units are in km^2, and are limited to the overall valid land mask
+ 
+ table output units are in ha - rounded to the nearest integer
  
  process only valid hyde land cells, as these are the source for land type area
  
@@ -514,7 +517,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 						// skip if not a valid economic country
 						if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
 							// now update this year's grids to reflect that this cell is not included in the outputs
-							// set the areas to zero, but leave the refveg category as is
+							// set the areas to zero, and set the refveg category to nodata
 							crop_grid[grid_ind] = 0;
 							pasture_grid[grid_ind] = 0;
 							urban_grid[grid_ind] = 0;
@@ -522,6 +525,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 								lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][grid_ind] = 0;
 							}
 							refveg_area_grid[grid_ind] = 0;
+                     refveg_them_out[grid_ind] = raster_info.potveg_nodata;
 							continue;
 						}
 						
