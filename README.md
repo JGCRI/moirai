@@ -22,7 +22,7 @@ Kanishka Narayan, Global Change Research Institute, Pacific Northwest National l
 	* Fixes a bug in determining the land rent outputs for Hong Kong and Taiwan. This now provides the full land rent values based on the relative GLU areas. These values were previously low due to using Vietnam GLU share weights.
 	* Fixes a bug in the downscaling of reference vegetation to the Moirai grid. This changes land area and carbon outputs at the reference vegetation level considerably. At other levels of aggregation the land area is consistent with the previous version, while the carbon outputs still show some differences due to the different distribution of reference vegetation.
 	* Adds some raster outputs for valid output boundaries
-	* Adds some raster outputsfor land type distribution at a specified year
+	* Adds some raster outputs for land type distribution at a specified year
 * **Version 3.0.1:** 18 August 2019; http://doi.org/10.5281/zenodo.3370875
 	* This fixes a makefile compilation bug and removes the absolute path in `moirai.h` for the NetCDF library header file
 * **Version 3.0.0:** 5 March 2019; http://doi.org/10.5281/zenodo.2584035
@@ -143,7 +143,7 @@ The Moirai LDS also generates these files (some of which were previously stored 
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
 * **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m<sup>3</sup>), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
@@ -252,13 +252,13 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **Vegetation carbon density rasters (12)** (`veg_carbon_<state>.bil` and `veg_BG_carbon_<state>.bil`):
 	A set of 12 rasters that represents above ground carbon biomass and below ground biomass (in MgC/ha) for 6 different carbon states (above first, then below, in the following order: weighted average, minimum, median, maximum, quartile 1 and quartile 3) for the year 2010.
 	* The raw rasters were downloaded from- https://daac.ornl.gov/VEGETATION/guides/Global_Maps_C_Density_2010.html. The rasters for each state were derived using gdal, the code for which is available in `…/moirai/ancillary/bash_scripts`.
-	* **Note that the Q3 state of this dataset is the current default for vegetation carbon calculations in moirai** 
+	* **Note that the Q3 state of this dataset is the current default for vegetation carbon calculations in moirai**
 	* These data should be cited as-
 	Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above and belowground biomass carbon density in the year 2010. Sci Data 7, 112 (2020). https://doi.org/10.1038/s41597-020-0444-4
 
 
 * The table below summarizes global soil and vegetation carbon numbers calculated in MOIRAI in Petagrams (Pg) from the data sources above for each carbon state for the year 2010.
-* Note that the carbon below represents the carbon on unmanaged land i.e. it does not include soil and vegetation carbon on cropland, land used for pastures and urban land. 
+* Note that the carbon below represents the carbon on unmanaged land i.e. it does not include soil and vegetation carbon on cropland, land used for pastures and urban land.
 
 |                  | Soil carbon (0-30 cm)     |                       |                                  | Vegetation carbon (above ground) | Vegetation carbon (below ground) |
 |------------------|----------------------------|-----------------------|----------------------------------|----------------------------------|----------------------------------|
@@ -270,7 +270,7 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 | Q1               | 284                        | 311                   | 814                              | 90                               | 31                               |
 | Q3               | 630                        | 468                   | 1182                             | 343                              | 134                              |
 
-* The table below summarizes global soil and vegetation carbon numbers by unmanaged land type in 2010 calculated in MOIRAI in Petagrams (Pg) using the soil_grids_95th_percentile dataset for soil carbon and the Spawn et al dataset for vegetation carbon. Note that Spawn et al. don't provide detailed information on vegetation carbon in the Tundra region, therefore the numbers for that particular land type in the table below may be unreliable.
+* The table below summarizes global soil and vegetation carbon numbers by unmanaged land type in 2010 calculated in MOIRAI in Petagrams (Pg) using the soil_grids_95th_percentile dataset for soil carbon and the Spawn et al dataset for vegetation carbon. Note that the "Evergreen/DeciduousMixedForest/Woodland" category has very little area as it is a default when a more specific category is unavailable. Also note that Spawn et al. don't provide detailed information on vegetation carbon in the Tundra region, therefore the numbers for that particular land type in the table below may be unreliable.
 
 
 | Unmanaged land type                         | soil carbon (Petagrams) | vegetation carbon (above ground) | vegetation carbon (belowground) | Total |
