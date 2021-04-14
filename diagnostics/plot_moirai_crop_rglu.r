@@ -1,6 +1,15 @@
 ######
 # plot_moirai_crop_rglu.r
 #
+# There are only five variables that the user should set (lines 81-93)
+#   GTAP:		TRUE=group to 226 GTAP regions; FALSE=group to the GCAM regions (this determines whether REG32 is used)
+#   REG32:		TRUE=use 32 gcam regions; FALSE=use 14 GCAM regions (this does not matter if GTAP==TRUE)
+#						also note that this must match the number of GCAM regions used as input to moirai
+#   papergray:	TRUE=plot grayscale figures; FALSE=plot color figures
+#   newdir:		The directory containing the moirai outputs to diagnose (can be either 235 basins or 18 aezs)
+#					If you have a custom glu file with > 235 units then increase num_aez in line 151 accordingly
+#   outdir:		The directory to write diagnostic figures to
+#
 # calc stats and make plots of the GCAM rglu (glu by region) level production and harvested area outputs from moirai lds and genaez
 #	harvested area is in ha: MOIRAI_ag_HA_ha.csv
 #	production is in metric tonnes: MOIRAI_ag_prod_t.csv
@@ -37,8 +46,31 @@
 
 # note that "aez" in this code now more generally means or refers to "glu"
 
-# this takes about 24 hours for gtap countries and 18 glus
-# the outputs make sense only for comparing the original 18 aezs to gtap and the original version of moirai
+# this takes about 10 hours for gtap countries and 18 glus and 
+# the comparison outputs make sense only for comparing the original 18 aezs to gtap and the original version of moirai
+
+# Created by Alan Di Vittorio
+ 
+# Moirai Land Data System (Moirai) Copyright (c) 2019, The
+# Regents of the University of California, through Lawrence Berkeley National
+# Laboratory (subject to receipt of any required approvals from the U.S.
+# Dept. of Energy).  All rights reserved.
+ 
+# If you have questions about your rights to use or distribute this software,
+# please contact Berkeley Lab's Intellectual Property Office at
+# IPO@lbl.gov.
+ 
+# NOTICE.  This Software was developed under funding from the U.S. Department
+# of Energy and the U.S. Government consequently retains certain rights.  As
+# such, the U.S. Government has been granted for itself and others acting on
+# its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit other to do
+# so.
+ 
+# This file is part of Moirai.
+ 
+# Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 library(stringr)
 
@@ -52,11 +84,14 @@ REG32 = TRUE
 
 papergray = FALSE
 
-# this is the new data directory
-newdir = "../outputs/aez_orig_sage/"
+# this is the new data directory (include final "/")
+newdir = "../example_outputs/basins235/"
+#newdir = "../example_outputs/aez_orig/"
 
-# recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./aez_orig_sage_stats_rglu/", sep="")
+# recommended outdir is in diagnostics because these are comparisons between cases (include final "/")
+outdir = paste("./basins235_example_outputs_stats_rglu/", sep="")
+#outdir = paste("./aez_orig_example_outputs_stats_rglu/", sep="")
+
 dir.create(outdir, recursive = TRUE)
 
 # input data files

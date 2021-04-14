@@ -88,7 +88,7 @@ int read_region_info_gcam(args_struct in_args) {
 	}
 	
 	// skip the header lines
-	if(fscanf(fpin, "%*[^\n\r]\n\r%*[^\n\r]\n%*[^\n\r]\n%*[^\n\r]\n\r") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n%*[^\r\n]\n%*[^\r\n]\n%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_country_info_gcam()\n", fname);
 		return ERROR_FILE;
@@ -96,7 +96,7 @@ int read_region_info_gcam(args_struct in_args) {
 	
     // count the records
     
-    while (fscanf(fpin, "%[^\n\r]\r\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords_reg++;
     }
     
@@ -125,7 +125,7 @@ int read_region_info_gcam(args_struct in_args) {
     rewind(fpin);
     
     // skip the header lines
-    if(fscanf(fpin, "%*[^\n\r]\n\r%*[^\n\r]\n%*[^\n\r]\n%*[^\n\r]\n\r") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n%*[^\r\n]\n%*[^\r\n]\n%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_country_info_gcam()\n", fname);
         return ERROR_FILE;
@@ -133,7 +133,7 @@ int read_region_info_gcam(args_struct in_args) {
     
 	// read the expected number of records
 	for (i = 0; i < NUM_GCAM_RGN; i++) {
-		if (fscanf(fpin, "%[^\n\r]\r\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			
 			// get the gcam region integer code
 			if((err = get_int_field(rec_str, delim, 1, &regioncodes_gcam[i])) != OK) {
@@ -183,7 +183,7 @@ int read_region_info_gcam(args_struct in_args) {
 	}
 	
     // count the records
-    while (fscanf(fpin, "%[^\n\r]\r\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords_iso++;
     }
     
@@ -229,7 +229,7 @@ int read_region_info_gcam(args_struct in_args) {
 	// read the expected number of records
 	// should change this to read the whole file then double-check the number (or set it here)
 	for (i = 0; i < NUM_GCAM_ISO_CTRY; i++) {
-		if (fscanf(fpin, "%[^\n\r]\r\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			
 			// get the iso abbreviation
 			if((err = get_text_field(rec_str, delim, 1, &countryabbrs_gcam_iso[i][0])) != OK) {
@@ -292,5 +292,4 @@ int read_region_info_gcam(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

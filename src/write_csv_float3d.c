@@ -111,5 +111,4 @@ int write_csv_float3d(float out_array[], int d1[], int d2[], int d1_length, int 
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

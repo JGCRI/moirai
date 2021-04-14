@@ -128,5 +128,4 @@ int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val
 	
 	*value = temp_val;
 	
-	return OK;
-}
+	return OK;}

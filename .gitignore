@@ -4,6 +4,9 @@
 # exclude .idea dir
 .idea
 
+# exclude xcode project file/directory
+moirai.xcodeproj/
+
 # exclude the unzipped sage175crop files
 indata/HarvestedAreaYield175Crops_NetCDF/*.png
 indata/HarvestedAreaYield175Crops_NetCDF/*.nc
@@ -22,3 +25,16 @@ Build/
 # exclude output dirs
 outputs/
 examples/outputs/
+*.tif
+diagnostics/.RData
+diagnostics/.Rhistory
+*.xml
+*.tif
+*.nc4
+
+# exclude some other stuff
+ancillary/old/
+diagnostics/basins235_example_outputs_spatial_output_files/
+example_outputs/basins235/*
+example_outputs/basins235/aglu-data/
+*.stackdump

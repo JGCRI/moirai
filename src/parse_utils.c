@@ -258,7 +258,7 @@ int rm_quotes(char *cln_field,char *str_field)
 	
 	// remove quotes if necessary
 	if (!strncmp(str_field, qchar, 1)) {
-		len = strlen(str_field);
+		len = (int) strlen(str_field);
 		strncpy(cln_field, &str_field[1], len - 2);
 	} else {
 		strcpy(cln_field, str_field);
@@ -291,6 +291,5 @@ int is_num(char *str_field)
 			onechar++;
 		}
 	}
-	return 1;
-}
+	return 1;}
 

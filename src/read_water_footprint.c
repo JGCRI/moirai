@@ -75,7 +75,7 @@ int read_water_footprint(char *fname, float *wf_grid) {
     }
     
     // read the data
-    num_read = fread(wf_grid, insize, ncells, fpin);
+    num_read = (int) fread(wf_grid, insize, ncells, fpin);
     fclose(fpin);
     if(num_read != ncells)
     {
@@ -84,5 +84,4 @@ int read_water_footprint(char *fname, float *wf_grid) {
         return ERROR_FILE;
     }
     
-    return OK;
-}
+    return OK;}

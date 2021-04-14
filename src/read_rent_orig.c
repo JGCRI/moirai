@@ -104,13 +104,13 @@ int read_rent_orig(args_struct in_args) {
 		return ERROR_FILE;
 	}
 	// skip the header line
-	if(fscanf(fpin, "%[^\n]\n", rec_str) == EOF)
+	if(fscanf(fpin, "%[^\r\n]\r\n", rec_str) == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_rent_orig()\n", fname);
 		return ERROR_FILE;
 	}
 
-	while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+	while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 		// get the input year
 		if((err = get_int_field(rec_str, delim, 1, &cpi_year[cpi_index])) != OK) {
 			fprintf(fplog, "Error processing file %s: read_rent_orig(); record=%i, column=1\n",
@@ -243,5 +243,4 @@ int read_rent_orig(args_struct in_args) {
 
 	free(lrout);
 	
-	return OK;
-}
+	return OK;}

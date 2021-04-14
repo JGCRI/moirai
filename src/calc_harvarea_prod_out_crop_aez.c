@@ -720,15 +720,15 @@ int calc_harvarea_prod_out_crop_aez(args_struct in_args, rinfo_struct raster_inf
 		free(yield_recalib);
 	}	// end if recalibrate
 	
-    // write the lost info to the log file
-    fprintf(fplog, "Discarded data (sqkm and t/sqkm): calc_harvarea_prod_out_crop_aez()\n");
-    for (i = 0; i < NUM_SAGE_CROP; i++) {
-        fprintf(fplog, "%s: lost_harvested_area=%f; mismatched_harvested_area=%f; mismatched_yield=%f\n",
-                cropnames_gtap[i], lost_harvested_area[i], mismatched_harvested_area[i],
-                mismatched_yield[i] / mismatched_yield_count[i]);
-    }
-	
 	if (in_args.diagnostics) {
+		// write the lost info to the log file
+		fprintf(fplog, "Discarded data (sqkm and t/sqkm): calc_harvarea_prod_out_crop_aez()\n");
+		for (i = 0; i < NUM_SAGE_CROP; i++) {
+			fprintf(fplog, "%s: lost_harvested_area=%f; mismatched_harvested_area=%f; mismatched_yield=%f\n",
+					cropnames_gtap[i], lost_harvested_area[i], mismatched_harvested_area[i],
+					mismatched_yield[i] / mismatched_yield_count[i]);
+		}
+		
 		// this is the diagnostic output for the missing aez mask
 		if ((err = write_raster_int(missing_aez_mask, ncells, out_name, in_args))) {
 			fprintf(fplog, "Error writing file %s: calc_harvarea_prod_out_crop_aez()\n", out_name);
@@ -763,5 +763,4 @@ int calc_harvarea_prod_out_crop_aez(args_struct in_args, rinfo_struct raster_inf
     free(diag_harvestarea_crop_aez);
     free(diag_pasturearea_aez);
     
-	return OK;
-}
+	return OK;}

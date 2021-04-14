@@ -63,12 +63,13 @@
 #include <netcdf.h>
 
 #define CODENAME				"moirai"				// name of the compiled program
-#define VERSION         		"3.0"           			// current version
+#define VERSION         		"3.1"           			// current version
 #define MAXCHAR					1000						// maximum string length
 #define MAXRECSIZE				10000						// maximum record (csv line) length in characters
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
-#define REF_YEAR               2000
+#define REF_YEAR				2000
+#define REF_CARBON_YEAR			2010
 
 // the min and max forest codes for the SAGE raster data (see SAGE_PVLT.csv)
 // these assume that the forest codes are all consecutive with no others mixed in the enumeration
@@ -76,7 +77,8 @@
 #define MIN_SAGE_FOREST_CODE    1
 
 // counts of useful variables
-#define NUM_IN_ARGS							54							// number of input variables in the input file
+//kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
+#define NUM_IN_ARGS						76					// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -94,9 +96,8 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
-#define PROTECTED               1               // value assigned to protected pixels for generating land category (this value - 1 is the output array index)
-#define UNPROTECTED             2               // value assigned to unprotected pixels for generating land category (this value - 1 is the output array index)
-#define NUM_PROTECTED           2               // number of protection categories
+#define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
+#define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -111,11 +112,13 @@
 #define NUM_WF_CROPS            18              // number of water footprint crops
 #define NUM_WF_TYPES            4               // number of water footprint types (blue, green, gray, total)
 
+
 // conversion factors for output
 #define KMSQ2HA					100.0						// km^2 * KMSQ2HA = ha
 #define MSQ2KMSQ				(1/1000000.0)					// m^2 * MSQ2KMSQ = km^2
 #define KGMSQ2MGHA              10.0                        // kg/m^2 * KGMSQ2MGHA = Mg/ha
 #define USD2MILUSD				(1/1000000.)0					// USD * USD2MILUSD = million USD
+#define VEG_CARBON_SCALER        0.1                            //scaling factor used by Spawn et al on veg carbon rasters. We need to multiply our values by this to get actual values.
 
 // conversion factors for inputs
 #define HGHA2TKMSQ				0.01			// conversion factor from hg / ha to t / km^2; FAOSTAT yield file
@@ -127,6 +130,7 @@
 #define NA_TEXT                  "-"            // if there is no iso3 or name for a country/territory
 #define FAOCTRY2GCAMCTRYAEZID   10000           // the gcam country+aez id is fao country id * 10000 + aez id; this is also used for the region-glu image
 #define ZERO_THRESH				1/1000000.0		// if a landtype area value is less than this, it is zero
+#define ROUND_TOLERANCE			1/1000000.0		// tolerance for checking sums and zeros in read_protected and proc_lulc_area
 
 // working resolution is 5 arcmin (2160x4320), WGS84 spherical earth, lat-lon projection
 // the origin is the upper left corner at 90 Lat and -180 Lon
@@ -160,6 +164,7 @@
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
 
+
 // variables for number of records based on input files
 int NUM_FAO_CTRY;                       // number of FAO/VMAP0 countries, including additions (see FAO_iso_VMAP0_ctry.csv)
 int NUM_GTAP_CTRY87;					// number of 87 GTAP countries (ctry87) for land rent data (see GTAP_GCAM_ctry87.csv)
@@ -172,9 +177,15 @@ int NUM_SAGE_CROP;						// number of SAGE crops (SAGE_crop) (see SAGE_gtap_fao_c
 int NUM_HYDE_TYPES;						// number of hyde land use types/files; the first 3 describe the total land use state
 int NUM_LULC_TYPES;						// number of input lulc types
 
+// for downscaling the lulc data to the working grid
+int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
+float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
+float *****refveg_carbon_out;		// the potveg carbon out table;4th dim is the state of carbon; 5th dim is the two carbon density values and the area
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
+//FILE *debug_file;
+//FILE *cell_file;
 
 // area and production arrays: now 3d arrays, dim1=country[NUM_FAO_CTRY], dim2=aez[ctry_aez_num], dim3=crop[NUM_SAGE_CROP]
 //  so the second dimension is variable, and it matches the aez list arrays below
@@ -184,16 +195,7 @@ float ***production_crop_aez;             // production output (metric tonnes), 
 //  so the second dimension is variable, and it matches the aez list arrays below
 float **pasturearea_aez;                 // pasture area (ha)
 // land rent output: dim1=land rent region[NUM_GTAP_CTRY87], dim2=aez[reglr_aez_num], dim3=use[NUM_GTAP_USE]
-float ***rent_use_aez;                    // land rent output (million USD), output a total on 10 digits
-
-// area and production output data arrays; aez varies fastest, then crop, then fao ctry
-//float *harvestarea_crop_aez;            // harvested area output (ha), output to nearest integer
-//float *production_crop_aez;             // production output (metric tonnes), output to nearest integer
-// associated to output data array - aez varies fastest, then fao ctry
-//float *pasturearea_aez;                 // pasture area (ha)
-// land rent output array
-// aez varies fastest, then use, then ctry87
-//float *rent_use_aez;                    // land rent output (million USD), output a total on 10 digits
+float ***rent_use_aez;                    // land rent output (million USD), output a total of 10 digits
 
 // lists of AEZs within fao country and land rent region and gcam region
 int **ctry_aez_list;                    // AEZ codes for each fao country - dim1=fao country, dim2=aez codes
@@ -206,12 +208,12 @@ int *reggcam_aez_num;                   // number of AEZs for each gcam region
 int num_lt_cats;        // the number of categories
 int *lt_cats;           // the list of categories
 
-// aggregated output data arrays; aez varies fastest, then crop/use, then gcam region
-// these two only in aggregate crop to gcam
-//float harvestarea_crop_aez_gcam[NUM_GCAM_RGN * NUM_SAGE_CROP * NUM_NEW_AEZ];	// harvested area output (ha)
-//float production_crop_aez_gcam[NUM_GCAM_RGN * NUM_SAGE_CROP * NUM_NEW_AEZ];	// production output (metric tonnes)
-// only in aggregate use to gcam
-//float rent_use_aez_gcam[NUM_GCAM_RGN * NUM_GTAP_USE * NUM_NEW_AEZ];			// land rent output (million USD)
+// variables to track taiwan and hong kong GLU areas for land rent separation
+// probably not more than 10 GLUs in each of these, but use NUM_ORIG_AEZ to allocate space for now
+float twn_land_area;                // total valid taiwan land area
+float hkg_land_area;                // total valid hong kong land area
+float *twn_glu_area;                // total valid taiwan glu area
+float *hkg_glu_area;                // total valid taiwan glu area
 
 // raster data as 1-d arrays; numlat * numlon, start at upper left corner, lon varies fastest [NUM_LAT X NUM_LON]
 // these are allocated and free dynamically as needed in moirai_main.c
@@ -226,8 +228,10 @@ float *pasture_area;                    // pasture area for ref veg area calc an
 float *urban_area;                      // urban area for ref veg area calc for forest land rent calc (km^2)
 float **lu_detail_area;					// additional hyde data files with more detailed area (km^2); d1=hyde types
 float *refveg_area;                     // reference vegetation area for forest land rent calc (km^2)
+float *refcarbon_area;                     // reference vegetation area for carbon calculations
 int *potveg_thematic;                   // potential vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 int *refveg_thematic;                   // reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
+int *refvegcarbon_thematic;                   // reference vegetation thematic data (integers 1 to NUM_SAGE_PVLT)
 short *country_fao;                     // fao country codes (integer fao code values)
 float *cell_area;                       // total area of grid cell; calculated based on spherical earth (km^2)
 float *cell_area_hyde;                  // total area of hyde land grid cells; from hyde data set (km^2)
@@ -248,12 +252,22 @@ int *land_mask_fao;                     // 1=land; 0=no land
 int *land_mask_potveg;                  // 1=land; 0=no land
 int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
-short *protected_thematic;              // 1=protected; 2=unprotected (after conversion from file value of 255); no other values
 
+//kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7
+float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
+//kbn 2020-06-01 Changing soil carbon variable
+//kbn 2020-06-29 Changing vegetation carbon variable
+float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
+int ***soil_carbon_array_cells;//These are the total number of cells contained within each array
+float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
+float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
+float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
+//Add above and below ground ratio for vegetation carbon
+float **above_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
+float **below_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
-
 // indices of land cells within the raster data; these are the only cells processed
 // these are allocated and free dynamically as needed in moirai_main.c
 // they are all 1d arrays of size NUM_CELLS, because it would add too much time to change their size at each additional cell
@@ -474,6 +488,9 @@ typedef struct {
 	int out_year_usd;					// the output US dollar value year for land rent
 	int in_year_lr_usd;					// the US dollar value year for the input land rent data
 	
+	// year to write set of output land use/cover rasters
+	int lulc_out_year;					// if this year falls outside of processing years then no output
+	
 	// useful paths
 	char inpath[MAXCHAR];				// path to the input data directory
 	char outpath[MAXCHAR];				// path to the output data directory
@@ -493,13 +510,37 @@ typedef struct {
 	char aez_orig_fname[MAXCHAR];			// file name only of the original aez boundaries raster file
 	char potveg_fname[MAXCHAR];				// file name only of the potential vegetation raster file
 	char country_fao_fname[MAXCHAR];		// file name only of the fao country code raster file
-    char protected_fname[MAXCHAR];          // file name only of the protected pixel raster file
-    char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
-    //char hist_crop_rast_name[MAXCHAR];      // file name only of the historical crop file
-    //char hist_pasture_rast_name[MAXCHAR];   // file name only of the historical pasture file
-    //char hist_urban_rast_name[MAXCHAR];     // file name only of the historical urban file
+    //kbn 2020-02-29 Introducing file names for new EPA suitability and protected area rasters
+	char L1_fname[MAXCHAR];                //L1 suitability raster
+	char L2_fname[MAXCHAR];                //L2 suitability raster
+	char L3_fname[MAXCHAR];                //L3 suitability raster
+	char L4_fname[MAXCHAR];                //L4 suitability raster 
+	char ALL_IUCN_fname[MAXCHAR];          //IUCN All protected area raster
+	char IUCN_1a_1b_2_fname[MAXCHAR];      //IUCN 1a_1b_2 protected area raster
+	char nfert_rast_fname[MAXCHAR];         // file name only of the nfert raster file
 	char cropland_sage_fname[MAXCHAR];		// file name only of the sage cropland file
-
+	//kbn 2020-06-01 Introducing file names for soil carbon
+	char soil_carbon_wavg_fname[MAXCHAR];   //Soil carbon weighted average raster
+	char soil_carbon_median_fname[MAXCHAR]; //Soil carbon median raster
+	char soil_carbon_min_fname[MAXCHAR];    //Soil carbon minimum raster
+	char soil_carbon_max_fname[MAXCHAR];    //Soil carbon maximum raster
+	char soil_carbon_q1_fname[MAXCHAR];     //Soil carbon q1 raster
+	char soil_carbon_q3_fname[MAXCHAR];     //Soil carbon q3 raster
+	//kbn 2020-06-30 Introducing file names for veg carbon
+	char veg_carbon_wavg_fname[MAXCHAR];    //Above ground vegetation carbon weighted average raster
+	char veg_carbon_median_fname[MAXCHAR];  //Above ground vegetation carbon median raster
+	char veg_carbon_min_fname[MAXCHAR];     //Above ground vegetation carbon minimum raster
+	char veg_carbon_max_fname[MAXCHAR];     //Above ground vegetation carbon maximum raster
+	char veg_carbon_q1_fname[MAXCHAR];      //Above ground vegetation carbon q1 raster
+	char veg_carbon_q3_fname[MAXCHAR];      //Above ground vegetation carbon q3 raster 
+    // 2020-08-08 Introducing file names for below ground biomass
+	char veg_BG_wavg_fname[MAXCHAR];        //Below ground vegetation carbon weighted averge raster
+	char veg_BG_median_fname[MAXCHAR];      //Below ground vegetation carbon median raster
+	char veg_BG_min_fname[MAXCHAR];         //Below ground vegetation carbon minimum raster 
+	char veg_BG_max_fname[MAXCHAR];         //Below ground vegetation carbon maximum raster
+	char veg_BG_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
+	char veg_BG_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
+ 
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
 	char country87_gtap_fname[MAXCHAR];		// file name only of the GTAP/GCAM ctry87 list
@@ -518,8 +559,6 @@ typedef struct {
 	char harvestarea_fao_fname[MAXCHAR];	// file name only of FAO harvested area data
 	char prodprice_fao_fname[MAXCHAR];		// file name only of FAO producer price data
 	char convert_usd_fname[MAXCHAR];		// file name only of the usd conversion factors
-    char vegc_csv_fname[MAXCHAR];          // file name only of the veg c to pot veg file
-    char soilc_csv_fname[MAXCHAR];         // file name only of the soil c file
 
 	// output file names (without path)
 	char lds_logname[MAXCHAR];              // log file name for runtime output
@@ -528,7 +567,6 @@ typedef struct {
 	char rent_fname[MAXCHAR];				// file name for land rent output
     char mirca_irr_fname[MAXCHAR];			// file name for mirca irrigated crop area output
     char mirca_rfd_fname[MAXCHAR];			// file name for mirca rainfed crop area output
-    char nfert_fname[MAXCHAR];              // file name for nfert output
     char land_type_area_fname[MAXCHAR];     // file name for land type area output
     char refveg_carbon_fname[MAXCHAR];      // file name for reference veg carbon output
     char wf_fname[MAXCHAR];                 // file name for water footprint output
@@ -554,13 +592,15 @@ int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
-int read_nfert(char *fname, float *nfert_grid, args_struct in_args);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
 int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int *land_mask_lulc);
 int read_hyde32(args_struct in_args, rinfo_struct *raster_info, int year, float* crop_grid, float* pasture_grid, float* urban_grid, float** lu_detail);
-
+//kbn 2020-06-01 Changing soil carbon function below
+int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info);
+//kbn 2020-06-01 Changing veg carbon function below
+int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info);
 // read csv file functions
 int read_rent_orig(args_struct in_args);
 int read_country87_info(args_struct in_args);
@@ -574,20 +614,19 @@ int read_production_fao(args_struct in_args);
 int read_yield_fao(args_struct in_args);
 int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
-int read_veg_carbon(char *fname, float *veg_carbon_sage);
 int read_water_footprint(char *fname, float *wf_grid);
-int read_soil_carbon(char *fname, float *soil_carbon_sage, args_struct in_args);
+
 
 // raster processing functions
 int get_land_cells(args_struct in_args, rinfo_struct raster_info);
 int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info);
+int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info);
 int get_aez_val(int aez_array[], int index, int nrows, int ncols, int nodata_val, int *value);
 int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
-int proc_nfert(args_struct in_args, rinfo_struct raster_info);
-int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells);
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
 
@@ -628,5 +667,7 @@ char *get_systime();
 int init_moirai(args_struct *in_args);
 int get_in_args(const char *fname, args_struct *in_args);
 int copy_to_destpath(args_struct in_args);
+// sorting function  that is used with qsort in proc_refveg_carbon.c
+int cmpfunc (const void * a, const void * b);
 
 #endif

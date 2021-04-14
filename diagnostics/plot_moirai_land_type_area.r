@@ -1,23 +1,38 @@
 ###### plot_moirai_land_type_area.r
 # diagnostitcs for the land type area output
 #
+# There are only four variables that the user should set (lines 96-109)
+#   AEZ:		TRUE=18 aez moirai outputs; FALSE=235 GLU moirai outputs or custom GLU outputs
+#   olddir:		The directory containing the old moirai outputs to diagnose
+#   newdir:		The directory containing the new moirai outputs to diagnose (can be either 235 basins or 18 aezs)
+#				If you have a custom glu file then modify num_lds_glu, ctag, and ptag on lines 117-119 accordingly and set AEZ=FALSE
+#   outdir:		The directory to write diagnostic figures to
+#
 # compare Moirai LDS outputs with the old GIS code
 # for 18 original aezs make comparisons at the aez level
 # for any geographic land units (glus) make comparisons at country level
 # need to compare specific land types
-#
 #
 # old gis file format (km^2)
 #	one header line with column labels
 #	4 columns: AEZ_ID, Category, Year, area(km2)
 #		AEZ_ID = 0 means that no original countryXaez info exists for those cells
 #
-# Moirai lds land type area file format (ha)
+# Moirai v3.1 lds land type area file format (ha)
 #	6 header lines, with the line 6 having the column labels
 #	5 columns: iso, glu_code, land_type, year, value
 #	no records exist for zero area or for cells that do not have a country and glu match
 #
-# land types file format
+# Moirai v3.1 land types file format
+#	5 header lines, line 5 has the column labels
+#	4 columns: Category, LT_SAGE, LT_HYDE, Status
+#
+# Moirai v3 and previous lds land type area file format (ha)
+#	6 header lines, with the line 6 having the column labels
+#	5 columns: iso, glu_code, land_type, year, value
+#	no records exist for zero area or for cells that do not have a country and glu match
+#
+# Moirai v3 previous land types file format
 #	5 header lines, line 5 has the column labels
 #	4 columns: Category, LT_SAGE, LT_HYDE, LT_WDPA
 #
@@ -33,20 +48,43 @@
 #
 # the old gis data uses hyde 3.1 (with 2010 added from the new hyde data)
 # previous version of moirai lds has output using the hyde 3.1 data (with 2010)
-# the moirai lds has output using the new hyde 3.2 data for all years
+# moirai v3 and v3.1 lds have output using the new hyde 3.2 data for all years
 #
 # aggregate to only these four hyde land types:
 #	hyde_type = c("Cropland", "Pasture", "Urbanland", "Unmanaged")
 #	unmanaged includes the "unknown" pot veg type
 #
 # the gis area data for no country or glu (aez) are excluded from these diagnostics (about 2.1 million sq km)
-# the Moirai lds area data for no country or glu (wb235) are not in the output file, but are only ~80,000 sq km
+# the Moirai lds area data for no country or glu (wb235) are not in the output file, but are < ~80,000 sq km
 #
 # output in km^2
 #
 
-# less than 10 minutes on my workstation, without the glu plots
-# about 30 min with the glu plots
+# less than 10 minutes
+# about 25 min when using "print()" with the glu plots to put them on the screen as they are created
+
+# Created by Alan Di Vittorio
+ 
+# Moirai Land Data System (Moirai) Copyright (c) 2019, The
+# Regents of the University of California, through Lawrence Berkeley National
+# Laboratory (subject to receipt of any required approvals from the U.S.
+# Dept. of Energy).  All rights reserved.
+ 
+# If you have questions about your rights to use or distribute this software,
+# please contact Berkeley Lab's Intellectual Property Office at
+# IPO@lbl.gov.
+ 
+# NOTICE.  This Software was developed under funding from the U.S. Department
+# of Energy and the U.S. Government consequently retains certain rights.  As
+# such, the U.S. Government has been granted for itself and others acting on
+# its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit other to do
+# so.
+ 
+# This file is part of Moirai.
+ 
+# Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 library(ggplot2)
 
@@ -58,23 +96,17 @@ setwd("./")
 # flag to denote whether this is 18 aez or 235 water basin lds output
 AEZ = FALSE
 
+# location of the old moirai lds output files (include final "/")
+#olddir = "../example_outputs/basins235/"
+olddir = "../example_outputs/aez_orig/"
+
+# location of the new moirai lds output files (include final "/")
+newdir = "../example_outputs/basins235/"
+#newdir = "../example_outputs/aez_orig/"
+
 # recommended outdir is in diagnostics because these are comparisons between cases
-outdir = paste("./basins235_sage_stats_area/", sep="")
-#outdir = paste("./aez_orig_sage_stats_area/", sep="")
-dir.create(outdir, recursive = TRUE)
-
-# location of the lds output files
-ldsdir = "../outputs/basins235_sage/"
-#ldsdir = "../outputs/aez_orig_sage/"
-
-# input files
-# some of these are lds diagnostic outputs
-gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")
-lds_fname = paste("./Land_type_area_ha_h31new.csv", sep="")
-lds_new_fname = paste(ldsdir, "Land_type_area_ha.csv", sep="")
-land_types_fname = paste(ldsdir, "Moirai_land_types.csv", sep="")
-gis_ctry_map_fname = paste("./FAO_gtap_gcam_ctry.csv", sep="")
-fao_iso_map_fname = paste("../indata/FAO_iso_VMAP0_ctry.csv", sep="")
+outdir = paste("./basins235_example_outputs_stats_area/", sep="")
+#outdir = paste("./aez_orig_example_outputs_stats_area/", sep="")
 
 num_gis_glu = 18
 if(AEZ) {
@@ -87,6 +119,19 @@ if(AEZ) {
 	ptag = "_wb235.pdf"
 }
 
+dir.create(outdir, recursive = TRUE)
+
+# input files
+# some of these are lds diagnostic outputs
+gis_fname = paste("./Sage_Hyde15_Area.csv", sep="")
+land_types_orig_fname = "./orig_land_types.csv"
+lds_fname = paste(olddir, "Land_type_area_ha.csv", sep="")
+land_types_old_fname = paste(olddir, "Moirai_land_types.csv", sep="")
+lds_new_fname = paste(newdir, "Land_type_area_ha.csv", sep="")
+land_types_new_fname = paste(newdir, "Moirai_land_types.csv", sep="")
+gis_ctry_map_fname = paste("./FAO_gtap_gcam_ctry.csv", sep="")
+fao_iso_map_fname = paste("../indata/FAO_iso_VMAP0_ctry.csv", sep="")
+
 HA2KMSQ = 1 / 100
 
 num_gis_ctry = 160
@@ -94,9 +139,11 @@ num_gis_ctryglu = num_gis_ctry * num_gis_glu
 
 # read the input files
 gis = read.csv(gis_fname)
+lt_list_orig = read.csv(land_types_orig_fname, skip=4)
 lds = read.csv(lds_fname, skip=5)
 lds_new = read.csv(lds_new_fname, skip=5)
-lt_list = read.csv(land_types_fname, skip=4)
+lt_list = read.csv(land_types_old_fname, skip=4)
+lt_list_new = read.csv(land_types_new_fname, skip=4)
 gis_ctry = read.csv(gis_ctry_map_fname)
 fao_iso = read.csv(fao_iso_map_fname)
 
@@ -108,6 +155,8 @@ num_gis_map = length(gis_ctry$gis_code)
 num_iso_map = length(fao_iso$fao_code)
 num_lds_ctry = length(fao_iso$fao_code)
 num_lt = length(lt_list$Category)
+num_lt_new = length(lt_list_new$Category)
+num_lt_orig = length(lt_list_orig$Category)
 
 gis_fao_code = array(dim = c(num_gis_ctryglu))
 gis_fao_code[] = -1
@@ -170,9 +219,9 @@ lds$value = lds$value * HA2KMSQ
 lds_new$value = lds_new$value * HA2KMSQ
 
 # set the hyde land type for all data frames
-gis = merge(gis, lt_list, by.x = "land_type", by.y = "Category")
+gis = merge(gis, lt_list_orig, by.x = "land_type", by.y = "Category")
 lds = merge(lds, lt_list, by.x = "land_type", by.y = "Category")
-lds_new = merge(lds_new, lt_list, by.x = "land_type", by.y = "Category")
+lds_new = merge(lds_new, lt_list_new, by.x = "land_type", by.y = "Category")
 
 # now aggregate the data to the hyde land types within glu
 gis_glu = aggregate(value ~ year + LT_HYDE + glu_code + iso, gis, FUN = "sum", na.rm = TRUE)
@@ -188,7 +237,7 @@ lds_new_ctry = aggregate(value ~ year + LT_HYDE + iso, lds_new_glu, FUN = "sum",
 gis_ctry$source = NA
 gis_ctry$source = "GIS"
 lds_ctry$source = NA
-lds_ctry$source = "Original"
+lds_ctry$source = "Previous"
 lds_new_ctry$source = NA
 lds_new_ctry$source = "Moirai new"
 
@@ -214,8 +263,8 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 			+ ggtitle( paste(as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "Land Type Area") )
 			+ ylab( "Area (km^2)" )
 			)
-		print(p1)
-		ggsave( paste( outdir, "lt_area_ctry_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
+		#print(p1)
+		ggsave( paste( outdir, "lt_area_ctry_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7)
 	
 		if(length(gis_tdata[,1] > 0)) {
 			# plot the glu level data for gis
@@ -225,8 +274,8 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ggtitle( paste(as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "GLU Land Type Area") )
 				+ ylab( "Area (km^2)" )
 				)
-			print(p1)
-			ggsave( paste( outdir, "gis_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "_aez.pdf", sep="" ) )
+			#print(p1)
+			ggsave( paste( outdir, "gis_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "_aez.pdf", sep="" ), width=7, height=7 )
 			
 			# write the glu level data
 			write.csv(gis_tdata, paste(outdir, "gis_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "_aez.csv", sep=""), row.names = FALSE)
@@ -240,11 +289,11 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ggtitle( paste(as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "GLU Land Type Area") )
 				+ ylab( "Area (km^2)" )
 				)
-			print(p1)
-			ggsave( paste( outdir, "original_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
+			#print(p1)
+			ggsave( paste( outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7 )
 			
 			# write the glu level data
-			write.csv(lds_tdata, paste(outdir, "original_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
+			write.csv(lds_tdata, paste(outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
 		}
 		
 		if(length(lds_new_tdata[,1] > 0)) {
@@ -255,8 +304,8 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ggtitle( paste(as.character(fao_iso$iso3_abbr[lds_ctry_ind]), "GLU Land Type Area") )
 				+ ylab( "Area (km^2)" )
 				)
-			print(p1)
-			ggsave( paste( outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ) )
+			#print(p1)
+			ggsave( paste( outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7 )
 			
 			# write the glu level data
 			write.csv(lds_new_tdata, paste(outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)

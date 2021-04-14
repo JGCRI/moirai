@@ -97,5 +97,4 @@ int write_rent_use_aez(args_struct in_args) {
 	
 	fprintf(fplog, "Wrote file %s: write_rent_use_aez(); records written=%i\n", fname, nrecords);
 	
-	return OK;
-}
+	return OK;}

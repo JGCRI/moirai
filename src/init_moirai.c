@@ -55,6 +55,7 @@ int init_moirai(args_struct *in_args) {
 	in_args->in_year_sage_crops = 0;
 	in_args->out_year_usd = 0;
 	in_args->in_year_lr_usd = 0;
+	in_args->lulc_out_year = 0;
 	// file paths; must include final "/"
 	memset(in_args->inpath, '\0', MAXCHAR);
 	memset(in_args->outpath, '\0', MAXCHAR);
@@ -73,9 +74,37 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->aez_orig_fname, '\0', MAXCHAR);
 	memset(in_args->potveg_fname, '\0', MAXCHAR);
 	memset(in_args->country_fao_fname, '\0', MAXCHAR);
-    memset(in_args->protected_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_rast_fname, '\0', MAXCHAR); // still in input file but not used
+    //memset(in_args->protected_fname, '\0', MAXCHAR);
+    //kbn 2020-02-29 Introduce memory set for each of the suitability, protected area rasters
+	memset(in_args->L1_fname, '\0', MAXCHAR);
+	memset(in_args->L2_fname, '\0', MAXCHAR);
+	memset(in_args->L3_fname, '\0', MAXCHAR);
+	memset(in_args->L4_fname, '\0', MAXCHAR);
+	memset(in_args->ALL_IUCN_fname, '\0', MAXCHAR);
+	memset(in_args->IUCN_1a_1b_2_fname, '\0', MAXCHAR);
+	memset(in_args->nfert_rast_fname, '\0', MAXCHAR); // still in input file but not used
 	memset(in_args->cropland_sage_fname, '\0', MAXCHAR);
+	//kbn 2020-06-01 Add new soil carbon states inputs here
+	memset(in_args->soil_carbon_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_min_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_median_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_max_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_q1_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_q3_fname, '\0', MAXCHAR);
+    //kbn 2020-06-30 Add new veg carbon states inputs here
+    memset(in_args->veg_carbon_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_q3_fname, '\0', MAXCHAR);
+	//kbn 2020-08-08 Add below ground biomass
+	memset(in_args->veg_BG_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_q3_fname, '\0', MAXCHAR);
 	// input csv file names (without path)
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
@@ -94,8 +123,6 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->harvestarea_fao_fname, '\0', MAXCHAR);
 	memset(in_args->prodprice_fao_fname, '\0', MAXCHAR);
 	memset(in_args->convert_usd_fname, '\0', MAXCHAR);
-    memset(in_args->vegc_csv_fname, '\0', MAXCHAR);
-    memset(in_args->soilc_csv_fname, '\0', MAXCHAR);
 	// output file names (without path)
     memset(in_args->lds_logname, '\0', MAXCHAR);
     memset(in_args->harvestarea_fname, '\0', MAXCHAR);
@@ -103,7 +130,6 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->rent_fname, '\0', MAXCHAR);
     memset(in_args->mirca_irr_fname, '\0', MAXCHAR);
     memset(in_args->mirca_rfd_fname, '\0', MAXCHAR);
-    memset(in_args->nfert_fname, '\0', MAXCHAR);	// not in input file and not used
     memset(in_args->land_type_area_fname, '\0', MAXCHAR);
     memset(in_args->refveg_carbon_fname, '\0', MAXCHAR);
     memset(in_args->wf_fname, '\0', MAXCHAR);
@@ -116,5 +142,4 @@ int init_moirai(args_struct *in_args) {
 	num_land_cells_hyde = 0;			// the actual number of land cell indices in land_cells_hyde[]
     num_forest_cells = 0;				// the actual number of land cell indices in forest_cells[]
 	
-	return OK;
-}
+	return OK;}

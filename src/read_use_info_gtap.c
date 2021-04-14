@@ -69,14 +69,14 @@ int read_use_info_gtap(args_struct in_args) {
 	}
 	
 	// skip the header line
-	if(fscanf(fpin, "%*[^\n]\n") == EOF)
+	if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_use_info_gtap()\n", fname);
 		return ERROR_FILE;
 	}
 	
     // count the records
-    while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords++;
     }
     
@@ -115,7 +115,7 @@ int read_use_info_gtap(args_struct in_args) {
     rewind(fpin);
     
     // skip the header line
-    if(fscanf(fpin, "%*[^\n]\n") == EOF)
+    if(fscanf(fpin, "%*[^\r\n]\r\n") == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_use_info_gtap()\n", fname);
         return ERROR_FILE;
@@ -123,7 +123,7 @@ int read_use_info_gtap(args_struct in_args) {
     
 	// read all the records
 	for (i = 0; i < NUM_GTAP_USE; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			
 			// get the integer code
 			if((err = get_int_field(rec_str, delim, 1, &usecodes_gtap[out_index])) != OK) {
@@ -176,5 +176,4 @@ int read_use_info_gtap(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

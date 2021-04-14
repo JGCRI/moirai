@@ -12,15 +12,18 @@
  only one non-land-use land cover type is currently allowed in each working grid cell
  currently aggregate to sage potential veg types, because that is what gcam data system currently uses
  
+ the randomized order for wg cells within each lulc cell is set once for each cell in calc_refveg_area
+ 
  arguments:
  args_struct in_args:		input argument structure
  rinfo_struct raster_info: 	information about input raster data
- float *lulc_area:			array of area values for each lulc land type; length is NUM_LULC_TYPES
- float *lu_indices:			array of lu cell indices for lu_area etc., from main lu raster arrays
- float **lu_area:			2-d array of area values for each lu cell and land type; d1=num_lu_cells (upper left start), d2=NUM_HYDE_TYPES
- float *refveg_area_out:	array of ref veg area values for each out lu cell
- int *refveg_them;			array of refveg thematic out values for each lu cell
+ double *lulc_area:			array of area values for each lulc land type; length is NUM_LULC_TYPES
+ int *lu_indices:			array of lu cell indices for lu_area etc., from main lu raster arrays
+ double **lu_area:			2-d array of area values for each lu cell and land type; d1=num_lu_cells (upper left start), d2=NUM_HYDE_TYPES
+ double *refveg_area_out:	array of ref veg area values for each out lu cell
+ int *refveg_them:			array of refveg thematic out values for each lu cell
  int num_lu_cells:			number of lu cells in lulc cell
+ int lulc_index:			index of the current lulc cell
 
  
  return value:
@@ -53,7 +56,7 @@
 
 #include "moirai.h"
 
-int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_area, int *lu_indices, float **lu_area, float *refveg_area_out, int *refveg_them, int num_lu_cells) {
+int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index) {
 	
 	int i, j, x, y, m;
 	int potveg_ind;			// the index of current cell potential vegeation; for refveg_type_area_sum and lc_agg_area
@@ -72,13 +75,13 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	int tot_rain_ind = 10;	// total rainfed
 	int tot_rice_ind = 11;	// total rice
 	
-	float lulc_scalar = 1;			// the ratio of reference veg area to input lulc non-land-use area
-	float sum_lulc_veg_area = 0;	// the total input lulc non-land-use area in this lulc cell
-	float sum_refveg_area = 0;	// the total reference veg area in this lulc cell
-	float sum_lu_land_area = 0;	// the total lu land area in this lulc cell
-	float *sum_lu_area;			// the total lu area in this lulc cell; NUM_HYDE_TYPES
-	float *lc_agg_area;		// the input lc area in this lulc cell by type, aggregated to sage pot veg
-	float *refveg_type_area_sum;	// sum of each output ref veg type within this lulc cell
+	double lulc_scalar = 1;			// the ratio of reference veg area to input lulc non-land-use area
+	double sum_lulc_veg_area = 0;	// the total input lulc non-land-use area in this lulc cell
+	double sum_refveg_area = 0;	// the total reference veg area in this lulc cell
+	double sum_lu_land_area = 0;	// the total lu land area in this lulc cell
+	double *sum_lu_area;			// the total lu area in this lulc cell; NUM_HYDE_TYPES
+	double *lc_agg_area;		// the input lc and lu area in this lulc cell by type, aggregated to sage pot veg
+	double *refveg_type_area_sum;	// sum of each output ref veg type within this lulc cell
 	
 	int temp_int;					// for swapping
 	int sub_type;					// corresponding substitute ref veg type (index)
@@ -87,12 +90,13 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	int max_resid_ind;				// index of the max residual area
 	int num_leftover_cells = 0;		// number of output cells not assigned a ref veg in the first pass
 	int *leftover_cell_inds;		// the indices of the output cells not assigned a ref veg in the first pass
-	int rand_order[num_lu_cells];	// the randomized array for selecting the lu cell to process
-	float sum_area_diff;			// difference between lulc area for a given type and the ref veg area for a given type within the lulc cell
-	float max_sum_area_diff;		// the maximum sum_area_diff across types
-	float *type_area_resid;			// array of residual areas (lulc - assigned refveg within lulc cell) for the types after the first pass
-	float max_resid_area;			// for finding the max resid area
-	float temp_rvt_area;			// for checking
+	double sum_area_diff;			// difference between lulc area for a given type and the ref veg area for a given type within the lulc cell
+	double max_sum_area_diff;		// the maximum sum_area_diff across types
+	double *type_area_resid;			// array of residual areas (lulc - assigned refveg within lulc cell) for the types after the first pass
+	double max_resid_area;			// for finding the max resid area
+	double temp_rvt_area;			// for checking
+	double temp_dbl2;				// for checking
+	double land_area_in;				// input land area for this lulc cell
 	
 	// for searching the lu cells
 	int ncols;
@@ -109,27 +113,27 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	int rightcol;
 	
 	// allocate some arrays
-	sum_lu_area = calloc(NUM_HYDE_TYPES, sizeof(float));
+	sum_lu_area = calloc(NUM_HYDE_TYPES, sizeof(double));
 	if(sum_lu_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for sum_lu_area: proc_lulc_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	lc_agg_area = calloc(NUM_SAGE_PVLT, sizeof(float));
+	lc_agg_area = calloc(NUM_LULC_TYPES, sizeof(double));
 	if(lc_agg_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lc_agg_area: proc_lulc_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	leftover_cell_inds = calloc(num_lu_cells, sizeof(float));
+	leftover_cell_inds = calloc(num_lu_cells, sizeof(int));
 	if(leftover_cell_inds == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for leftover_cell_inds: proc_lulc_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	refveg_type_area_sum = calloc(NUM_SAGE_PVLT, sizeof(float));
+	refveg_type_area_sum = calloc(NUM_SAGE_PVLT, sizeof(double));
 	if(refveg_type_area_sum == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_type_area_sum: proc_lulc_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	type_area_resid = calloc(NUM_SAGE_PVLT, sizeof(float));
+	type_area_resid = calloc(NUM_SAGE_PVLT, sizeof(double));
 	if(type_area_resid == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for type_area_resid: proc_lulc_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
@@ -158,8 +162,8 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 				}
 				refveg_area_out[i] = 0;
 				// calculate reference veg area
-				refveg_area_out[i] = land_area_hyde[lu_indices[i]] -
-				lu_area[i][crop_ind] - lu_area[i][pasture_ind] - lu_area[i][urban_ind];
+				refveg_area_out[i] = land_area_hyde[lu_indices[i]] - lu_area[i][crop_ind] -
+					lu_area[i][pasture_ind] - lu_area[i][urban_ind];
 				temp_dbl = refveg_area_out[i];
 				// check for negative values
 				if (refveg_area_out[i] < 0) {
@@ -207,7 +211,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 				}
 				temp_dbl = lu_area[i][crop_ind];
 				// this shouldn't happen, but check anyway
-				if (lu_area[i][crop_ind] < 0) {
+				if (lu_area[i][crop_ind] < -ZERO_THRESH) {
 					lu_area[i][crop_ind] = 0;
 					lu_area[i][ir_norice_ind] = 0;
 					lu_area[i][rf_norice_ind] = 0;
@@ -218,12 +222,12 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 					lu_area[i][tot_rice_ind] = 0;
 					fprintf(fplog, "Warning: negative crop area %lf at i %i: proc_lulc_area()\n", temp_dbl, i);
 					// some small (effectively zero) negative values appear here from time to time
-					//return ERROR_CALC;
+					return ERROR_CALC;
 				}
 			} else {
 				// this could be reached due to coarse resolution lulc data
 				// here, hyde land area == nodata sets all land type areas to zero for this lu cell
-				// calc_refveg_area stores nodata for the types for hyde land area == nodata
+				// calc_refveg_area and proc_land_type_area store nodata for the types for hyde land area == nodata
 				for (j = 0; j < NUM_HYDE_TYPES; j++) {
 					lu_area[i][j] = 0;
 				}
@@ -235,33 +239,79 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 			} // end if valid hyde land area else not
 
 		// now sum the final lu areas
+		// also sum the physical lu land areas
+		temp_dbl2 = 0;
 		for (j = 0; j < NUM_HYDE_TYPES; j++) {
 			if (lu_area[i][j] != raster_info.lu_nodata) {
 				sum_lu_area[j] = sum_lu_area[j] + lu_area[i][j];
 			}
+			if (j < NUM_HYDE_TYPES_MAIN) {
+    			temp_dbl2 = temp_dbl2 + lu_area[i][j];
+			}
 		}
-		// sum the lu land area within this lulc cell
-		if (land_area_hyde[lu_indices[i]] != raster_info.land_area_hyde_nodata) {
-			sum_lu_land_area = sum_lu_land_area + land_area_hyde[lu_indices[i]];
-		}
+		
 		// sum the ref veg area
 		sum_refveg_area = sum_refveg_area + refveg_area_out[i];
 		
-		// fill the array with the enumerated indices so they can be shuffled below
-		rand_order[i] = i;
+		// sum the lu land area within this lulc cell
+		if (land_area_hyde[lu_indices[i]] != raster_info.land_area_hyde_nodata) {
+			sum_lu_land_area = sum_lu_land_area + land_area_hyde[lu_indices[i]];
+			
+			// check that these sum to land area for each lu cell, within tolerance
+			// the max precision error here is 0.000015
+			temp_dbl = land_area_hyde[lu_indices[i]] - (temp_dbl2 + refveg_area_out[i]);
+			if (in_args.diagnostics) {
+				if ((temp_dbl2 + refveg_area_out[i]) < (land_area_hyde[lu_indices[i]] - ROUND_TOLERANCE) || (temp_dbl2 + refveg_area_out[i]) > 	(land_area_hyde[lu_indices[i]] + ROUND_TOLERANCE)) {
+					fprintf(fplog, "Warning: cell %i lu area %lf + refveg area %lf != land area %f, diff = %lf: proc_lulc_area()\n", lu_indices[i], temp_dbl2, refveg_area_out[i], land_area_hyde[lu_indices[i]], temp_dbl);
+					//return ERROR_CALC;
+				}
+			} // end if diagnostics output
+		} // end sum the lu area within this cell
+
+		//if (lulc_index == 63120) {
+		//	fprintf(cell_file, "proc_lulc_area,%i,%i,%i,%f,%lf,%lf,%lf,%lf,%lf\n", i, lu_indices[i], lulc_index, land_area_hyde[lu_indices[i]], refveg_area_out[i], temp_dbl2, lu_area[i][0], lu_area[i][1], lu_area[i][2]);
+		//}
 		
 	} // end i loop over the lu cells to determine total areas
-
+	
 	// aggregate the lulc land cover type areas to pot veg types
 	for (i = 0; i < NUM_LULC_LC_TYPES; i++) {
 		if (lulc_area[i] != raster_info.lulc_input_nodata && lulc2sagecodes[i] != -1) {
 			lc_agg_area[lulc2sagecodes[i]-1] = lc_agg_area[lulc2sagecodes[i]-1] + lulc_area[i];
 		}
 	}
+	for (j = NUM_LULC_LC_TYPES; j < NUM_LULC_TYPES; j++) {
+		if (lulc_area[j] != raster_info.lulc_input_nodata && lulc2hydecodes[j] != -1) {
+			lc_agg_area[NUM_SAGE_PVLT + lulc2hydecodes[j]] = lc_agg_area[NUM_SAGE_PVLT + lulc2hydecodes[j]] + lulc_area[j];
+		}
+	}
+	
 	// now sum the non-land-use veg types for input lulc
 	for (j = 0; j < NUM_SAGE_PVLT; j++) {
-			sum_lulc_veg_area = sum_lulc_veg_area + lc_agg_area[j];
+		sum_lulc_veg_area = sum_lulc_veg_area + lc_agg_area[j];
 	}
+	
+	// sum the land use types for input lulc to get in land area
+	land_area_in = sum_lulc_veg_area;
+	temp_dbl2 = 0;
+	for (j = NUM_SAGE_PVLT + 1; j < NUM_SAGE_PVLT + 1 + NUM_HYDE_TYPES_MAIN; j++) {
+		land_area_in = land_area_in + lc_agg_area[j];
+		temp_dbl2 = temp_dbl2 + sum_lu_area[j-(NUM_SAGE_PVLT + 1)];
+	}
+	
+	// print the refveg area and lu area
+	//if (sum_refveg_area != 0 || temp_dbl2 != 0) {
+	//	fprintf(fplog, "Check: lulc cell %i refveg area %lf lu area %lf: proc_lulc_area()\n", lulc_index, sum_refveg_area, temp_dbl2);
+	//	fprintf(debug_file, "proc_lulc_area,,%i,%lf,%lf,%lf\n", lulc_index, sum_refveg_area, temp_dbl2, sum_refveg_area + temp_dbl2);
+	//}
+	
+	// check that lu land sum equals lulc land sum for this lulc cell
+	// this unequal situation happens a fair amount due to different estimates of land along coastlines
+	// this is why a scalar is calculated
+	//if ((temp_dbl2 + sum_refveg_area) != land_area_in) {
+	//	fprintf(fplog, "Error: lulc cell %i lu area %lf + refveg area %lf != lulc land area %lf: proc_lulc_area()\n", lulc_index, sum_lu_land_area, sum_refveg_area, land_area_in);
+	//}
+	
 	// scale the input land cover to the available ref veg area
 	if (sum_lulc_veg_area > 0) {
 		lulc_scalar = sum_refveg_area / sum_lulc_veg_area;
@@ -269,21 +319,12 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 		lulc_scalar = 0;
 	}
 	
-	// "randomize" the lu cell order
-	// this will be the order of the cells to process
-	for (i = num_lu_cells - 1; i > 0; i--) {
-		j = rand() % (i+1);
-		temp_int = rand_order[i];
-		rand_order[i] = rand_order[j];
-		rand_order[j] = temp_int;
-	}
-	
 	// distribute the land cover based on the potential vegetation and adjust to lulc as necessary, but not over lulc limts
 	// no lu land sets ref veg to nodata
 	// zero ref veg area sets ref veg to pot veg
 	for (m = 0; m < num_lu_cells; m++) {
 		// get the randomized cell index
-		i = rand_order[m];
+		i = rand_order[lulc_index][m];
 		
 		// do this only for cells with land area
 		if (land_area_hyde[lu_indices[i]] != raster_info.land_area_hyde_nodata) {
@@ -653,7 +694,7 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	for (j = 0; j < NUM_SAGE_PVLT; j++) {
 		type_area_resid[j] = lulc_scalar * lc_agg_area[j] - refveg_type_area_sum[j];
 		if (type_area_resid[j] < 0 && in_args.diagnostics) {
-			//fprintf(fplog, "Warning, resid area for pot veg type %i is < 0 (%f): proc_lulc_area()\n", j+1, type_area_resid[j]);
+			//fprintf(fplog, "Warning, resid area for pot veg type %i is < 0 (%lf): proc_lulc_area()\n", j+1, type_area_resid[j]);
 		}
 	} // end for j loop over pot veg types
 
@@ -681,22 +722,26 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 		} // end for j loop over pot veg types for getting largest resid area
 		
 		// assign the veg type and reduce the corresponding residual area
-		// if there is no max resid area found, then assign an unkown type
+		// if there is no max resid area found, then assign an unkown type, or check for potential veg value to reduce unknown area
 		if (max_resid_ind != NOMATCH) {
 			refveg_them[leftover_cell_inds[i]] = landtypecodes_sage[max_resid_ind];
 			type_area_resid[max_resid_ind] = type_area_resid[max_resid_ind] - refveg_type_area_sum[max_resid_ind];
 			if (in_args.diagnostics && type_area_resid[max_resid_ind] < 0) {
-				//fprintf(fplog, "Extra lulc cell area for ref veg type %i is %f: proc_lulc_area()\n", max_resid_ind+1, type_area_resid[max_resid_ind]);
+				//fprintf(fplog, "Extra lulc cell area for ref veg type %i is %lf: proc_lulc_area()\n", max_resid_ind+1, type_area_resid[max_resid_ind]);
 			}
 		} else {
-			refveg_them[leftover_cell_inds[i]] = 0;
+			if (potveg_thematic[lu_indices[leftover_cell_inds[i]]] != raster_info.potveg_nodata) {
+    			refveg_them[leftover_cell_inds[i]] = potveg_thematic[lu_indices[leftover_cell_inds[i]]];
+			} else {
+				refveg_them[leftover_cell_inds[i]] = 0;
+			}
 		}
-
+		
 	} // end for i loop over cells to deal with unassigned cells and residual area
 	
 	//if (in_args.diagnostics) {
 	//	for (j = 0; j < NUM_SAGE_PVLT; j++) {
-	//		fprintf(fplog,"pvlt %i:\tlc_agg_area = %f;\trv_sum = %f\n", j+1, lulc_scalar * lc_agg_area[j], refveg_type_area_sum[j]);
+	//		fprintf(fplog,"pvlt %i:\tlc_agg_area = %lf;\trv_sum = %lf\n", j+1, lulc_scalar * lc_agg_area[j], refveg_type_area_sum[j]);
 	//	}
 	//}
 	
@@ -706,5 +751,4 @@ int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, float *lulc_ar
 	free(refveg_type_area_sum);
 	free(type_area_resid);
 	
-	return OK;
-}
+	return OK;}

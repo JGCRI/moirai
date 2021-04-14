@@ -37,18 +37,18 @@ INCDIRS = $(HDRDIR) $(NCHDRDIR)
 IFLAGS = $(INCDIRS:%=-I%)
 
 # For Linux
-CFLAGS =  -O3 -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
-# CFLAGS = -fast -std=c99 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
-# CFLAGS = -O3 -std=c99 -ffloat-store ${CFLAGS_GENERIC} # Use precise IEEE Floating Point
-#CFLAGS = -g -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # debugging with line/file reporting and 'standards' testing flags
-# CFLAGS = -fast -Wall -pedantic -std=c99 ${CFLAGS_GENERIC} # testing with line/file reporting and 'standards' testing flags
+CFLAGS =  -O3 -std=c11 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
+# CFLAGS = -fast -std=c11 ${CFLAGS_GENERIC} # Almost fully optimized and using ISO C99 features
+# CFLAGS = -O3 -std=c11 -ffloat-store ${CFLAGS_GENERIC} # Use precise IEEE Floating Point
+# CFLAGS = -g -Wall -pedantic -std=c11 ${CFLAGS_GENERIC} # debugging with line/file reporting and 'standards' testing flags
+# CFLAGS = -fast -Wall -pedantic -std=c11 ${CFLAGS_GENERIC} # testing with line/file reporting and 'standards' testing flags
 LDFLAGS = ${LDFLAGS_GENERIC}
 CC = gcc
 
 # get just the object names for the desired source files
 SRC_FILES_ALL_WPATH = ${wildcard ${SRCDIR}/*.c}
 SRC_FILES_ALL = ${notdir ${SRC_FILES_ALL_WPATH}}
-RMSRC = read_nfert.c proc_nfert.c read_lu_hyde.c
+RMSRC = read_lu_hyde.c
 SRC_FILES = ${filter-out ${RMSRC}, ${SRC_FILES_ALL}}
 SRC_FILES_WPATH = ${patsubst %,${SRCDIR}/%,${SRC_FILES}}
 LDS_OBJS = ${patsubst %.c,%.o,${SRC_FILES}}

@@ -188,5 +188,4 @@ int read_lulc_land(args_struct in_args, int year, rinfo_struct *raster_info, int
 		}
 	}
 	
-	return OK;
-}
+	return OK;}

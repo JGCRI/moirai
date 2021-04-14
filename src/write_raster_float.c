@@ -57,7 +57,7 @@ int write_raster_float(float out_array[], int out_length, char *out_name, args_s
 		return ERROR_FILE;
 	}
 	
-	num_out = fwrite(out_array, sizeof(float), out_length, fpout);
+	num_out = (int) fwrite(out_array, sizeof(float), out_length, fpout);
 	
 	fclose(fpout);
 	
@@ -68,5 +68,4 @@ int write_raster_float(float out_array[], int out_length, char *out_name, args_s
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

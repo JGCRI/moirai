@@ -69,5 +69,4 @@ int write_text_char(char **out_array, int out_length, char *out_name, args_struc
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

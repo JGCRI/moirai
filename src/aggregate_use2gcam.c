@@ -196,5 +196,4 @@ int aggregate_use2gcam(args_struct in_args) {
     
     free(diag_rent_use_aez_gcam);
 	
-	return OK;
-}
+	return OK;}

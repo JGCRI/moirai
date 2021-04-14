@@ -20,6 +20,9 @@
  
  this function does not check for valid country/glu
  
+ this function also sets the cell order for distribution of ref veg within coarse lulc cells,
+ because this is the first time the hyde and lulc data are read.
+ 
  arguments:
  args_struct in_args:	input argument structure
  rinfo_struct raster_info: information about input raster data
@@ -92,21 +95,23 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 	int ncells_lulc;	// number of lulc input cells
 	
 	// used to determine working grid cell indices
+	int temp_int;			// for setting the random order
 	int num_split = 0;		// number of working grid cells in one dimension of one lulc cell
-	int num_lu_cells = 0;	// number of working grid cells in one lulc cell
 	int grid_y_ul;				// row for ul corner working grid cell in lulc cell
 	int grid_x_ul;				// col for ul corner working grid cell in lulc cell
 	double rem_dbl;				// used to get the remainder of a decimal number
 	double int_dbl;				// used to get the integer of a decimal number
 	
-	float *lulc_area;		// array for the lulc areas per type for a single lulc cell
-	float **lu_area;		// array for the lu areas determined for each lulc cell; dim1=num_lu_cells, dim2 = NUM_HYDE_TYPES
+	double *lulc_area;		// array for the lulc areas per type for a single lulc cell
+	double **lu_area;		// array for the lu areas determined for each lulc cell; dim1=NUM_LU_CELLS, dim2 = NUM_HYDE_TYPES
 	int *lu_indices;		// array for the working grid indices for the lu cells for a single lulc cell
-	float *refveg_area_out;		// array for the reference veg areas in each working grid cell, for a single lulc cell
+	double *refveg_area_out;		// array for the reference veg areas in each working grid cell, for a single lulc cell
 	int *refveg_them;		// array for the reference veg tyep values in each working grid cell, for a single lulc cell
 	
+	double rfarea_check;
+	double luarea_check;
+	
 	// first read in the appropriate hyde land use area data
-	// this is needed to get num_lu_cells
 	if((err = read_hyde32(in_args, raster_info, REF_YEAR, cropland_area, pasture_area, urban_area, lu_detail_area)) != OK)
 	{
 		fprintf(fplog, "Failed to read lu hyde data for reference year: calc_refveg_area()\n");
@@ -120,6 +125,9 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 		return err;
 	}
 	
+	// this is the first time these are read in, so set the number of lu cells within lulc cell
+	// also set the random order once so it doesn't change over multiple calls of proc_lulc_area
+	
 	// determine how many base lu cells are in one lulc cell
 	// assume perfect fit of working grid into lulc data
 	// assume symmetric cells
@@ -128,37 +136,64 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 	ncells_lulc = raster_info->lulc_input_ncells;
 	
 	num_split = ncols / ncols_lulc;
-	num_lu_cells = num_split * num_split;
+	NUM_LU_CELLS = num_split * num_split;
+	
+	// allocate the random order array here
+	// this is deallocated at the end of proc_refveg_carbon()
+	rand_order = calloc(ncells_lulc, sizeof(float*));
+	if(rand_order == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for rand_order: calc_refveg_area()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	for (i = 0; i < ncells_lulc; i++) {
+		rand_order[i] = calloc(NUM_LU_CELLS, sizeof(float));
+		if(rand_order[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for rand_order[%i]: calc_refveg_area()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+		
+		// "randomize" the lu cell order for each lulc cell; but do this only once so each year is the same
+		// this will be the order of the cells to process
+		for (j = 0; j < NUM_LU_CELLS; j++) {
+			rand_order[i][j] = j;
+		}
+		for (j = NUM_LU_CELLS - 1; j > 0; j--) {
+			m = rand() % (j+1);
+			temp_int = rand_order[i][j];
+			rand_order[i][j] = rand_order[i][m];
+			rand_order[i][m] = temp_int;
+		}
+	}
 	
 	// allocate some arrays
-	lulc_area = calloc(NUM_LULC_TYPES, sizeof(float));
+	lulc_area = calloc(NUM_LULC_TYPES, sizeof(double));
 	if(lulc_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lulc_area: calc_refveg_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	lu_area = calloc(num_lu_cells, sizeof(float*));
+	lu_area = calloc(NUM_LU_CELLS, sizeof(double*));
 	if(lu_area == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_area: calc_refveg_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	for (i = 0; i < num_lu_cells; i++) {
-		lu_area[i] = calloc(NUM_HYDE_TYPES, sizeof(float));
+	for (i = 0; i < NUM_LU_CELLS; i++) {
+		lu_area[i] = calloc(NUM_HYDE_TYPES, sizeof(double));
 		if(lu_area[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_area[%i]: calc_refveg_area()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
 		}
 	}
-	lu_indices = calloc(num_lu_cells, sizeof(int));
+	lu_indices = calloc(NUM_LU_CELLS, sizeof(int));
 	if(lu_indices == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_indices: calc_refveg_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	refveg_area_out = calloc(num_lu_cells, sizeof(float));
+	refveg_area_out = calloc(NUM_LU_CELLS, sizeof(double));
 	if(refveg_area_out == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area_out: calc_refveg_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
-	refveg_them = calloc(num_lu_cells, sizeof(float));
+	refveg_them = calloc(NUM_LU_CELLS, sizeof(float));
 	if(refveg_them == NULL) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_them: calc_refveg_area()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
@@ -173,7 +208,7 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 		
 		// get lulc areas for this cell
 		for (j = 0; j < NUM_LULC_TYPES; j++) {
-			lulc_area[j] = lulc_input_grid[j][i];
+			lulc_area[j] = (double) lulc_input_grid[j][i];
 		}
 		
 		// determine the working grid 1d indices of the lu cells in this lulc cell
@@ -187,25 +222,25 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 		for (m = grid_y_ul; m < grid_y_ul + num_split; m++) {
 			for (n = grid_x_ul; n < grid_x_ul + num_split; n++) {
 				lu_indices[count] = m * NUM_LON + n;
-				lu_area[count][urban_ind] = urban_area[lu_indices[count]];
-				lu_area[count][crop_ind] = cropland_area[lu_indices[count]];
-				lu_area[count][pasture_ind] = pasture_area[lu_indices[count]];
+				lu_area[count][urban_ind] = (double) urban_area[lu_indices[count]];
+				lu_area[count][crop_ind] = (double) cropland_area[lu_indices[count]];
+				lu_area[count][pasture_ind] = (double) pasture_area[lu_indices[count]];
 				for (j = NUM_HYDE_TYPES_MAIN; j < NUM_HYDE_TYPES; j++) {
-					lu_area[count][j] = lu_detail_area[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
+					lu_area[count][j] = (double) lu_detail_area[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
 				}
 				refveg_area_out[count] = 0;
 				refveg_them[count] = 0;
 				count++;
 			} // end for n loop over the columns to set
 		} // end for m loop over the rows to set
-		if (count != num_lu_cells) {
+		if (count != NUM_LU_CELLS) {
 			fprintf(fplog, "Failed to get working grid indices for lulc cell %i for reference year: calc_refveg_area()\n", i);
 			return err;
 		}
 		
 		// calculate the areas for this lulc cell
 		// this keeps the hyde land use (but checks it for land consistency), and disaggregates the lc data to the non-lu cell area
-		if ((err = proc_lulc_area(in_args, *raster_info, lulc_area, lu_indices, lu_area, refveg_area_out, refveg_them, num_lu_cells)) != OK)
+		if ((err = proc_lulc_area(in_args, *raster_info, lulc_area, lu_indices, lu_area, refveg_area_out, refveg_them, NUM_LU_CELLS, i)) != OK)
 		{
 			fprintf(fplog, "Failed to process lulc cell %i for reference year: calc_refveg_area()\n", i);
 			return err;
@@ -213,16 +248,21 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 		
 		// store the areas in the appropriate places
 		// set cell to nodata if it is not a land cell
-		for (j = 0; j < num_lu_cells; j++) {
+		rfarea_check = 0;
+		luarea_check = 0;
+		for (j = 0; j < NUM_LU_CELLS; j++) {
 			if (land_area_hyde[lu_indices[j]] != raster_info->land_area_hyde_nodata) {
-				cropland_area[lu_indices[j]] = lu_area[j][crop_ind];
-				pasture_area[lu_indices[j]] = lu_area[j][pasture_ind];
-				urban_area[lu_indices[j]] = lu_area[j][urban_ind];
+				cropland_area[lu_indices[j]] = (float) lu_area[j][crop_ind];
+				pasture_area[lu_indices[j]] = (float) lu_area[j][pasture_ind];
+				urban_area[lu_indices[j]] = (float) lu_area[j][urban_ind];
 				for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
-					lu_detail_area[m-NUM_HYDE_TYPES_MAIN][lu_indices[j]] = lu_area[j][m];
+					lu_detail_area[m-NUM_HYDE_TYPES_MAIN][lu_indices[j]] = (float) lu_area[j][m];
 				}
-				refveg_area[lu_indices[j]] = refveg_area_out[j];
+				refveg_area[lu_indices[j]] = (float) refveg_area_out[j];
 				refveg_thematic[lu_indices[j]] = refveg_them[j];
+				
+				rfarea_check = rfarea_check + refveg_area_out[j];
+				luarea_check = luarea_check + lu_area[j][crop_ind] + lu_area[j][pasture_ind] +lu_area[j][urban_ind];
 				
 				// if ref veg, then add cell index to land_mask_refveg and forest cells as appropriate
 				if (refveg_thematic[lu_indices[j]] != raster_info->potveg_nodata) {
@@ -245,6 +285,12 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 				refveg_thematic[lu_indices[j]] = raster_info->potveg_nodata;
 			}
 		} // end for j loop over the lu cells to store
+		
+		//if(rfarea_check != 0 || luarea_check != 0){
+		//	fprintf(fplog, "Check: year 2000 lulc cell %i refveg area %lf lu area %lf: calc_refveg_area()\n", i, rfarea_check, luarea_check);
+		//	fprintf(debug_file, "calc_refveg_area,2000,%i,%lf,%lf,%lf\n", i, rfarea_check, luarea_check, rfarea_check + luarea_check);
+		//}
+		
 	} // end for i loop over the lulc cells
 	
 	 
@@ -280,11 +326,10 @@ int calc_refveg_area(args_struct in_args, rinfo_struct *raster_info) {
 	free(refveg_area_out);
 	free(refveg_them);
 	free(lu_indices);
-	for (i = 0; i < num_lu_cells; i++) {
+	for (i = 0; i < NUM_LU_CELLS; i++) {
 		free(lu_area[i]);
 	}
 	free(lu_area);
 	
 	
-	return OK;
-}
+	return OK;}

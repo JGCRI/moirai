@@ -68,5 +68,4 @@ int write_text_int(int out_array[], int out_length, char *out_name, args_struct 
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

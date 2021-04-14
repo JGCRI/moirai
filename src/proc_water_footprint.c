@@ -97,7 +97,6 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     char fname[MAXCHAR];        // current file name to read, or write
     char tmp_str[MAXCHAR];		// stores a temporary string
     char diag_name[MAXCHAR];	// for diagnostic output names
-    
     FILE *fpout;                // out file pointer
     
     float wf_nodata = NODATA;  // wf binary file nodata value
@@ -378,6 +377,10 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     
     fprintf(fplog, "Wrote file %s: proc_water_footprint(); records written=%i\n", fname, nrecords_wf);
     
+  for (i = 0; i < raster_info.lulc_input_ncells; i++) {
+		free(rand_order[i]);
+	}
+	free(rand_order);
     free(bl_grid);
     free(gn_grid);
     free(gy_grid);
@@ -393,5 +396,4 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info) {
     }
     free(wf_out);
     
-    return OK;
-}
+    return OK;}

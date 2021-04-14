@@ -98,5 +98,4 @@ int write_csv_float2d(float out_array[], int d1[], int d1_length, int d2_length,
 		return ERROR_FILE;
 	}
 	
-	return OK;
-}
+	return OK;}

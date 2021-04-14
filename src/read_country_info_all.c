@@ -85,14 +85,14 @@ int read_country_info_all(args_struct in_args) {
 	}
 	
 	// skip the header line
-	if(fscanf(fpin, "%[^\n]\n", rec_str) == EOF)
+	if(fscanf(fpin, "%[^\r\n]\r\n", rec_str) == EOF)
 	{
 		fprintf(fplog,"Failed to scan over file %s header:  read_country_info_all()\n", fname);
 		return ERROR_FILE;
 	}
 	
     // count the records
-    while (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+    while (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
         nrecords++;
     }
     
@@ -131,7 +131,7 @@ int read_country_info_all(args_struct in_args) {
     rewind(fpin);
     
     // skip the header line
-    if(fscanf(fpin, "%[^\n]\n", rec_str) == EOF)
+    if(fscanf(fpin, "%[^\r\n]\r\n", rec_str) == EOF)
     {
         fprintf(fplog,"Failed to scan over file %s header:  read_country_info_all()\n", fname);
         return ERROR_FILE;
@@ -139,7 +139,7 @@ int read_country_info_all(args_struct in_args) {
     
 	// read all the records
 	for (i = 0; i < NUM_FAO_CTRY; i++) {
-		if (fscanf(fpin, "%[^\n]\n", rec_str) != EOF) {
+		if (fscanf(fpin, "%[^\r\n]\r\n", rec_str) != EOF) {
 			// get the FAO integer code
 			if((err = get_int_field(rec_str, delim, 1, &countrycodes_fao[out_index])) != OK) {
 				fprintf(fplog, "Error processing file %s: read_country_info_all(); record=%i, column=1\n",
@@ -192,5 +192,4 @@ int read_country_info_all(args_struct in_args) {
 		}
 	}	// end if diagnostics
 	
-	return OK;
-}
+	return OK;}

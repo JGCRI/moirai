@@ -66,7 +66,6 @@
         Land_type_area_ha.csv  - this replaces the Sage_Hyde15_Area.csv file
         Pot_veg_carbon_Mg_per_ha.csv - this replaces the level0 carbon files
         Water_footprint_m3.csv - this is the water footprint data
-        Nfert_kg.csv - no longer output because it is wrong, and it is not used by gcam
  
  It also writes these ancillary files (names can be changed in the LDS input file):
 	gcam-data-system/aglu-data/mappings/
@@ -227,19 +226,22 @@
  
  
  Data for the additional GIS processing:
-    protected area raster (not sure where it is from)
-        5 arcmin resolution, single byte integers, 1 = protected, 255 = not protected (only these 2 values)
-            ProArea_0408_ENVI.img
-    nitrogen addition (likely from potter 2010, but some sort of average of the different crops)
-        5 arcmin, but resampled from half-degree
-        these data are not used by GCAM, and while the original processing is included here, it is not correct
-            Nfert_003d.img
-    potential vegetation carbon (above ground and roots)
-        text file with values mapped to SAGE potential vegetation types, based on liturature search
-            veg_carbon.csv
-    soil carbon for potential vegetation types (soil only)
-        text file with values mapped to SAGE potential vegetation types, based on liturature search
-            soil_carbon.csv
+    suitable/protected area data from epa
+ 		6 files, fraction of grid cell, see read_protectd for details
+        5 arcmin resolution
+potential vegetation carbon (above ground and below ground biomass)
+        6 different binary rasters representing 6 states of potential vegetation carbon (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
+        The input rasters are 5 arcmin binary files , 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
+        Data is scaled up by a factor of 0.1 in the raw data and is scaled down in our calculations
+        These are calculated using a fine resolution raster dataset from Spawn et al 2020    
+soil carbon (soil only for a depth of 0-30 cms)
+        6 different binary rasters representing 6 states of potential vegetation carbon (weighted average, median, minimum, maximum, quartile 1 and quartile 3).
+        The input rasters are 5 arcmin binary files , 2160 rows, 4320 cols, llcornboundary = -180lon, -90lat, WGS84
+        The user has the option to select these rasters from 3 different sources, namely, 
+        A) FAO Harmonized World Soil Database
+        B) Soil grids (mean soil  carbon )
+        C) Soil grids (95th percentile soil carbon)
+
  
  GTAP land use database R2.1V6.0:
 	gcam-data-system/aglu-data/level0/
@@ -291,10 +293,13 @@
  **********/
 
 #include "moirai.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int main(int argc, const char * argv[]) {
     
-    int i, j;
+    int i, j, k,l;
+    int array_cells =3;
 	char fname[MAXCHAR];		// used to open files
 	args_struct in_args;		// data structure for holding the control input file info
 	rinfo_struct raster_info;	// data structure for storing raster input file specific info
@@ -322,7 +327,7 @@ int main(int argc, const char * argv[]) {
 	
 	// initialize all of the arrays
 	if((error_code = init_moirai(&in_args))) {
-		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}
 	
@@ -361,7 +366,31 @@ int main(int argc, const char * argv[]) {
 	system(mkoutputpathcmd);
 	
 	fprintf(fplog, "\nProgram %s started at %s\n", CODENAME, get_systime());
+	
+	fprintf(fplog, "\nFor more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file\n");
 
+	/*
+	// create a file to check each lulc cell that is easy to read into r and compare area values
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_area.csv");
+	if ((debug_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(debug_file, "func,year,lulc_cell,rf_area,lu_area,land_area\n");
+	
+	// create a file for particular lu values for a given lulc cell
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_lulc_cell.csv");
+	if ((cell_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(cell_file, "func,lu_index,wg_index,lulc_index,land_area,rf_area,lu_area,u_area,c_area,p_area\n");
+	*/
+	 
     //////////
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
@@ -563,6 +592,13 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+
+    refcarbon_area = calloc(NUM_CELLS, sizeof(float));
+    if(refcarbon_area == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+
     region_gcam = calloc(NUM_CELLS, sizeof(int));
     if(region_gcam == NULL) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for region_gcam: main()\n", get_systime(), ERROR_MEM);
@@ -650,6 +686,12 @@ int main(int argc, const char * argv[]) {
 		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
 		return ERROR_MEM;
 	}
+
+    refvegcarbon_thematic = calloc(NUM_CELLS, sizeof(int));
+	if(refvegcarbon_thematic == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
 	
     // allocate some arrays to keep track of valid raster cells
     land_cells_aez_new = calloc(NUM_CELLS, sizeof(int));
@@ -686,15 +728,18 @@ int main(int argc, const char * argv[]) {
 	
 	////
 	// convert the hyde land use, lulc, and sage potential veg input data to working grid area
+	// the rand_order array is allocated here in calc_refvef_area and is deallocated in proc_refveg_carbon
 	if((error_code = calc_refveg_area(in_args, &raster_info))) {
 		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
 		return error_code;
 	}	
-
+    
+    if((error_code = calc_refcarbon_area(in_args, raster_info))) {
+		fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+		return error_code;
+	}
     // free some raster arrays
-    free(urban_area);
     free(region_gcam);
-    free(cell_area_hyde);
     free(sage_minus_hyde_land_area);
     free(glacier_water_area_hyde);
     free(land_mask_aez_orig);
@@ -703,10 +748,23 @@ int main(int argc, const char * argv[]) {
     free(land_mask_hyde);
     free(land_mask_fao);
     free(land_mask_potveg);
-	free(land_mask_refveg);
-    free(land_mask_forest);
 	free(land_mask_lulc);
-    
+	
+	    free(land_mask_forest);
+		free(land_mask_refveg);
+   
+   // allocate space for hong kong and taiwan glu area tracking in write_glu_mapping
+   twn_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(twn_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for twn_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   hkg_glu_area = calloc(NUM_ORIG_AEZ, sizeof(float));
+   if(hkg_glu_area == NULL) {
+      fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for hkg_glu_area: main()\n", get_systime(), ERROR_MEM);
+      return ERROR_MEM;
+   }
+   
 	// store the country/land rent region + aez lists
     // the arrays are allocated within write_glu_mapping()
 	if((error_code = write_glu_mapping(in_args, raster_info))) {
@@ -720,27 +778,191 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
-    // allocate and read the protected pixel data
-    protected_thematic = calloc(NUM_CELLS, sizeof(short));
-    if(protected_thematic == NULL) {
-        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_thematic: main()\n", get_systime(), ERROR_MEM);
+	
+    //kbn 2020
+    protected_EPA = calloc(NUM_EPA_PROTECTED, sizeof(float*));
+    if(protected_EPA == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
+    for (i = 0; i < NUM_EPA_PROTECTED; i++) {
+		protected_EPA[i] = calloc(NUM_CELLS, sizeof(float));
+		if(protected_EPA[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for protected_EPA[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    
     if((error_code = read_protected(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
+    //kbn 2020/06/01 Add code for read_soil_c here
+    soil_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(soil_carbon_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		soil_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(soil_carbon_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
     
-    /***** deprecated
-    // process the nfert data
-    //  nfert grid is allocated/freed within proc_nfert()
-    if((error_code = proc_nfert(in_args, raster_info))) {
+    //Allocate the arrays to hold the number of cells
+    soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int**));
+    if(soil_carbon_array_cells == NULL) {
+        fprintf(fplog,"Failed to allocate memory for refveg_carbon_out: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        soil_carbon_array_cells[i] = calloc(ctry_aez_num[i], sizeof(int*));
+        if(soil_carbon_array_cells[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            soil_carbon_array_cells[i][j] = calloc(num_lt_cats, sizeof(int));
+            if(soil_carbon_array_cells[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for refveg_carbon_out[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+             // end for k loop over output values
+            } // end for j loop over aezs
+        }
+    
+  //Allocate the main soil_carbon_array
+    soil_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
+    if(soil_carbon_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        soil_carbon_array[i] = calloc(ctry_aez_num[i], sizeof(float***));
+        if(soil_carbon_array[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            soil_carbon_array[i][j] = calloc(num_lt_cats, sizeof(float**));
+            if(soil_carbon_array[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+            for (k = 0; k < num_lt_cats; k++) {
+                soil_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
+                if(soil_carbon_array[i][j][k] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }//The last dimension will be assigned in read_soil_carbon.c
+                for (l = 0; l < NUM_CARBON; l++) {
+                soil_carbon_array[i][j][k][l] = calloc(array_cells, sizeof(float));
+                if(soil_carbon_array[i][j][k][l] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }
+                }// end for k loop over output values
+            }// end for j loop over aezs
+        }// end for j loop over glus
+     }// end for i loop over fao country 
+    
+    //Allocate the vegetation carbon arrays
+    veg_carbon_array = calloc(NUM_FAO_CTRY, sizeof(float****));
+    if(veg_carbon_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for soil_carbon_array: proc_refveg_carbon()\n");
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        veg_carbon_array[i] = calloc(ctry_aez_num[i], sizeof(float***));
+        if(veg_carbon_array[i] == NULL) {
+            fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i]: proc_refveg_carbon()\n", i);
+            return ERROR_MEM;
+        }
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            veg_carbon_array[i][j] = calloc(num_lt_cats, sizeof(float**));
+            if(veg_carbon_array[i][j] == NULL) {
+                fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i]: proc_refveg_carbon()\n", i, j);
+                return ERROR_MEM;
+            }
+            for (k = 0; k < num_lt_cats; k++) {
+                veg_carbon_array[i][j][k] = calloc(NUM_CARBON, sizeof(float*));
+                if(veg_carbon_array[i][j][k] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }//The last dimension will be assigned in read_soil_carbon.c
+                for (l = 0; l < NUM_CARBON; l++) {
+                veg_carbon_array[i][j][k][l] = calloc(array_cells, sizeof(float));
+                if(veg_carbon_array[i][j][k][l] == NULL) {
+                    fprintf(fplog,"Failed to allocate memory for soil_carbon_array[%i][%i][%i]: proc_refveg_carbon()\n", i, j, k);
+                    return ERROR_MEM;
+                }
+                }// end for k loop over output values
+            }// end for j loop over aezs
+        }// end for j loop over glus
+     }// end for i loop over fao country
+
+
+
+
+
+    //Call the read soil carbon function
+    if((error_code = read_soil_carbon(in_args, &raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    } 
+    
+    //kbn 2020/06/30 Add code for read_veg_c here
+    veg_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(veg_carbon_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for veg_carbon_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		veg_carbon_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(veg_carbon_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for veg_carbon_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    // Add above ground and below ground ratio for vegetation carbon
+    above_ground_ratio = calloc(NUM_CARBON, sizeof(float*));
+    if(above_ground_ratio == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for above_ground_ratio: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		above_ground_ratio[i] = calloc(NUM_CELLS, sizeof(float));
+		if(above_ground_ratio[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for above_ground_ratio[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    // Add above ground and below ground ratio for vegetation carbon
+    below_ground_ratio = calloc(NUM_CARBON, sizeof(float*));
+    if(below_ground_ratio == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for below_ground_ratio: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		below_ground_ratio[i] = calloc(NUM_CELLS, sizeof(float));
+		if(below_ground_ratio[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for below_ground_ratio[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+
+
+    if((error_code = read_veg_carbon(in_args, &raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-     */
-    
+
+
     // process the land type area data
     //  lu grids are allocated/freed within proc_land_type_area()
     if((error_code = proc_land_type_area(in_args, raster_info))) {
@@ -748,35 +970,99 @@ int main(int argc, const char * argv[]) {
         return error_code;
     }
     
-    // process the potential vegetation carbon data
-    //  needed arrays are allocated/freed within proc_potveg_carbon()
+    // process the reference vegetation carbon data
+    //  needed arrays are allocated/freed within proc_refveg_carbon()
+	// the rand_order array that is allocated in calc_refvef_area is deallocated in proc_refveg_carbon
     if((error_code = proc_refveg_carbon(in_args, raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
     
+  //  fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            free(soil_carbon_array_cells[i][j]);
+        }free(soil_carbon_array_cells[i]);
+   }free(soil_carbon_array_cells);
+
+//fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
+       
+     
+  
+
     // process the water footprint data
     //  needed arrays are allocated/freed within proc_water_footprint()
+ 
+ //fprintf(stdout, "\n Start water footprint %s\n", get_systime());
+ 
     if((error_code = proc_water_footprint(in_args, raster_info))) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
+	
     // free the land type category array
     free(lt_cats);
     
     // free some rasters
+	free(urban_area);
 	free(cell_area);
 	free(land_area_hyde);
+	free(cell_area_hyde);
     free(land_cells_aez_new);
-    free(protected_thematic);
+    //kbn 2020
+    for (i = 0; i < NUM_EPA_PROTECTED; i++) {
+		free(protected_EPA[i]);
+	}
+	free(protected_EPA);
+    //kbn 2020/06/01 Add code for soil carbon here
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(soil_carbon_sage[i]);
+	}
+	free(soil_carbon_sage);
+    //kbn 2020/06/30 Add code for veg carbon here
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(veg_carbon_sage[i]);
+	}
+	free(veg_carbon_sage);
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(above_ground_ratio[i]);
+	}
+	free(above_ground_ratio);
+    for (i = 0; i < NUM_CARBON; i++) {
+		free(below_ground_ratio[i]);
+	}
+	free(below_ground_ratio);
     free(potveg_thematic);
 	free(refveg_thematic);
+    free(refvegcarbon_thematic);
 	for (i = 0; i < NUM_LULC_TYPES; i++) {
 		free(lulc_input_grid[i]);
 	}
 	free(lulc_input_grid);
-    
+    //free soil and veg carbon arrays
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+	           for(l=0; l< NUM_CARBON;l++){
+                   free(soil_carbon_array[i][j][k][l]);
+               }free(soil_carbon_array[i][j][k]);
+            }free(soil_carbon_array[i][j]);
+        }free(soil_carbon_array[i]);
+   }free(soil_carbon_array);
+   
+
+    for (i = 0; i < NUM_FAO_CTRY; i++) {
+        for (j = 0; j < ctry_aez_num[i]; j++) {
+            for (k = 0; k < num_lt_cats; k++) {
+	           for(l=0; l<NUM_CARBON;l++){
+                   free(veg_carbon_array[i][j][k][l]);
+               }free(veg_carbon_array[i][j][k]);
+            }free(veg_carbon_array[i][j]);
+        }free(veg_carbon_array[i]);
+   }free(veg_carbon_array);
+  
+ 
+
     // allocate the arrays for all the fao input data (initialized to zero)
     yield_fao = calloc(NUM_FAO_CTRY * NUM_SAGE_CROP * NUM_FAO_YRS, sizeof(float));
     if(yield_fao == NULL) {
@@ -1008,6 +1294,7 @@ int main(int argc, const char * argv[]) {
     free(aez_bounds_new);
     free(aez_bounds_orig);
     free(refveg_area);
+    free(refcarbon_area);
     free(country87_gtap);
     free(forest_cells);
     free(land_cells_hyde);
@@ -1030,7 +1317,11 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    
+   
+   // free the hong kong and taiwan glu area arrays
+   free(twn_glu_area);
+   free(hkg_glu_area);
+   
     // free the reglr+aez arrays
     for (i = 0; i < NUM_GTAP_CTRY87; i++) {
         free(reglr_aez_list[i]);
@@ -1160,5 +1451,7 @@ int main(int argc, const char * argv[]) {
 	fprintf(fplog, "\nSuccessful completion of program %s at %s\n", CODENAME, get_systime());
 	fclose(fplog);
 	
-    return OK;
-}	// end moirai_main()
+	//fclose(debug_file);
+	//fclose(cell_file);
+	
+    return OK;}	// end moirai_main()
