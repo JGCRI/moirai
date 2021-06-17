@@ -7,7 +7,7 @@ Kanishka Narayan, Global Change Research Institute, Pacific Northwest National l
 ## Version: 3
 
 ## Version History
-* **Version 3.1.0:** April 2021; DOI TBD
+* **Version 3.1.0:** April 2021; DOI: http://doi.org/10.5281/zenodo.4973631
 	* Adds comprehensive suitable and protected area land distinctions to the land area and carbon outputs
 		* There are now 8 distinct categories (including unknown) based on new input data
 	* Replaces simple carbon inputs with spatially explicit raster data and expands the carbon outputs
