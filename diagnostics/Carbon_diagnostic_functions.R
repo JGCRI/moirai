@@ -80,12 +80,12 @@ create_carbon_plots_soil<-function(fig_dir  = "carbon_plots/",
                                  "soil_carbon_wavg.bil")}
   
   if (carbon_input_src_name == "soil_grids_95pct"){
-    carbon_raster_file_names = c("soil_carbon_q1_95pct.bil",
-                                 "soil_carbon_q3_95pct.bil",
-                                 "soil_carbon_median_95pct.bil",
-                                 "soil_carbon_min_95pct.bil",
-                                 "soil_carbon_max_95pct.bil",
-                                 "soil_carbon_weighted_average_95pct.bil")}
+    carbon_raster_file_names = c("soil_carbon_q1.envi",
+                                 "soil_carbon_q3.envi",
+                                 "soil_carbon_median.envi",
+                                 "soil_carbon_min.envi",
+                                 "soil_carbon_max.envi",
+                                 "soil_carbon_weighted_average.envi")}
 
 
 
@@ -109,13 +109,13 @@ get_carbon_data_basin <- function(x){
   
   # need to distinguish between basin and aez input
 	if(names(mapping_names)[1] == "AEZ_ID") {
-		carbon_data_raw %>% rename(value=gsub(".bil","",carbon_raster_name,)) %>%
+		carbon_data_raw %>% rename(value=gsub(".envi","",carbon_raster_name,)) %>%
     		filter(value>0) %>% 
     		inner_join(mapping_data, by=c("x","y")) %>% 
     		inner_join(mapping_names %>% rename(basin_id= AEZ_ID,basin_nm= AEZ_NAME),by=c("basin_id")) %>% 
     		filter(basin_nm==glu_name)->carbon_data_clean 
 	} else if (names(mapping_names)[1] == "GCAM_ID_1") {
-		carbon_data_raw %>% rename(value=gsub(".bil","",carbon_raster_name,)) %>%
+		carbon_data_raw %>% rename(value=gsub(".envi","",carbon_raster_name,)) %>%
     		filter(value>0) %>% 
     		inner_join(mapping_data, by=c("x","y")) %>% 
     		inner_join(mapping_names %>% rename(basin_id= GCAM_ID_1,basin_nm= Basin_na_1),by=c("basin_id")) %>% 
@@ -137,7 +137,7 @@ consolidated_carbon_data <- rbindlist(lapply(carbon_raster_file_names,get_carbon
 
 #Get the soil carbon data and clean the same.
 Carbon_data %>% 
-  filter(c_type=="soil_c (0-30 cms)") %>%
+  filter(c_type=="soil_c (0-100 cms)") %>%
   rename(wavg=weighted_average) %>% 
   distinct() %>% 
   inner_join(iso_data,by=c("iso")) %>% 
@@ -157,10 +157,18 @@ soil_carbon_data %>%
   ungroup() %>% 
   dplyr::select(glu_code,wavg,median_value,min_value,max_value,q1_value,q3_value) %>% 
   distinct()->soil_carbon_agg
+if(print_raster_progress_log == TRUE){
+  write.csv(soil_carbon_agg, "soil_carbon_agg.csv")
+  
+}
+
 
 #Generate data for the plot
 consolidated_carbon_data %>% left_join(soil_carbon_agg %>% rename(basin_id=glu_code), by=c("basin_id"))->data_for_plot
-
+if(print_raster_progress_log == TRUE){
+  write.csv(data_for_plot, "data_for_plot.csv")
+  
+}
 #Plot distributions
 g<-ggplot(data=data_for_plot,aes(x=value)) +
   geom_histogram(color="black",fill="white",bins=35)+
@@ -170,7 +178,7 @@ g<-ggplot(data=data_for_plot,aes(x=value)) +
   geom_point(data=data_for_plot,aes(x=q1_value,y=plot_lim,color="q1_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=q3_value,y=plot_lim,color="q3_value"),show.legend = TRUE,size=3,alpha=0.9)+
   geom_point(data=data_for_plot,aes(x=wavg,y=plot_lim,color="weighted_average"),show.legend = TRUE,size=3,alpha=0.9)+
-  ggtitle(paste0("Soil carbon distribution for ",toString(glu_name), " in MgC/ha (0-30 cm depth), distribution from ", toString(carbon_input_src_name)))+
+  ggtitle(paste0("Soil carbon distribution for ",toString(glu_name), " in MgC/ha (0-100 cm depth), distribution from ", toString(carbon_input_src_name)))+
   labs(subtitle = "Colors represent initialization values from moirai outputs for each category")
 
 #Save distributions
