@@ -143,7 +143,7 @@ The Moirai LDS also generates these files (some of which were previously stored 
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
 * **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-100 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m<sup>3</sup>), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
@@ -238,62 +238,8 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **SAGE physical cropland area, circa 2000**: Physical cropland area circa 2000, as fraction of cell area (`Cropland2000_5min.nc`)
 	* These data are used to normalize the SAGE individual crop harvested area values to each grid cell
 	* Please cite these data when using Moirai: Ramankutty, N., Evan, A. T., Monfreda, C. & Foley, J. A. 2008. Farming the planet: 1. Geographic distribution of global agricultural lands in the year 2000. Global Biogeochem. Cycles, 22, GB1003.
-* **Soil carbon density (0-30 cm) rasters (6)** (`soil_carbon_<state>_<level>.bil`): A set of new rasters representing 6 carbon states determined by aggregation to 5 arcmin (in order: weighted average, minimum, median, maximum, quartile 1 and quartile 3) for soil carbon density in MgC/ha for a depth of 0-30 cm for the year 2010. There are 3 estimate levels to choose from (from 2 different data sources).
- * The user can choose any level by updating the input file `moirai_input_basins235.txt` or `moirai_input_aez_orig.txt`. The table below summarizes the levels that are available along with the appropriate citations.
- * Raw raster files were processed using gdal to get values for each state, and this code (`get_soil_grids_mean.sh`, `get_soil_grids_95th_percentile.sh`, and `get_FAO_HWS_data.sh`) is located in `…/moirai/ancillary/bash_scripts`.
-
-
-| file names                    | data description                                                                                 | source                                                                                                     | citation                                                                                                                                                                                                                                |
-|-------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| soil_carbon_`<state>`_95pct.bil | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on 95th perecntile of soil characteristics, for the year 2010. **Note that the Q3 state of this dataset is the current default for soil carbon calculations in moirai**                          | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
-| soil_carbon_`<state>`.bil       | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on mean of all soil characteristics, for the year 2010                                     | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
-| FAO_HWS_`<state>`.bil           | FAO harmonized world soil database (v1.2), soil carbon density in MgC/ha for a depth of 0-30 cm, for the year 2010 | http://www.fao.org/soils-portal/soil-survey/soil-maps-and-databases/harmonized-world-soil-database-v12/en/ | Fischer, G., F. Nachtergaele, S. Prieler, H.T. van Velthuizen, L. Verelst, D. Wiberg, 2008. Global Agro-ecological Zones Assessment for Agriculture (GAEZ 2008). IIASA, Laxenburg, Austria and FAO, Rome, Italy.                        |
-
-* **Vegetation carbon density rasters (12)** (`veg_carbon_<state>.bil` and `veg_BG_carbon_<state>.bil`):
-	A set of 12 rasters that represents above ground carbon biomass and below ground biomass (in MgC/ha) for 6 different carbon states (above first, then below, in the following order: weighted average, minimum, median, maximum, quartile 1 and quartile 3) for the year 2010.
-	* The raw rasters were downloaded from- https://daac.ornl.gov/VEGETATION/guides/Global_Maps_C_Density_2010.html. The rasters for each state were derived using gdal, the code for which is available in `…/moirai/ancillary/bash_scripts`.
-	* **Note that the Q3 state of this dataset is the current default for vegetation carbon calculations in moirai**
-	* These data should be cited as-
-	Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above and belowground biomass carbon density in the year 2010. Sci Data 7, 112 (2020). https://doi.org/10.1038/s41597-020-0444-4
-
-
-* The table below summarizes global soil and vegetation carbon numbers calculated in MOIRAI in Petagrams (Pg) from the data sources above for each carbon state for the year 2010.
-* Note that the carbon below represents the carbon on unmanaged land i.e. it does not include soil and vegetation carbon on cropland, land used for pastures and urban land.
-
-|                  | Soil carbon (0-30 cm)     |                       |                                  | Vegetation carbon (above ground) | Vegetation carbon (below ground) |
-|------------------|----------------------------|-----------------------|----------------------------------|----------------------------------|----------------------------------|
-| State/Source     | HWS database from FAO (Pg) | Soil grids (mean)(Pg) | Soil grids (95th Percentile)(Pg) | Spawn et al (Pg)                 | Spawn et al (Pg)                 |
-| Weighted average | 473                        | 393                   | 1019                             | 234                              | 88                               |
-| Median           | 435                        | 391                   | 971                              | 205                              | 73                               |
-| Minimum          | 2                          | 1                     | 296                              | 0.8                              | 1                                |
-| Maximum          | 697                        | 551                   | 2781                              | 990                              | 633                              |
-| Q1               | 284                        | 311                   | 814                              | 90                               | 31                               |
-| Q3               | 630                        | 468                   | 1182                             | 343                              | 134                              |
-
-* The table below summarizes global soil and vegetation carbon numbers by unmanaged land type in 2010 calculated in MOIRAI in Petagrams (Pg) using the soil_grids_95th_percentile dataset for soil carbon and the Spawn et al dataset for vegetation carbon. Note that the "Evergreen/DeciduousMixedForest/Woodland" category has very little area as it is a default when a more specific category is unavailable. Also note that Spawn et al. don't provide detailed information on vegetation carbon in the Tundra region, therefore the numbers for that particular land type in the table below may be unreliable.
-
-
-| Unmanaged land type                         | soil carbon (Petagrams) | vegetation carbon (above ground) | vegetation carbon (belowground) | Total |
-|---------------------------------------------|-------------------------|----------------------------------|---------------------------------|-------|
-| BorealDeciduousForest/Woodland              | 55                      | 12                               | 6                               | 73    |
-| BorealEvergreenForest/Woodland              | 126                     | 32                               | 14                              | 172   |
-| DenseShrubland                              | 38                      | 7                                | 6                               | 51    |
-| Desert                                      | 72                      | 0                                | 1                               | 73    |
-| Evergreen/DeciduousMixedForest/Woodland     | 2                       | 0                                | 0                               | 2     |
-| Grassland/Steppe                            | 225                     | 49                               | 23                              | 297   |
-| OpenShrubland                               | 123                     | 9                                | 8                               | 140   |
-| PolarDesert/Rock/Ice                        | 24                      | 1                                | 0                               | 25    |
-| Savanna                                     | 74                      | 24                               | 15                              | 113   |
-| TemperateBroadleafEvergreenForest/Woodland  | 10                      | 4                                | 1                               | 15    |
-| TemperateDeciduousForest/Woodland           | 41                      | 17                               | 6                               | 64    |
-| TemperateNeedleleafEvergreenForest/Woodland | 47                      | 19                               | 6                               | 72    |
-| TropicalDeciduousForest/Woodland            | 26                      | 9                                | 4                               | 39    |
-| TropicalEvergreenForest/Woodland            | 177                     | 151                              | 37                              | 365   |
-| Tundra                                      | 140                     | 6                                | 7                               | 153   |
-| Unknown                                     | 5                       | 1                                | 0                               | 6     |
-| Total                                       | 1183                    | 341                              | 134                             | 1658  |
-
-
+* **Soil carbon density (0-100 cm) rasters (6)** (Please see `…/moirai/  ancillary/readme.md` for details on the same)
+* **Vegetation carbon density rasters (12)**(Please see `…/moirai/  ancillary/readme.md` for details on the same)  
 
 ### CSV input data (filename without path)
 * **Original GTAP LU2.1 land rent data** (`GTAP_value_milUSD.csv`): Please cite these data when using Moirai: Lee, H.-L., Hhertel, T. W., Rose, S., Avetisyan, M. An integrated global land use data base for CGE analysis of climate policy options. Chapter 4, pp. 72-88, in Hertel, T. W., S. Rose and R. Tol  (eds.) (2009). Economic Analysis of Land Use in Global Climate Change Policy. Abingdon: Routledge.
