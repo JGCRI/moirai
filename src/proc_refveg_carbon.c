@@ -523,7 +523,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                 //5. Q1
                 
-                size_temp=(size*0.25) + soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
+                size_temp=(size-soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp])*0.25 + soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 if(size_temp <= size){
                 temp_float= soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][size_temp];
                 
@@ -611,7 +611,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                 refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][3] =
 				temp_float * temp_bg_ratio;
                 //5. Q1
-                size_temp=(size*0.25)+veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
+                size_temp=((size-veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp])*0.25)+veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp];
                 
                 if(size_temp < size){
                 temp_float= veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][size_temp];
@@ -720,7 +720,7 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 					// write the value only if weighted average is over 0 and all other values are 0 or above.
 					if (outval_soilc > 0 &&  outval_soilc_median >=0 && outval_soilc_min >=0 && outval_soilc_max >=0 &&  outval_soilc_q1 >=0  && outval_soilc_q3 >= 0 ) {
 						fprintf(fpout,"\n%s,%i,%i,%s", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-								lt_cats[cur_lt_cat_ind], "soil_c (0-100 cms)");
+								lt_cats[cur_lt_cat_ind], "soil_c (0-30 cms)");
 						fprintf(fpout,",%.0f", outval_soilc);
                         fprintf(fpout,",%.0f", outval_soilc_median);
                         fprintf(fpout,",%.0f", outval_soilc_min);
