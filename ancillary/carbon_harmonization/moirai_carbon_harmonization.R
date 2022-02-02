@@ -31,6 +31,7 @@ library(raster)
 library(dplyr)
 library(data.table)
 library(FNN)
+library(ggplot2)
 
 #Scheme for plots
 scheme_basic <- theme_bw() +
@@ -79,7 +80,7 @@ if(!dir.exists("Carbon_rasters/")){
 
 #Set basin for debugging. Select basin of your choice from the input file 
 #input_files/basin_to_country_mapping.csv 
-basin_debug <- 157
+basin_debug <- 168
 
 #Helper function for nearest neighbor interpolation
 find_nearest_reighbor <- function(sample_data){
@@ -95,7 +96,7 @@ find_nearest_reighbor <- function(sample_data){
   sample_data_non_zero <- sample_data %>% 
     filter(Carbon_AG != 0)
   
-  sample_data_zero %>% gather("Nearest_neighbor","nn_value","V1":"V10") %>% 
+  sample_data_zero %>% tidyr::gather("Nearest_neighbor","nn_value","V1":"V40") %>% 
     filter(nn_value %in% c(sample_data$ID)) %>% 
     left_join(sample_data %>% dplyr::select(ID,Carbon_AG) %>% 
                 rename(nn_value=ID, Carbon_nn = Carbon_AG),by = c("nn_value")) %>% 
@@ -122,7 +123,7 @@ find_nearest_reighbor <- function(sample_data){
 #Read in carbon thematic file for moirai. The below can be set to `AG` for above
 #ground vegetation, `BG` for below ground vegetation and `soil` for soil. It is recommended that the user run 
 #these one by one given the time it takes to generate the final rasters.  
-veg_type <- "BG"
+veg_type <- "soil"
 
 #This will print out diagnostics (.csv files) for the World (Global) and the Amazon basin
 print_diagnostics <- TRUE
@@ -144,7 +145,7 @@ GLU_data <- as.data.frame(rasterToPoints(raster("input_files/gcam_glu_boundaries
 ESA_classes <- read.csv("input_files/ESA_classes.csv", stringsAsFactors = FALSE)
 
 #Can set states of carbon here.
-states_of_carbon <- c("q3","min","max","q1","weighted_average","median")
+states_of_carbon <- c("q3","median","q1","weighted_average","min","max")
 
 for (i in states_of_carbon){
   Carbon_thematic_data_joined <- Carbon_thematic_data
@@ -250,7 +251,14 @@ for (i in states_of_carbon){
                                                if_else(Flood_Shrub > 0, Flood_Shrub,
                                                        if_else(Unknown_Herb> 0,Unknown_Herb,if_else(Shrubland > 0, Shrubland, 0)
                                                        )))),Carbon_AG),
-           Carbon_AG = if_else(sage_hyde32_name=="Tundra",if_else(Polar_Desert_Rock_Ice > 0, Polar_Desert_Rock_Ice, 0),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Tundra",if_else(Polar_Desert_Rock_Ice > 0, Polar_Desert_Rock_Ice, 
+                                                                  if_else(Sparse_Shrub >0,Sparse_Shrub,
+                                                                          if_else(Mosaic_Herb>0,Mosaic_Herb,
+                                                                                  if_else(Unknown_Herb>0,Unknown_Herb,
+                                                                                          if_else(Unknown_Tree>0,Unknown_Tree,
+                                                                                                  if_else(Sparse_Tree >0,Sparse_Tree,0,
+                                                                                                          if_else(Shrubland>0,Shrubland,
+                                                                                                                  if_else(Mosaic_Tree>0,Mosaic_Tree,0)))))))),Carbon_AG),
            Carbon_AG = if_else(sage_hyde32_name=="Desert",if_else(Desert > 0, Desert, 0),Carbon_AG),
            Carbon_AG = if_else(sage_hyde32_name=="Polardesert/Rock/Ice",if_else(Polar_Desert_Rock_Ice > 0, Polar_Desert_Rock_Ice, 0),Carbon_AG))->temp_data
   
@@ -281,7 +289,7 @@ for (i in states_of_carbon){
   temp_area %>% mutate(ID = 1:nrow(temp_area))->temp_area_w_IDS
   
   #Get nearest neighbors (10 nearest geographic neighbors)
-  near_data <- get.knn(temp_area_w_IDS[, 1:2], k = 10)
+  near_data <- get.knn(temp_area_w_IDS[, 1:2], k = 40)
   nn_index <- as.data.frame(near_data$nn.index) %>% 
     mutate(ID = 1:nrow(temp_area_w_IDS))
   

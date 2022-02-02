@@ -362,14 +362,26 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
                
                
 
-
+                if( wavg_array[grid_ind] < 0){
                 
+                soil_carbon_sage[0][grid_ind]= NODATA;
+                soil_carbon_sage[1][grid_ind]= NODATA;
+                soil_carbon_sage[2][grid_ind]= NODATA;
+                soil_carbon_sage[3][grid_ind]= NODATA;
+                soil_carbon_sage[4][grid_ind]= NODATA;
+                soil_carbon_sage[5][grid_ind]= NODATA;
+                
+                }else{
+
                 soil_carbon_sage[0][grid_ind]=wavg_array[grid_ind];
                 soil_carbon_sage[1][grid_ind]=median_array[grid_ind];
                 soil_carbon_sage[2][grid_ind]=min_array[grid_ind];
                 soil_carbon_sage[3][grid_ind]=max_array[grid_ind];
                 soil_carbon_sage[4][grid_ind]=q1_array[grid_ind];
-                soil_carbon_sage[5][grid_ind]=q3_array[grid_ind];
+                soil_carbon_sage[5][grid_ind]=q3_array[grid_ind];    
+
+
+                }
 
                 //calculate the number of cells to hold within each array
                 
