@@ -238,8 +238,8 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **SAGE physical cropland area, circa 2000**: Physical cropland area circa 2000, as fraction of cell area (`Cropland2000_5min.nc`)
 	* These data are used to normalize the SAGE individual crop harvested area values to each grid cell
 	* Please cite these data when using Moirai: Ramankutty, N., Evan, A. T., Monfreda, C. & Foley, J. A. 2008. Farming the planet: 1. Geographic distribution of global agricultural lands in the year 2000. Global Biogeochem. Cycles, 22, GB1003.
-* **Soil carbon density (0-100 cm) rasters (6)** (Please see `…/moirai/  ancillary/readme.md` for details on the same)
-* **Vegetation carbon density rasters (12)**(Please see `…/moirai/  ancillary/readme.md` for details on the same)  
+* **Soil carbon density (0-30 cm) rasters (6)** (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
+* **Vegetation carbon density rasters (12)**(Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
 
 ### CSV input data (filename without path)
 * **Original GTAP LU2.1 land rent data** (`GTAP_value_milUSD.csv`): Please cite these data when using Moirai: Lee, H.-L., Hhertel, T. W., Rose, S., Avetisyan, M. An integrated global land use data base for CGE analysis of climate policy options. Chapter 4, pp. 72-88, in Hertel, T. W., S. Rose and R. Tol  (eds.) (2009). Economic Analysis of Land Use in Global Climate Change Policy. Abingdon: Routledge.
