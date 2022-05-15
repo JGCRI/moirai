@@ -18,9 +18,9 @@ This folder contains a number of scripts which are used to generate 36 raster fi
 
 * Above and below ground vegetation carbon data from Spawn et al. that is available at https://www.nature.com/articles/s41597-020-0444-4
 
-Note that the user should run the above ground script (`Above_ground_carbon.sh`) first since this script will generate land cover files that are used by the other two scripts.The total run time of the three scripts is 7.5 hours (2.5 hours per script). 
+Note that the user should run the above ground script (`Generate_vegetation_rasters.sh`) first since this script will generate land cover files that are used by the other four scripts.The total run time of the four scripts is 10 hours (2.5 hours per script). 
 
-For the sake of convenience the final output files from the above are made available as a zip file (`Carbon_rasters.zip`)
+For the sake of convenience the final output files from the above are made available as a zip file (`Carbon_rasters.zip` for the moirai default and `FAO_carbon_rasters.zip` for the HWSD inputs. These are described in detail below.)
 
 ## Other inputs
 These are the files in the folder `input_files`
