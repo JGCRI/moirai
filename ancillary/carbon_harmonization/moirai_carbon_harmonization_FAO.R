@@ -70,7 +70,7 @@ moirai_no_data_value <- -9999
 
 #Scalers (Vegetation numbers need to be multiplied by 0.1 to get values, soil by 1000)
 veg_scaler <- 0.1
-soil_scaler <- 1000 
+soil_scaler <- 100 
 
 # These are the SAGE HYDE land use classes. These need to be ignored since we are only interested in LC.
 sage_hyde_land_use_codes <- 23:34
