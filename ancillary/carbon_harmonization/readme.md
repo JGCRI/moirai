@@ -1,4 +1,4 @@
-# Carbon data harmonization for  `moirai`  
+# Carbon data implementation and harmonization for  `moirai`  
 
 ## Description:
 This folder contains a number of scripts which are used to generate 36 raster files (12 for soil carbon, 12 for above ground carbon, 12 for below ground carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land cover classes from the ESA/IGBP land classes.    
