@@ -143,7 +143,7 @@ The Moirai LDS also generates these files (some of which were previously stored 
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
 * **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-100 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m<sup>3</sup>), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
