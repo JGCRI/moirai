@@ -82,7 +82,7 @@ As a part of the final harmonization we also use a nearest neighbor interpolatio
 | LC type                                     | Total cells | Vegetation carbon Percentage unfound (NO DATA cells after interpolation) | Soil carbon Percentage unfound (NO DATA cells after interpolation) |
 |---------------------------------------------|-------------|--------------------------------------------------------------------------|--------------------------------------------------------------------|
 | Polardesert/rock/ice                        | 132021      | 100.0                                                                    | 100.0                                                              |
-| Tundra                                      | 214261      | 100.0                                                                    | 86.6                                                               |
+| Tundra                                      | 25000      | 29.02                                                                   | 24.89                                                               |
 | OpenShrubland                               | 274296      | 16.0                                                                     | 16.0                                                               |
 | BorealDeciduousForest/Woodland              | 65824       | 0.0                                                                      | 0.4                                                                |
 | Grassland/Steppe                            | 498404      | 15.0                                                                     | 14.6                                                               |
@@ -104,14 +104,14 @@ With the above, We now have results for soil and vegetation carbon that are harm
 
 Similarly for the different states, the table below shows the total global soil and vegetation carbon in petagrams,
 
-| State            | Soil (0-100 cms) | Above ground vegetation | Below ghround vegetation | Total |
-|------------------|------------------|-------------------------|--------------------------|-------|
-| Weighted Average | 1613             | 215                     | 79                       | 1907  |
-| Median           | 1701             | 211                     | 76                       | 1988  |
-| Minimum          | 414              | 2                       | 1                        | 417   |
-| Maximum          | 9900             | 691                     | 436                      | 11027 |
-| Q1               | 1138             | 136                     | 49                       | 1323  |
-| Q3               | 2572             | 297                     | 117                      | 2986  |
+| State            | Soil (0-30 cms) | Soil (30-100 cms) | Above ground vegetation | Below ground vegetation | Total |
+| ---------------- | --------------- | ----------------- | ----------------------- | ----------------------- | ----- |
+| Weighted Average | 840             | 773               | 215                     | 79                      | 1907  |
+| Median           | 842             | 859               | 211                     | 76                      | 1988  |
+| Minimum          | 700             | 842               | 2                       | 1                       | 1545  |
+| Maximum          | 3202            | 6698              | 691                     | 436                     | 11027 |
+| Q1               | 665             | 473               | 136                     | 49                      | 1323  |
+| Q3               | 1124            | 1448              | 297                     | 117                     | 2986  |
 
 ## Citations for raw data
 We also include citations for the data from the FAO Harmonized World Soil Database. However, we have not yet performed the harmonization process for the same.
