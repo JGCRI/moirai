@@ -1,4 +1,4 @@
-# Carbon data harmonization for  `moirai`  
+# Carbon data implementation and harmonization for  `moirai`  
 
 ## Description:
 This folder contains a number of scripts which are used to generate 36 raster files (12 for soil carbon, 12 for above ground carbon, 12 for below ground carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land cover classes from the ESA/IGBP land classes.    
@@ -18,9 +18,9 @@ This folder contains a number of scripts which are used to generate 36 raster fi
 
 * Above and below ground vegetation carbon data from Spawn et al. that is available at https://www.nature.com/articles/s41597-020-0444-4
 
-Note that the user should run the above ground script (`Above_ground_carbon.sh`) first since this script will generate land cover files that are used by the other two scripts.The total run time of the three scripts is 7.5 hours (2.5 hours per script). 
+Note that the user should run the above ground script (`Generate_vegetation_rasters.sh`) first since this script will generate land cover files that are used by the other four scripts.The total run time of the four scripts is 10 hours (2.5 hours per script). 
 
-For the sake of convenience the final output files from the above are made available as a zip file (`Carbon_rasters.zip`)
+For the sake of convenience the final output files from the above are made available as a zip file (`Carbon_rasters.zip` for the moirai default and `FAO_carbon_rasters.zip` for the HWSD inputs. These are described in detail below.)
 
 ## Other inputs
 These are the files in the folder `input_files`
@@ -118,10 +118,10 @@ We also include citations for the data from the FAO Harmonized World Soil Databa
 
 | file names                    | data description                                                                                 | source                                                                                                     | citation                                                                                                                                                                                                                                |
 |-------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| soil_carbon_`<state>`.bil | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on 95th perecntile of soil characteristics, for the year 2010. **Note that the Q3 state of this dataset is the current default for soil carbon calculations in moirai**                          | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
-| FAO_HWS_`<state>`.bil           | FAO harmonized world soil database (v1.2), soil carbon density in MgC/ha for a depth of 0-30 cm, for the year 2010 | http://www.fao.org/soils-portal/soil-survey/soil-maps-and-databases/harmonized-world-soil-database-v12/en/ | Fischer, G., F. Nachtergaele, S. Prieler, H.T. van Velthuizen, L. Verelst, D. Wiberg, 2008. Global Agro-ecological Zones Assessment for Agriculture (GAEZ 2008). IIASA, Laxenburg, Austria and FAO, Rome, Italy.                        |
+| soil_carbon_`<state>`.envi | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on 95th perecntile of soil characteristics, for the year 2010. **Note that the Q3 state of this dataset is the current default for soil carbon calculations in moirai**                          | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
+| soil_carbonFAO_`<state>`.bil           | FAO harmonized world soil database (v1.2), soil carbon density in MgC/ha for a depth of 0-30 cm, for the year 2010 | http://www.fao.org/soils-portal/soil-survey/soil-maps-and-databases/harmonized-world-soil-database-v12/en/ | Fischer, G., F. Nachtergaele, S. Prieler, H.T. van Velthuizen, L. Verelst, D. Wiberg, 2008. Global Agro-ecological Zones Assessment for Agriculture (GAEZ 2008). IIASA, Laxenburg, Austria and FAO, Rome, Italy.                        |
 
-* **Vegetation carbon density rasters (12)** (`veg_carbon_<state>.bil` and `veg_BG_carbon_<state>.bil`):
+* **Vegetation carbon density rasters (12)** (`AG_carbon_<state>.bil`,`AG_carbonFAO_<state>.bil` ,`BG_carbon_<state>.bil` and `BG_carbonFAO_<state>.bil`):
 	* These data should be cited as-
-	Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above and belowground biomass carbon density in the year 2010. Sci Data 7, 112 (2020). https://doi.org/10.1038/s41597-020-0444-4
+	Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above and belowground biomass carbon density in the year 2010. Sci Data 7, 112 (2020). https://doi.org/10.1038/s41597-020-0444-4 (Note that the files with the FAO in their names represent carbon densities for the year 2000)
 
