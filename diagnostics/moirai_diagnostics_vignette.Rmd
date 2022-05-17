@@ -10,6 +10,7 @@ library(dplyr)
 library(data.table)
 library(testthat)
 library(ggplot2)
+library(scales)
 
 
 path_to_diagnostics_folder <- "C:/Projects/moirai/moirai/diagnostics/"
@@ -95,92 +96,29 @@ compare_iso_glu_sage_land_data(path_to_Original_LDS_Data = "../example_outputs/b
 ```
 
 
-```{r,fig.height=5,fig.width=10}
-#Create carbon distributions for soil carbon
-
-create_carbon_plots_soil_detail(fig_dir  = "carbon_plots/",
-                              plot_lim = 1000, 
-                              path_to_carbon_data = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-                              path_to_carbon_rasters = "../indata/",
-                              path_to_mapping = "C:/Projects/moirai/moirai/diagnostics/GLU_ID_mapping.csv",
-                              path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
-                              path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                              path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
-                              glu_name = "Amazon",
-                              carbon_year = 2016,
-                              carbon_input_src_name = "soil_grids"
-                              ,
-                              print_raster_progress_log =TRUE)
 
 
 
-```
-```{r,fig.height=5,fig.width=10}
 
-#Create carbon distributions for veg carbon (above ground biomass)
-
-
-create_carbon_plots_veg_carbon_above_ground(
-  fig_dir  = "carbon_plots/",
-                                   plot_lim = 1000, 
-                                   path_to_carbon_data = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-                                   path_to_carbon_rasters = "../indata/",
-                                   path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
-                                   path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
-                                   path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                                   path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
-                                   glu_name = "Missouri_River_Basin",
-                                   carbon_year = 2010,
-                                   carbon_raster_file_names = c("veg_carbon_max.bil",
-                                                                "veg_carbon_q3.bil",
-                                                                "veg_carbon_median.bil",
-                                                                "veg_carbon_min.bil",
-                                                                "veg_carbon_q1.bil",
-                                                                "veg_carbon_wavg.bil"),
-                                   print_raster_progress_log =FALSE
-)
-
-
-```
-
-```{r}
-#Create carbon distributions for veg carbon (below ground biomass)
-
-
-create_carbon_plots_veg_carbon_below_ground(
-  fig_dir  = "carbon_plots/",
-                                   plot_lim = 1000, 
-                                   path_to_carbon_data = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-                                   path_to_carbon_rasters = "../indata/",
-                                   path_to_mapping = "../diagnostics/spatial_output_files/mapping_files/GLU_ID_mapping.csv",
-                                   path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
-                                   path_to_iso_mapping = "../indata/FAO_iso_VMAP0_ctry.csv",
-                                   path_to_land_data = "../example_outputs/basins235/Land_type_area_ha.csv",
-                                   glu_name = "Missouri_River_Basin",
-                                   carbon_year = 2010,
-                                   carbon_raster_file_names =c("veg_BG_carbon_weighted_average.bil",                                                                "veg_BG_carbon_q1.bil",                                                                             "veg_BG_carbon_median.bil",                                                                   "veg_BG_carbon_min.bil",                                                                      "veg_BG_carbon_q3.bil",                                                                         "veg_BG_carbon_max.bil"),
-                                   print_raster_progress_log =FALSE
-)
-
-```
 ```{r}
 
 
 scheme_basic <- theme_bw() +
-    theme(legend.text = element_text(size = 10, vjust = 0.5)) +
-    theme(legend.title = element_text(size = 10, vjust = 2)) +
-    theme(axis.text = element_text(size = 10)) +
-    theme(axis.title = element_text(size = 10, face = "bold")) +
-    theme(plot.title = element_text(size = 10, face = "bold", vjust = 1)) +
-    theme(plot.subtitle = element_text(size = 8, face = "bold", vjust = 1))+
-    theme(strip.text = element_text(size = 7))+
-    theme(strip.text.x = element_text(size = 8, face = "bold"))+
-    #theme(legend.position = "bottom")+
-    theme(legend.text = element_text(size = 10))+
-    theme(legend.title = element_text(size = 10,color = "black",face="bold"))+
-    theme(axis.text.x= element_text(angle=60,hjust=1))+
-    theme(legend.background = element_blank(),
-          legend.box.background = element_rect(colour = "black"))
+  theme(legend.text = element_text(size = 15)) +
+  theme(legend.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(axis.title = element_text(size = 18, face = "bold")) +
+  theme(plot.title = element_text(size = 15, face = "bold", vjust = 1)) +
+  theme(plot.subtitle = element_text(size = 9, face = "bold", vjust = 1))+ 
+  theme(strip.text = element_text(size = 7))+
+  theme(strip.text.x = element_text(size = 18, face = "bold"))+
+  theme(strip.text.y = element_text(size = 15, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.text = element_text(size = 12))+
+  theme(legend.title = element_text(size = 12,color = "black",face="bold"))+
+  theme(axis.text.x= element_text(hjust=1))+
+  theme(legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
 
 moirai_land_classes <- read.csv("../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv")
 
@@ -189,11 +127,20 @@ for (i in c("TropicalEvergreenForest/Woodland",
             "Savanna",
             "Grassland/Steppe")){
 
-g <- compare_carbon_distribution(carbon_type = "above ground biomass",
+  c_type <- "above ground biomass"
+g <- compare_carbon_distribution_ESA(carbon_type = c_type,
                             basin_for_testing = "Amazon",
-                            moirai_LC = i)
-  
-ggsave(plot= g+ scheme_basic filename= paste0("carbon_plots/","AG",i,"Amazon", ".jpeg"), width = 10, height = 6, device= "jpeg")
+                            moirai_LC = i,
+                            harmonized_carbon_raster_file_names = c("AG_carbon_q1.envi",
+                                                                    "AG_carbon_q3.envi",
+                                                                    "AG_carbon_median.envi",
+                                                                    "AG_carbon_min.envi",
+                                                                    "AG_carbon_max.envi",
+                                                                    "AG_carbon_weighted_average.envi"),
+                            plot_lim = 8000,
+                            produce_ESA_distribution = FALSE)
+name_for_plot <- gsub("/","_",i)  
+ggsave(plot= g+ scheme_basic ,filename= paste0("carbon_plots/",c_type,name_for_plot,"Amazon", ".jpeg"), width = 10, height = 6, device= "jpeg")
     }
 ```
 
