@@ -95,6 +95,7 @@ setwd("./")
 
 # flag to denote whether this is 18 aez or 235 water basin lds output
 AEZ = FALSE
+BOTH = TRUE
 
 # location of the old moirai lds output files (include final "/")
 #olddir = "../example_outputs/basins235/"
@@ -109,14 +110,33 @@ outdir = paste("./basins235_example_outputs_stats_area/", sep="")
 #outdir = paste("./aez_orig_example_outputs_stats_area/", sep="")
 
 num_gis_glu = 18
+
 if(AEZ) {
 	num_lds_glu = 18
-	ctag = "_aez.csv"
-	ptag = "_aez.pdf"
+	coldtag = "_aez.csv"
+	poldtag = "_aez.pdf"
+	cnewtag = "_aez.csv"
+	pnewtag = "_aez.pdf"
+	cctrytag = "_aez.csv"
+	pctrytag = "_aez.pdf"
 } else {
 	num_lds_glu = 235
-	ctag = "_wb235.csv"
-	ptag = "_wb235.pdf"
+	coldtag = "_wb235.csv"
+	poldtag = "_wb235.pdf"
+	cnewtag = "_wb235.csv"
+	pnewtag = "_wb235.pdf"
+	cctrytag = "_wb235.csv"
+	pctrytag = "_wb235.pdf"
+}
+
+if(BOTH) {
+	num_lds_glu = 235
+	coldtag = "_aez.csv"
+	poldtag = "_aez.pdf"
+	cnewtag = "_wb235.csv"
+	pnewtag = "_wb235.pdf"
+	cctrytag = "_aez_wb235.csv"
+	pctrytag = "_aez_wb235.pdf"
 }
 
 dir.create(outdir, recursive = TRUE)
@@ -241,6 +261,123 @@ lds_ctry$source = "Previous"
 lds_new_ctry$source = NA
 lds_new_ctry$source = "Moirai new"
 
+# now aggregate the data to the hyde land types globally
+gis_globe = aggregate(value ~ year + LT_HYDE, gis_ctry, FUN = "sum", na.rm = TRUE)
+lds_globe = aggregate(value ~ year + LT_HYDE, lds_ctry, FUN = "sum", na.rm = TRUE)
+lds_new_globe = aggregate(value ~ year + LT_HYDE, lds_new_ctry, FUN = "sum", na.rm = TRUE)
+
+# label each data frame in a column
+gis_globe$source = NA
+gis_globe$source = "GIS"
+lds_globe$source = NA
+lds_globe$source = "Previous"
+lds_new_globe$source = NA
+lds_new_globe$source = "Moirai new"
+
+# now bind the global data frames so that they can be plotted together
+plot_df = rbind(gis_globe, lds_globe, lds_new_globe)
+	
+# only plot and write outputs if there are data
+if(length(plot_df[,1] > 0)) {
+	
+	# plot the global level data
+	p1 <- ( ggplot( plot_df, aes( year, value, color = source ) ) 
+		+ geom_point(aes(shape=source)) + geom_line() 
+		+ facet_grid( LT_HYDE~., scales="free" ) 
+		+ ggtitle("Global Land Type Area")
+		+ ylab( "Area (km^2)" )
+		)
+	#print(p1)
+	ggsave( paste( outdir, "lt_area_globe.pdf", sep="" ), width=7, height=7)
+	# write the global level data
+	write.csv(plot_df, paste(outdir, "lt_area_globe.csv", sep=""), row.names = FALSE)
+} # end plot global area hyde land types
+
+# now aggregate the unmanaged data to the aggregated sage land types globally
+gis_sage = aggregate(value ~ year + LT_SAGE, gis[gis$LT_HYDE=="Unmanaged",], FUN = "sum", na.rm = TRUE)
+lds_sage = aggregate(value ~ year + LT_SAGE, lds[lds$LT_HYDE=="Unmanaged",], FUN = "sum", na.rm = TRUE)
+lds_new_sage = aggregate(value ~ year + LT_SAGE, lds_new[lds_new$LT_HYDE=="Unmanaged",], FUN = "sum", na.rm = TRUE)
+
+# now aggregate unmanaged land types to forest, savanna, grassland, shrubland, and other (tundra, desert, polar desert/rock/ice, unknown)
+# unknown is 1-2 orders of magnitude less than the rest, and is relatively constant, so group it with other
+forest_names = levels(lds_new$LT_SAGE)[grep("Forest", levels(lds_new$LT_SAGE), fixed = TRUE)]
+shrub_names = levels(lds_new$LT_SAGE)[grep("Shrubland", levels(lds_new$LT_SAGE), fixed = TRUE)]
+other_names = c("Tundra", "Desert", "PolarDesert/Rock/Ice", "Unknown")
+
+# old gis data
+gis_forest = aggregate(value ~ year, gis_sage[gis_sage$LT_SAGE %in% forest_names,], FUN = "sum", na.rm = TRUE)
+gis_shrub = aggregate(value ~ year, gis_sage[gis_sage$LT_SAGE %in% shrub_names,], FUN = "sum", na.rm = TRUE)
+gis_other = aggregate(value ~ year, gis_sage[gis_sage$LT_SAGE %in% other_names,], FUN = "sum", na.rm = TRUE)
+gis_forest$LT_SAGE = NA
+gis_shrub$LT_SAGE = NA
+gis_other$LT_SAGE = NA
+gis_forest$LT_SAGE = "Forest"
+gis_shrub$LT_SAGE = "Shurbland"
+gis_other$LT_SAGE = "Other"
+gis_forest = gis_forest[,order(c("year", "LT_SAGE", "values"))]
+gis_shrub = gis_shrub[,order(c("year", "LT_SAGE", "values"))]
+gis_other = gis_other[,order(c("year", "LT_SAGE", "values"))]
+
+gis_lts = rbind(gis_sage[gis_sage$LT_SAGE=="Savanna" | gis_sage$LT_SAGE=="Grassland/Steppe",], gis_forest, gis_shrub, gis_other)
+
+# previous data
+lds_forest = aggregate(value ~ year, lds_sage[lds_sage$LT_SAGE %in% forest_names,], FUN = "sum", na.rm = TRUE)
+lds_shrub = aggregate(value ~ year, lds_sage[lds_sage$LT_SAGE %in% shrub_names,], FUN = "sum", na.rm = TRUE)
+lds_other = aggregate(value ~ year, lds_sage[lds_sage$LT_SAGE %in% other_names,], FUN = "sum", na.rm = TRUE)
+lds_forest$LT_SAGE = NA
+lds_shrub$LT_SAGE = NA
+lds_other$LT_SAGE = NA
+lds_forest$LT_SAGE = "Forest"
+lds_shrub$LT_SAGE = "Shurbland"
+lds_other$LT_SAGE = "Other"
+lds_forest = lds_forest[,order(c("year", "LT_SAGE", "values"))]
+lds_shrub = lds_shrub[,order(c("year", "LT_SAGE", "values"))]
+lds_other = lds_other[,order(c("year", "LT_SAGE", "values"))]
+
+lds_lts = rbind(lds_sage[lds_sage$LT_SAGE=="Savanna" | lds_sage$LT_SAGE=="Grassland/Steppe",], lds_forest, lds_shrub, lds_other)
+
+# current data
+lds_new_forest = aggregate(value ~ year, lds_new_sage[lds_new_sage$LT_SAGE %in% forest_names,], FUN = "sum", na.rm = TRUE)
+lds_new_shrub = aggregate(value ~ year, lds_new_sage[lds_new_sage$LT_SAGE %in% shrub_names,], FUN = "sum", na.rm = TRUE)
+lds_new_other = aggregate(value ~ year, lds_new_sage[lds_new_sage$LT_SAGE %in% other_names,], FUN = "sum", na.rm = TRUE)
+lds_new_forest$LT_SAGE = NA
+lds_new_shrub$LT_SAGE = NA
+lds_new_other$LT_SAGE = NA
+lds_new_forest$LT_SAGE = "Forest"
+lds_new_shrub$LT_SAGE = "Shurbland"
+lds_new_other$LT_SAGE = "Other"
+lds_new_forest = lds_new_forest[,order(c("year", "LT_SAGE", "values"))]
+lds_new_shrub = lds_new_shrub[,order(c("year", "LT_SAGE", "values"))]
+lds_new_other = lds_new_other[,order(c("year", "LT_SAGE", "values"))]
+
+lds_new_lts = rbind(lds_new_sage[lds_new_sage$LT_SAGE=="Savanna" | lds_new_sage$LT_SAGE=="Grassland/Steppe",], lds_new_forest, lds_new_shrub, lds_new_other)
+
+gis_lts$source = NA
+gis_lts$source = "GIS"
+lds_lts$source = NA
+lds_lts$source = "Previous"
+lds_new_lts$source = NA
+lds_new_lts$source = "Moirai new"
+
+# now bind the global data frames so that they can be plotted together
+plot_df = rbind(gis_lts, lds_lts, lds_new_lts)
+
+# only plot and write outputs if there are data
+if(length(plot_df[,1] > 0)) {
+	
+	# plot the global land type data
+	p1 <- ( ggplot( plot_df, aes( year, value, color = source ) ) 
+		+ geom_point(aes(shape=source)) + geom_line() 
+		+ facet_grid( LT_SAGE~., scales="free" ) 
+		+ ggtitle("Global Unmanaged Land Type Area")
+		+ ylab( "Area (km^2)" )
+		)
+	#print(p1)
+	ggsave( paste( outdir, "unmanaged_lt_area_globe.pdf", sep="" ), width=7, height=7)
+	# write the global land type level data
+	write.csv(plot_df, paste(outdir, "unmanaged_lt_area_globe.csv", sep=""), row.names = FALSE)
+} # end plot global area hyde land types
+
 # loop over the countries to make plots and csv files
 for(lds_ctry_ind in 1:num_lds_ctry) {
 	gis_pdata = subset(gis_ctry, iso == as.character(fao_iso$iso3_abbr[lds_ctry_ind]))
@@ -264,7 +401,9 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 			+ ylab( "Area (km^2)" )
 			)
 		#print(p1)
-		ggsave( paste( outdir, "lt_area_ctry_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7)
+		ggsave( paste( outdir, "lt_area_ctry_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), pctrytag, sep="" ), width=7, height=7)
+		# write the ctry level data
+		write.csv(plot_df, paste(outdir, "lt_area_ctry_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), cctrytag, sep=""), row.names = FALSE)
 	
 		if(length(gis_tdata[,1] > 0)) {
 			# plot the glu level data for gis
@@ -290,10 +429,10 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ylab( "Area (km^2)" )
 				)
 			#print(p1)
-			ggsave( paste( outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7 )
+			ggsave( paste( outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), poldtag, sep="" ), width=7, height=7 )
 			
 			# write the glu level data
-			write.csv(lds_tdata, paste(outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
+			write.csv(lds_tdata, paste(outdir, "previous_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), coldtag, sep=""), row.names = FALSE)
 		}
 		
 		if(length(lds_new_tdata[,1] > 0)) {
@@ -305,10 +444,10 @@ for(lds_ctry_ind in 1:num_lds_ctry) {
 				+ ylab( "Area (km^2)" )
 				)
 			#print(p1)
-			ggsave( paste( outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ptag, sep="" ), width=7, height=7 )
+			ggsave( paste( outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), pnewtag, sep="" ), width=7, height=7 )
 			
 			# write the glu level data
-			write.csv(lds_new_tdata, paste(outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), ctag, sep=""), row.names = FALSE)
+			write.csv(lds_new_tdata, paste(outdir, "moirai_new_lt_area_km2_glu_", as.character(fao_iso$iso3_abbr[lds_ctry_ind]), cnewtag, sep=""), row.names = FALSE)
 		}
 	
 	} # end if there are data at the country level
