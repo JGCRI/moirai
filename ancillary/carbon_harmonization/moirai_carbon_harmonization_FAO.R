@@ -489,30 +489,3 @@ for(a in num_neighbor){
 
 
 
-
-#Additional Code to fix soil carbon NAs
-# The weighted average values for soil carbon are different than those for other states.
-# There are some NAs (approx 1158 values) that we replace with the medians. 
-rdata_q1 <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_q1.envi"))) %>% filter(soil_carbon_q1 != moirai_no_data_value)
-rdata_q3 <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_q3.envi"))) %>% filter(soil_carbon_q3 != moirai_no_data_value)
-rdata_min <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_min.envi"))) %>% filter(soil_carbon_min != moirai_no_data_value)
-rdata_max <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_max.envi"))) %>% filter(soil_carbon_max != moirai_no_data_value)
-rdata_median <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_median.envi")))%>% filter(soil_carbon_median != moirai_no_data_value) 
-rdata_wavg <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_weighted_average.envi"))) %>% filter(soil_carbon_weighted_average != moirai_no_data_value)
-
-rdata_median %>% left_join(rdata_min) %>% left_join(rdata_max)%>% left_join(rdata_q1)%>% left_join(rdata_q3) %>% left_join(rdata_wavg)->j 
-
-na_cells <- j[is.na(j$soil_carbon_weighted_average),]
-
-
-na_cells$soil_carbon_weighted_average <- na_cells$soil_carbon_median
-
-rdata_wavg <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_weighted_average.envi"))) %>% 
-  left_join(na_cells %>% rename(replace_values = soil_carbon_weighted_average), by= c("x","y")) %>% 
-  mutate(soil_carbon_weighted_average = if_else(is.na(replace_values),soil_carbon_weighted_average,replace_values)) %>% 
-  dplyr::select(x,y,soil_carbon_weighted_average) %>% distinct() 
-
-raster_print<- rasterize(rdata_wavg[,1:2],Carbon_thematic,rdata_wavg[,3])
-
-
-writeRaster(raster_print,"outputs/soil_carbon_weighted_average", format= "ENVI",options="INTERLEAVE=BIL", overwrite = TRUE,bandorder="BIL")
