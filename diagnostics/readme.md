@@ -123,7 +123,7 @@ Figures 5 ,6 and 7 below present plots for soil and vegetation carbon for the Am
 ![Figure 5: Distribution of soil carbon for the Amazon Basin for Tropical Evergreen Forests](examples/soilTropicalEvergreenForest_WoodlandAmazon.jpeg)
 Figure 5: Distribution of soil carbon for Tropical Evergreen Forests Amazon Basin
 
-![Figure 6: Distribution of above ground biomass for the Amazon Basin for Tropical Evergreen Forests](examples/above ground biomassTropicalEvergreenForest_WoodlandAmazon.jpeg)
+![Figure 6: Distribution of above ground biomass for the Amazon Basin for Tropical Evergreen Forests](examples/above_ground_biomassTropicalEvergreenForest_WoodlandAmazon.jpeg)
 Figure 6: Distribution of above ground biomass (vegetation carbon) for the Missouri Basin
 
 
