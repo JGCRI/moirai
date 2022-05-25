@@ -1,8 +1,10 @@
+ ## Author- Evan Margiotta (evan.margiotta@pnnl.gov)
+ 
  cd C:/Moirai/ancillary/carbon_harmonization/Soil_cover/
 
 #First cut the soilgrid data to fit GLCC resolution
-gdal_translate -of GTiff C:/Moirai/ancillary/carbon_harmonization/input_files/AWT_T_SOC.nc4 topsoil.tif
-gdal_translate -of GTiff C:/Moirai/ancillary/carbon_harmonization/input_files/AWT_S_SOC.nc4 subsoil.tif
+gdal_translate -of GTiff AWT_T_SOC.nc4 topsoil.tif
+gdal_translate -of GTiff AWT_S_SOC.nc4 subsoil.tif
 gdalwarp -ts 43200 21600 -r average topsoil.tif topsoil_carbon_clipped.tif -ot Float32 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9999999999670024 -89.9999928000332972 179.9999856000329999 89.9999999999667040 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
 gdalwarp -ts 43200 21600 -r average subsoil.tif subsoil_carbon_clipped.tif -ot Float32 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9999999999670024 -89.9999928000332972 179.9999856000329999 89.9999999999667040 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
 
@@ -10,7 +12,8 @@ gdalwarp -ts 43200 21600 -r average subsoil.tif subsoil_carbon_clipped.tif -ot F
 ##Evergreen Needleleaf Forest
 
 #Get Carbon
-gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/ENF.tif --calc="0*(A!=1) + 1*(A==1)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+# Note that gbigbpgeo20.tif is the IGBP land cover
+gdal_calc.py -A gbigbpgeo20.tif --outfile=LC/ENF.tif --calc="0*(A!=1) + 1*(A==1)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
 gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/ENF.tif --outfile=LC/ENF_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
 gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/ENF.tif --outfile=LC/ENF_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
 
