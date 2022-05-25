@@ -57,11 +57,19 @@ The table below explains the availability of data from different sources and the
 
 ### How to use the FAO HWSD soil carbon for initialization?
 
-The FAO HWSD has only data for soil carbon (These outputs are generated using `moirai_carbon_harmonization.R` ), but no data for vegetation carbon. Hence to use these outputs, the user will have to create vegetation layers corresponding to the FAO reference year (2000) from Spawn et al. for above and below ground biomass using the script - `moirai_carbon_harmonization.R`.Note that the user will also have to set the reference carbon year to `2000` in `moirai.h`. This is necessary since both soil and vegetation carbon numbers need to use the same reference year. For the convenience of the user, we have pre-generated the outputs (in the `carbon_harmonization/outputs/` folder) for the FAO data.These are the files with the following naming convention-
+The FAO HWSD has only data for soil carbon (These outputs are generated using `moirai_carbon_harmonization.R` ), but no data for vegetation carbon. Hence to use these outputs, the user will have to use the following steps
+* (1) set the reference carbon year to `2000` in `moirai.h` and rerun moirai in case they want to re-generate the reference vegetation files (refveg_area_carbon_2000.bil & refveg_carbon_thematic_2000.bil) for the year 2000. (This step is optional and needs to be used only when these files are to be updated)
+* (2) use the script `moirai_carbon_harmonization_FAO.R` to generate the FAO soil carbon rasters for the 6 states
+* (3) create vegetation layers corresponding to the FAO reference year (2000) from Spawn et al. for above and below ground biomass using the script - `moirai_carbon_harmonization.R`.
+* (4) the user will also have to set the reference carbon year to `2000` in `moirai.h`. This is necessary since both soil and vegetation carbon numbers need to use the same reference year. 
+* (5) After the above, the user can run `moirai` 
+ 
+
+For the convenience of the user, we have pre-generated the outputs (in the `carbon_harmonization/outputs/` folder) for the FAO data.These are the files with the following naming convention-
 
 `<carbon_type>`_carbon_`<state>_FAO`.envi
 
-There are 18 separate files generated for the FAO dataset.
+There are 18 separate files pre-generated for the FAO dataset. Therefore, the user would need only step (4) and (5) from the above in case directly using these files.    
 
 ### Do the carbon outputs represent managed land or unmanaged land or both ?
 
