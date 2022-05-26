@@ -26,6 +26,9 @@ library(data.table)
 library(testthat)
 library(ggplot2)
 
+# make sure working directory is .../moirai/diagnostics/
+setwd("./")
+
 #Add fast group_by function
 fast_group_by<- function(df,by,colname="value",func= "sum"){
   

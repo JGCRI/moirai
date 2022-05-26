@@ -1,12 +1,15 @@
 ###### plot_moirai_land_type_area.r
 # diagnostitcs for the land type area output
 #
-# There are only four variables that the user should set (lines 96-109)
+# There are only five variables that the user should set (lines 96-109)
 #   AEZ:		TRUE=18 aez moirai outputs; FALSE=235 GLU moirai outputs or custom GLU outputs
-#   olddir:		The directory containing the old moirai outputs to diagnose
+#   BOTH:   TRUE=override AEZ flag: olddir is aez 18, newdir is 235 GLU (or custom); this enables comparison
+#           between two different sets of bouandaries
+#   olddir:		The directory containing the old moirai outputs to diagnose (can be either 235 basins or 18 aezs)
 #   newdir:		The directory containing the new moirai outputs to diagnose (can be either 235 basins or 18 aezs)
-#				If you have a custom glu file then modify num_lds_glu, ctag, and ptag on lines 117-119 accordingly and set AEZ=FALSE
 #   outdir:		The directory to write diagnostic figures to
+#   If you have a custom glu file then modify num_lds_glu, ctag, and ptag on lines 117-119 accordingly
+#             and set AEZ=FALSE or BOTH=TRUE
 #
 # compare Moirai LDS outputs with the old GIS code
 # for 18 original aezs make comparisons at the aez level
@@ -90,7 +93,7 @@ library(ggplot2)
 
 cat("started plot_moirai_land_type_area.r at ",date(), "\n")
 
-# make sure working directory is .../lds/diagnostics/
+# make sure working directory is .../moirai/diagnostics/
 setwd("./")
 
 # flag to denote whether this is 18 aez or 235 water basin lds output

@@ -82,7 +82,7 @@ library(stringr)
 cat("started plot_moirai_crop_ctry.r at ",date(), "\n")
 
 # make sure that the working directory is .../moirai/diagnostics
-#setwd("./")
+setwd("./")
 
 # compare against gtap or older genaezecon output
 # comparing to another moirai lds output should be identical because the outputs are aggregated to country (unless a new source data set is used)

@@ -30,6 +30,9 @@ library(reldist)
 library(ggsci)
 library(scales)
 
+# make sure working directory is .../moirai/diagnostics/
+setwd("./")
+
 # this is just a standalone helper function
 
 get_raster_data_basin <- function(x,path_to_carbon_rasters="../indata/",
@@ -77,26 +80,26 @@ get_raster_data_basin <- function(x,path_to_carbon_rasters="../indata/",
 compare_carbon_distribution_ESA<-function(
   
   carbon_type = "above ground biomass",
-  path_to_glu_data = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
-  path_to_carbon_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-  path_to_land_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Land_type_area_ha.csv",
-  path_to_lt_mapping = "C:/Projects/moirai/moirai/example_outputs/basins235/MOIRAI_land_types.csv",
-  path_to_basin_mapping = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
-  path_to_carbon_rasters = "C:/Projects/moirai/moirai/indata/",
-  path_to_ESA_rasters = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/Carbon_rasters",
-  path_to_moirai_ESA = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv",
+  path_to_glu_data = "../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
+  path_to_carbon_outputs = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
+  path_to_land_outputs = "../example_outputs/basins235/Land_type_area_ha.csv",
+  path_to_lt_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+  path_to_basin_mapping = "../ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
+  path_to_carbon_rasters = "../indata/",
+  path_to_ESA_rasters = "../ancillary/carbon_harmonization/Carbon_rasters",
+  path_to_moirai_ESA = "../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv",
   basin_for_testing = "Amazon",
   year_of_reference = 2016,
   moirai_LC = "TropicalEvergreenForest/Woodland",
-  path_to_moirai_ref_veg_thematic = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
-  path_to_sage_mapping = "C:/Projects/moirai/moirai/indata/SAGE_PVLT.csv",
+  path_to_moirai_ref_veg_thematic = "../ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
+  path_to_sage_mapping = "../indata/SAGE_PVLT.csv",
   harmonized_carbon_raster_file_names = c("AG_carbon_q1.envi",
                                           "AG_carbon_q3.envi",
                                           "AG_carbon_median.envi",
                                           "AG_carbon_min.envi",
                                           "AG_carbon_max.envi",
                                           "AG_carbon_weighted_average.envi"),
-  path_to_harmonized_rasters = "C:/Projects/moirai/moirai/indata/", 
+  path_to_harmonized_rasters = "../indata/", 
   plot_lim = 25000,
   produce_ESA_distribution=FALSE
 ){

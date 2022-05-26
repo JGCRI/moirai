@@ -1,5 +1,5 @@
 
-Program moirai started at Fri Apr  9 14:42:28 2021
+Program moirai started at Wed May 18 16:37:10 2022
 
 
 For more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file
@@ -73,30 +73,30 @@ Currently processing Year: 46
 Currently processing Year: 47Wrote file ./example_outputs/aez_orig/Land_type_area_ha.csv: proc_land_type_area(); records written=2605821
 
 Global reference carbon values, in Mg: proc_refveg_carbon()
-Soil C = 987108081664.000000
-Soil C Median = 952985518080.000000
-Soil C Min = 386970877952.000000
-Soil C Max = 2681824870400.000000
-Soil C Q1 = 788075773952.000000
-Soil C Q3 = 1157229314048.000000
-Veg C (above ground biomass) = 228800593920.000000
+Soil C = 823011835904.000000
+Soil C Median = 6944960719615179424875050154598596608.000000
+Soil C Min = 70785059871366887070733851777040384.000000
+Soil C Max = 3542523052032.000000
+Soil C Q1 = 168509150815069848530475928038408192.000000
+Soil C Q3 = 14178269633039978107151283136757760.000000
+Veg C (above ground biomass) = 210918703104.000000
 
-Veg C (above ground biomass) Median = 198454837248.000000
-Veg C (above ground biomass) Min = 809624128.000000
-Veg C (above ground biomass) Max = 1064960786432.000000
-Veg C (above ground biomass) Q1 = 88568012800.000000
-Veg C (above ground biomass) Q3 = 332636028928.000000
-Veg C (below ground biomass) = 86875750400.000000
+Veg C (above ground biomass) Median = 208572760064.000000
+Veg C (above ground biomass) Min = 1410905344.000000
+Veg C (above ground biomass) Max = 858476380160.000000
+Veg C (above ground biomass) Q1 = 122540326912.000000
+Veg C (above ground biomass) Q3 = 309681291264.000000
+Veg C (below ground biomass) = 78078541824.000000
 
-Veg C (below ground biomass) Median = 70891913216.000000
-Veg C (below ground biomass) Min = 757360192.000000
-Veg C (below ground biomass) Max = 693941239808.000000
-Veg C (below ground biomass) Q1 = 30868879360.000000
-Veg C (below ground biomass) Q3 = 130321719296.000000
+Veg C (below ground biomass) Median = 76246990848.000000
+Veg C (below ground biomass) Min = 841485760.000000
+Veg C (below ground biomass) Max = 574879039488.000000
+Veg C (below ground biomass) Q1 = 42543345664.000000
+Veg C (below ground biomass) Q3 = 124839280640.000000
 Wrote file ./example_outputs/aez_orig/Water_footprint_m3.csv: proc_water_footprint(); records written=23456
 Wrote file ./example_outputs/aez_orig/MOIRAI_ag_HA_ha.csv: write_harvestarea_crop_aez(); records written=37978 != countries skipped=4
 Wrote file ./example_outputs/aez_orig/MOIRAI_ag_prod_t.csv: write_production_crop_aez(); records written=37978 != countries skipped=4
 Wrote file ./example_outputs/aez_orig/MOIRAI_value_milUSD.csv: write_rent_use_aez(); records written=4850
 
-Successful completion of program moirai at Fri Apr  9 16:16:07 2021
+Successful completion of program moirai at Wed May 18 18:57:10 2022
 
