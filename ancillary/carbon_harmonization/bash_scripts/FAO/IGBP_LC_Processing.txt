@@ -1,7 +1,5 @@
  ## Author- Evan Margiotta (evan.margiotta@pnnl.gov)
  
- cd C:/Moirai/ancillary/carbon_harmonization/Soil_cover/
-
 #First cut the FAO data to fit GLCC resolution
 gdal_translate -of GTiff AWT_T_SOC.nc4 topsoil.tif
 gdal_translate -of GTiff AWT_S_SOC.nc4 subsoil.tif
