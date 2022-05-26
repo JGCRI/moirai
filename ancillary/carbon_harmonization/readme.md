@@ -55,6 +55,24 @@ The table below explains the availability of data from different sources and the
 
 ## Common questions related to inputs and outputs
 
+### Do the carbon outputs represent managed land or unmanaged land or both ?
+
+Currently the carbon outputs only represent carbon densities for unmanaged/undisturbed land. We are working on extending our approach to managed land types (Cropland, Pastures, Urbanland). Eventually, our outputs will include both carbon densities for managed and unmanaged land. 
+
+### What year do the carbon outputs from moirai represent ?
+
+The carbon outputs by default (soil grids, spawn et al. data) represent the year 2010, but can also be re-programmed to generate outputs that represent the year 2000 (for the FAO outputs). See instructions below for the same. The user can also use any reference year by changing the reference carbon year in `moirai.h`. More detailed instructions are provided below. 
+
+### How can a user update the reference year i.e. can a user change the reference year to another year (e.g. 2015) so that the carbon outputs refer to the vegetation cover in this year?
+
+To update the reference year, the following steps are involved:
+* (1) First the user would have to set the reference carbon year in `moirai.h` to a new reference year (e.g. 2015)
+* (2) Now the user must run `moirai` to re-generate `refveg_carbon_thematic.bil` and `refveg_area_carbon.bil`
+* (3) Copy these files to the ancillary/carbon_harmonization/input_files folder
+* (4) Re-run the moirai_carbon_harmonization.R script to regenerate new inputs (Run this for soil, aboveground biomass and below ground biomass)
+* (5) Copy the outputs to the indata/ folder
+* (6) Now when the user re-runs moirai, the carbon outputs will represent the new year 
+
 ### How to use the FAO HWSD soil carbon for initialization?
 
 The FAO HWSD has only data for soil carbon (These outputs are generated using `moirai_carbon_harmonization.R` ), but no data for vegetation carbon. Hence to use these outputs, the user will have to use the following steps
@@ -70,11 +88,6 @@ For the convenience of the user, we have pre-generated the outputs (in the `carb
 `<carbon_type>`_carbon_`<state>_FAO`.envi
 
 There are 18 separate files pre-generated for the FAO dataset. Therefore, the user would need only step (4) and (5) from the above in case directly using these files.    
-
-### Do the carbon outputs represent managed land or unmanaged land or both ?
-
-Currently the carbon outputs only represent carbon densities for unmanaged/undisturbed land. We are working on extending our approach to managed land types (Cropland, Pastures, Urbanland). Eventually, our outputs will include both carbon densities for managed and unmanaged land. 
-
 ## Description of harmonization process
 
 (NOTE THAT ALL STATISTICS AND PROCESSES DESCRIBED HERE FORWARD ONLY REFERENCE THE `moirai` DEFAULTS. BUT THE SAME PROCESS IS ALSO APPLICABLE TO THE FAO HWSD DATA)
