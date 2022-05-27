@@ -52,8 +52,8 @@ scheme_basic <- theme_bw() +
         legend.box.background = element_rect(colour = "black"))+
   theme(legend.key.width=unit(4,"cm"))
 
-#Set the working directory
-path_to_working_directory <- "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/"
+#Set the working directory to .../moirai/ancillary/carbon_harmonizastion
+path_to_working_directory <- "./"
 setwd(path_to_working_directory)
 
 #Create some directories
