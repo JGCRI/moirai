@@ -96,7 +96,7 @@ library(stringr)
 cat("started plot_moirai_landrent_glu.r at ",date(), "\n")
 
 # make sure that the working directory is .../moirai/diagnostics
-#setwd("./")
+setwd("./")
 
 # three levels of aggregation: none, 14 region, 32 region
 AGGREGATE = FALSE

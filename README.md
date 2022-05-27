@@ -2,11 +2,21 @@
 
 Alan Di Vittorio, Lawrence Berkeley National Laboratory
 
-Kanishka Narayan, Global Change Research Institute, Pacific Northwest National laboratory
+Kanishka Narayan, Global Change Research Institute, Pacific Northwest National Laboratory
 
-## Version: 3
+Evan Margiotta, Global Change Research Institute, Pacific Northwest National Laboratory
+
+## Current Version: 3.1.1
 
 ## Version History
+* **Version 3.1.1:** May 2022; DOI TBD
+	* Harmonizes carbon data for Moirai by matching land cover types between source data and Moirai
+		* This improves carbon density estimates
+	* New capacity to include deeper soil carbon (30-100cm) in addition to topsoil carbon (0-30cm)
+		* The default is topsoil carbon only (0-30cm)
+	* Adds more detailed diagnostics for basin and global level carbon outputs
+	* Updates some data references in the documentation
+	* Note that this version maintains the same spatial configuration and data sources as version 3.1.0
 * **Version 3.1.0:** April 2021; DOI: http://doi.org/10.5281/zenodo.4973631
 	* Adds comprehensive suitable and protected area land distinctions to the land area and carbon outputs
 		* There are now 8 distinct categories (including unknown) based on new input data
@@ -80,7 +90,7 @@ The Moirai LDS production outputs are independent of the GCAM regions. However, 
 
 ## Installing Moirai LDS
 
-The Moirai LDS can be obtained by downloading the release zipfile from [zenodo.org](http://zenodo.org/record/2584034) or by cloning or downloading the release tag directly from the [GitHub repository](https://github.com/JGCRI/moirai). To clone from GitHub type `git clone https://github.com/JGCRI/moirai.git` at the command line in your directory where you want the moirai folder to be placed. Once the moirai folder is expanded on your local machine the 'moirai' command line tool can be compiled using a makefile (on linux or Mac) or Xcode (on a Mac). To compile in Xcode, open the `…/moirai/moirai.xcodeproj` file and set the location of your NetCDF library (see below for NetCDF details) in the Build Settings (click on the top-level 'moirai' project file icon in the navigator window to access these). There are three fields that need to be updated to reflect the location of your NetCDF header file (netcdf.h): `Search Paths>Header Search Paths`, and the Debug and Release fields of `Search Paths>User Header Search Paths`. The `Search Paths>Library Search Paths` and `Linking>Other Linker Flags` fields need to be updated to reflect the location of the actual library file. Once the NetCDF location is set, simply select `Build` from the `Product` menu to compile `moirai`. The current default setting for the location of the executable is `…/moirai/Build/Products/Debug`.
+The Moirai LDS can be obtained by downloading the release zipfile from [zenodo.org](http://zenodo.org/record/2584034) or by cloning or downloading the release tag directly from the [GitHub repository](https://github.com/JGCRI/moirai). To clone from GitHub type `git clone https://github.com/JGCRI/moirai.git` at the command line in your directory where you want the moirai folder to be placed. Once the moirai folder is expanded on your local machine the 'moirai' command line tool can be compiled using a makefile (on linux or Mac) or Xcode (on a Mac). To compile in Xcode, first copy the `…/moirai/moirai.xcodeproj.copy` file to `…/moirai/moirai.xcodeproj`, and open this new project file and set the location of your NetCDF library (see below for NetCDF details) in the Build Settings (click on the top-level 'moirai' project file icon in the navigator window to access these). There are three fields that need to be updated to reflect the location of your NetCDF header file (netcdf.h): `Search Paths>Header Search Paths`, and the Debug and Release fields of `Search Paths>User Header Search Paths`. The `Search Paths>Library Search Paths` and `Linking>Other Linker Flags` fields need to be updated to reflect the location of the actual library file. Once the NetCDF location is set, simply select `Build` from the `Product` menu to compile `moirai`. The current default setting for the location of the executable is `…/moirai/Build/Products/Debug`.
 
 Alternatively, `moirai` can be compiled using the `makefile`, with which the NetCDF library and header paths are automatically determined.
 

@@ -41,6 +41,9 @@ library(smoothr)
 library(ggplot2)
 library(rgeos)
 
+# make sure working directory is .../moirai/diagnostics/
+setwd("./")
+
 #Load helper function to get raster data
 get_and_standardize_raster <- function(raster_path= "spatial_input_files/country_out.bil",
                                        crs_for_proj= "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
