@@ -76,11 +76,12 @@ library(stringr)
 
 cat("started plot_moirai_crop_rglu.r at ",date(), "\n")
 
+# make sure working directory is .../moirai/diagnostics/
 setwd("./")
 
 # this determines the grouping of the comparison
 GTAP = TRUE
-REG32 = TRUE
+REG32 = FALSE
 
 papergray = FALSE
 

@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "39b395ce-a6a9-4ab4-977e-b50d05e3dfc0++6762",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "39b395ce-a6a9-4ab4-977e-b50d05e3dfc0++6762" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "39b395ce-a6a9-4ab4-977e-b50d05e3dfc0++6762" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "C31E5A72-4ABA-406D-82EE-0D76B3DBC895",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "39b395ce-a6a9-4ab4-977e-b50d05e3dfc0++6762" : "lds-workspace\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "lds",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "input\/gcam-data-system\/aglu-processing-code\/lds\/lds2.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/128.8.246.24\/svn",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "39b395ce-a6a9-4ab4-977e-b50d05e3dfc0++6762"
+    }
+  ]
+}

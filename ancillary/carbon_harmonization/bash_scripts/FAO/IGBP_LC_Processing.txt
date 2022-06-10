@@ -1,0 +1,410 @@
+ ## Author- Evan Margiotta (evan.margiotta@pnnl.gov)
+ 
+#First cut the FAO data to fit GLCC resolution
+gdal_translate -of GTiff AWT_T_SOC.nc4 topsoil.tif
+gdal_translate -of GTiff AWT_S_SOC.nc4 subsoil.tif
+gdalwarp -ts 43200 21600 -r average topsoil.tif topsoil_carbon_clipped.tif -ot Float32 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9999999999670024 -89.9999928000332972 179.9999856000329999 89.9999999999667040 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
+gdalwarp -ts 43200 21600 -r average subsoil.tif subsoil_carbon_clipped.tif -ot Float32 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9999999999670024 -89.9999928000332972 179.9999856000329999 89.9999999999667040 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
+
+
+##Evergreen Needleleaf Forest
+
+#Get Carbon
+# Note that gbigbpgeo20.tif is the IGBP land cover
+gdal_calc.py -A gbigbpgeo20.tif --outfile=LC/ENF.tif --calc="0*(A!=1) + 1*(A==1)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/ENF.tif --outfile=LC/ENF_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/ENF.tif --outfile=LC/ENF_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/ENF_topsoil.tif  Soil_carbon_rasters/ENF_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/ENF_topsoil.tif Soil_carbon_rasters/ENF_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/ENF_topsoil.tif Soil_carbon_rasters/ENF_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/ENF_topsoil.tif Soil_carbon_rasters/ENF_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/ENF_topsoil.tif Soil_carbon_rasters/ENF_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/ENF_topsoil.tif Soil_carbon_rasters/ENF_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/ENF_subsoil.tif  Soil_carbon_rasters/ENF_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/ENF_subsoil.tif Soil_carbon_rasters/ENF_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/ENF_subsoil.tif Soil_carbon_rasters/ENF_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/ENF_subsoil.tif Soil_carbon_rasters/ENF_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/ENF_subsoil.tif Soil_carbon_rasters/ENF_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/ENF_subsoil.tif Soil_carbon_rasters/ENF_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Evergreen Broadleaf Forest
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/EBF.tif --calc="0*(A!=2) + 1*(A==2)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/EBF.tif --outfile=LC/EBF_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/EBF.tif --outfile=LC/EBF_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0 
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/EBF_topsoil.tif Soil_carbon_rasters/EBF_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/EBF_subsoil.tif Soil_carbon_rasters/EBF_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Deciduous Needleleaf Forest
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/DNF.tif --calc="0*(A!=3) + 1*(A==3)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/DNF.tif --outfile=LC/DNF_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/DNF.tif --outfile=LC/DNF_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/DNF_topsoil.tif Soil_carbon_rasters/DNF_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/DNF_subsoil.tif Soil_carbon_rasters/DNF_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+##Deciduous Broadleaf Forest
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/DBF.tif --calc="0*(A!=4) + 1*(A==4)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/DBF.tif --outfile=LC/DBF_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/DBF.tif --outfile=LC/DBF_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/DBF_topsoil.tif Soil_carbon_rasters/DBF_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/DBF_subsoil.tif Soil_carbon_rasters/DBF_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Mixed Forest
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/MixedForest.tif --calc="0*(A!=5) + 1*(A==5)" --co="TILED=YES " --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/MixedForest.tif --outfile=LC/MixedForest_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/MixedForest.tif --outfile=LC/MixedForest_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/MixedForest_topsoil.tif Soil_carbon_rasters/MixedForest_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/MixedForest_subsoil.tif Soil_carbon_rasters/MixedForest_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+##Combined Forest
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/CombinedForest.tif --calc="0*(A>4) + 1*(A==1) + 1*(A==2) + 1*(A==3) + 1*(A==4)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/CombinedForest.tif --outfile=LC/CombinedForest_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/CombinedForest.tif --outfile=LC/CombinedForest_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/CombinedForest_topsoil.tif Soil_carbon_rasters/CombinedForest_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/CombinedForest_subsoil.tif Soil_carbon_rasters/CombinedForest_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Closed Shrublands
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/ClosedShrub.tif --calc="0*(A!=6) + 1*(A==6)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/ClosedShrub.tif --outfile=LC/ClosedShrub_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/ClosedShrub.tif --outfile=LC/ClosedShrub_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/ClosedShrub_topsoil.tif Soil_carbon_rasters/ClosedShrub_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+gdalwarp -ts 4320 2160 -r average LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/ClosedShrub_subsoil.tif Soil_carbon_rasters/ClosedShrub_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Open Shrublands
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/OpenShrub.tif --calc="0*(A!=7) + 1*(A==7)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/OpenShrub.tif --outfile=LC/OpenShrub_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/OpenShrub.tif --outfile=LC/OpenShrub_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/OpenShrub_topsoil.tif Soil_carbon_rasters/OpenShrub_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/OpenShrub_subsoil.tif Soil_carbon_rasters/OpenShrub_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Woody Savannas
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/WoodySavannas.tif --calc="0*(A!=8) + 1*(A==8)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/WoodySavannas.tif --outfile=LC/WoodySavannas_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/WoodySavannas.tif --outfile=LC/WoodySavannas_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/WoodySavannas_topsoil.tif Soil_carbon_rasters/WoodySavannas_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/WoodySavannas_subsoil.tif Soil_carbon_rasters/WoodySavannas_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+## Savannas
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/Savannas.tif --calc="0*(A!=9) + 1*(A==9)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/Savannas.tif --outfile=LC/Savannas_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/Savannas.tif --outfile=LC/Savannas_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Savannas_topsoil.tif Soil_carbon_rasters/Savannas_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Savannas_subsoil.tif Soil_carbon_rasters/Savannas_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+##Grasslands
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/Grasslands.tif --calc="0*(A!=10) + 1*(A==10)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/Grasslands.tif --outfile=LC/Grasslands_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/Grasslands.tif --outfile=LC/Grasslands_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Grasslands_topsoil.tif Soil_carbon_rasters/Grasslands_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Grasslands_subsoil.tif Soil_carbon_rasters/Grasslands_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Permanent Wetlands
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/Wetlands.tif --calc="0*(A!=11) + 1*(A==11)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/Wetlands.tif --outfile=LC/Wetlands_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/Wetlands.tif --outfile=LC/Wetlands_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Wetlands_topsoil.tif Soil_carbon_rasters/Wetlands_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Wetlands_subsoil.tif Soil_carbon_rasters/Wetlands_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Snow and Ice
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/SnowIce.tif --calc="0*(A!=15) + 1*(A==15)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/SnowIce.tif --outfile=LC/SnowIce_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/SnowIce.tif --outfile=LC/SnowIce_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/SnowIce_topsoil.tif Soil_carbon_rasters/SnowIce_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/SnowIce_subsoil.tif Soil_carbon_rasters/SnowIce_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Barren or Sparsely Vegetated
+
+#Get Carbon
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/BSV.tif --calc="0*(A!=16) + 1*(A==16)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/BSV.tif --outfile=LC/BSV_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/BSV.tif --outfile=LC/BSV_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/BSV_topsoil.tif Soil_carbon_rasters/BSV_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/BSV_subsoil.tif Soil_carbon_rasters/BSV_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+### Managed Land Classes ###
+
+## Cropland
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/Cropland.tif --calc="0*(A!=12) + 1*(A==12)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/Cropland.tif --outfile=LC/Cropland_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/Cropland.tif --outfile=LC/Cropland_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Cropland_topsoil.tif Soil_carbon_rasters/Cropland_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Cropland_subsoil.tif Soil_carbon_rasters/Cropland_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##CVM
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/CVM.tif --calc="0*(A!=14) + 1*(A==14)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/CVM.tif --outfile=LC/CVM_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/CVM.tif --outfile=LC/CVM_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/CVM_topsoil.tif Soil_carbon_rasters/CVM_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/CVM_subsoil.tif Soil_carbon_rasters/CVM_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+
+##Urban
+gdal_calc.py -A C:/Moirai/ancillary/carbon_harmonization/input_files/gbigbpgeo20.tif --outfile=LC/Urban.tif --calc="0*(A!=13) + 1*(A==13)" --co="TILED=YES" --co="COMPRESS=DEFLATE"
+gdal_calc.py -A topsoil_carbon_clipped.tif -B LC/Urban.tif --outfile=LC/Urban_topsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+gdal_calc.py -A subsoil_carbon_clipped.tif -B LC/Urban.tif --outfile=LC/Urban_subsoil.tif --calc="(A>-32767)*(A*B*0.1)" --co="TILED=YES" --co="COMPRESS=DEFLATE" --NoDataValue=0
+
+#Topsoil
+gdalwarp -ts 4320 2160 -r average LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Urban_topsoil.tif Soil_carbon_rasters/Urban_topsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+
+#Subsoil
+gdalwarp -ts 4320 2160 -r average LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_weighted_average.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r med  LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_median.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r min  LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_min.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r max  LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_max.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q1  LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_q1.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0
+gdalwarp -ts 4320 2160 -r q3 LC/Urban_subsoil.tif Soil_carbon_rasters/Urban_subsoil_q3.bil -ot Float32 -of ENVI -t_srs "+proj=longlat +ellps=WGS84" -te -180 -90 180 90 -dstnodata -9999 -srcnodata 0

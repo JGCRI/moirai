@@ -2,11 +2,21 @@
 
 Alan Di Vittorio, Lawrence Berkeley National Laboratory
 
-Kanishka Narayan, Global Change Research Institute, Pacific Northwest National laboratory
+Kanishka Narayan, Global Change Research Institute, Pacific Northwest National Laboratory
 
-## Version: 3
+Evan Margiotta, Global Change Research Institute, Pacific Northwest National Laboratory
+
+## Current Version: 3.1.1
 
 ## Version History
+* **Version 3.1.1:** May 2022; DOI TBD
+	* Harmonizes carbon data for Moirai by matching land cover types between source data and Moirai
+		* This improves carbon density estimates
+	* New capacity to include deeper soil carbon (30-100cm) in addition to topsoil carbon (0-30cm)
+		* The default is topsoil carbon only (0-30cm)
+	* Adds more detailed diagnostics for basin and global level carbon outputs
+	* Updates some data references in the documentation
+	* Note that this version maintains the same spatial configuration and data sources as version 3.1.0
 * **Version 3.1.0:** April 2021; DOI: http://doi.org/10.5281/zenodo.4973631
 	* Adds comprehensive suitable and protected area land distinctions to the land area and carbon outputs
 		* There are now 8 distinct categories (including unknown) based on new input data
@@ -80,7 +90,7 @@ The Moirai LDS production outputs are independent of the GCAM regions. However, 
 
 ## Installing Moirai LDS
 
-The Moirai LDS can be obtained by downloading the release zipfile from [zenodo.org](http://zenodo.org/record/2584034) or by cloning or downloading the release tag directly from the [GitHub repository](https://github.com/JGCRI/moirai). To clone from GitHub type `git clone https://github.com/JGCRI/moirai.git` at the command line in your directory where you want the moirai folder to be placed. Once the moirai folder is expanded on your local machine the 'moirai' command line tool can be compiled using a makefile (on linux or Mac) or Xcode (on a Mac). To compile in Xcode, open the `…/moirai/moirai.xcodeproj` file and set the location of your NetCDF library (see below for NetCDF details) in the Build Settings (click on the top-level 'moirai' project file icon in the navigator window to access these). There are three fields that need to be updated to reflect the location of your NetCDF header file (netcdf.h): `Search Paths>Header Search Paths`, and the Debug and Release fields of `Search Paths>User Header Search Paths`. The `Search Paths>Library Search Paths` and `Linking>Other Linker Flags` fields need to be updated to reflect the location of the actual library file. Once the NetCDF location is set, simply select `Build` from the `Product` menu to compile `moirai`. The current default setting for the location of the executable is `…/moirai/Build/Products/Debug`.
+The Moirai LDS can be obtained by downloading the release zipfile from [zenodo.org](http://zenodo.org/record/2584034) or by cloning or downloading the release tag directly from the [GitHub repository](https://github.com/JGCRI/moirai). To clone from GitHub type `git clone https://github.com/JGCRI/moirai.git` at the command line in your directory where you want the moirai folder to be placed. Once the moirai folder is expanded on your local machine the 'moirai' command line tool can be compiled using a makefile (on linux or Mac) or Xcode (on a Mac). To compile in Xcode, first copy the `…/moirai/moirai.xcodeproj.copy` file to `…/moirai/moirai.xcodeproj`, and open this new project file and set the location of your NetCDF library (see below for NetCDF details) in the Build Settings (click on the top-level 'moirai' project file icon in the navigator window to access these). There are three fields that need to be updated to reflect the location of your NetCDF header file (netcdf.h): `Search Paths>Header Search Paths`, and the Debug and Release fields of `Search Paths>User Header Search Paths`. The `Search Paths>Library Search Paths` and `Linking>Other Linker Flags` fields need to be updated to reflect the location of the actual library file. Once the NetCDF location is set, simply select `Build` from the `Product` menu to compile `moirai`. The current default setting for the location of the executable is `…/moirai/Build/Products/Debug`.
 
 Alternatively, `moirai` can be compiled using the `makefile`, with which the NetCDF library and header paths are automatically determined.
 
@@ -226,7 +236,7 @@ The Moirai LDS input file specifies the input and output paths, the file names o
   * Please cite these data when using Moirai: Ramankutty, N. & Foley, J. A. 1999. Estimating historical changes in global land cover: Croplands from 1700 to 1992. Global Biogeochem. Cycles, 13, 997-1027.
 * **Country thematic map**: integer codes representing the country coverage, with valid data only in cells that have been assigned to a country (`fao_ctry_rast.bil`)
   * The base for these data is the VAMP0 spatial data set, which has been used by the FAO and is thus labeled with FAO country names. The FAO integer country codes from FAOSTAT have been assigned to the countries where possible, with some additional values for VMAP0 countries not listed in the FAOSTAT database. Furthermore, East Timor has been added based on a map, and the edges of the country raster data were “grown” to ensure better coverage of coastal land cells. See `…/moirai/indata/FAO_iso_VMAP0_ctry_readme.txt` for details on this data set and how it maps to the tabular country data. A shapefile of these data is available in `…/moirai/ancillary/countries/` (once countries.zip is unzipped). Note: The original data did not assign a country to inland water. Hence it was supplemented with another country shapefile to assign countries to the inland water cells. The code used for this along with instructions on use is located in `…/moirai/ancillary/update_fao_ctry_rast/`.
-* **Suitable and protected area rasters (6)**: These raster files represent different states of suitability and protection and are used to derive the 7 states of protection and suitability in the LDS outputs. Raw .tif files were processed using the `warp_raster_to_moirai_crs.sh` located in the `…/moirai/ancillary/bash_scripts/` directory. These raw data were provided by researchers at U.S. Environmental Protection Agency (EPA) in support of research with the Global Change Analysis Model (GCAM). Contact Aaron Sobel (Sobel.Aaron@epa.gov) for availability, and see […/moirai/docs/third_party_contributions_v31.pdf](https://github.com/JGCRI/moirai/blob/master/docs/third_party_contributions_v31.pdf) for original data sources and their citations. The six files in order are:
+* **Suitable and protected area rasters (6)**: These raster files represent different states of suitability and protection and are used to derive the 7 states of protection and suitability in the LDS outputs. Raw .tif files were processed using the `warp_raster_to_moirai_crs.sh` located in the `…/moirai/ancillary/suitability_raster_processing/` directory. These raw data were provided by researchers at U.S. Environmental Protection Agency (EPA) in support of research with the Global Change Analysis Model (GCAM). Contact Aaron Sobel (Sobel.Aaron@epa.gov) for availability, and see […/moirai/docs/third_party_contributions_v31.pdf](https://github.com/JGCRI/moirai/blob/master/docs/third_party_contributions_v31.pdf) for original data sources and their citations. The six files in order are:
  * Cropland and suitable cropland = 1, otherwise = 0: `L1_processed.bil`
  * Cropland and suitable cropland minus highly protected area = 1, otherwise = 0: `L2_processed.bil`
  * Cropland and suitable cropland minus highly protected area plus deforested land = 1, otherwise = 0: `L3_processed.bil`
@@ -238,62 +248,8 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **SAGE physical cropland area, circa 2000**: Physical cropland area circa 2000, as fraction of cell area (`Cropland2000_5min.nc`)
 	* These data are used to normalize the SAGE individual crop harvested area values to each grid cell
 	* Please cite these data when using Moirai: Ramankutty, N., Evan, A. T., Monfreda, C. & Foley, J. A. 2008. Farming the planet: 1. Geographic distribution of global agricultural lands in the year 2000. Global Biogeochem. Cycles, 22, GB1003.
-* **Soil carbon density (0-30 cm) rasters (6)** (`soil_carbon_<state>_<level>.bil`): A set of new rasters representing 6 carbon states determined by aggregation to 5 arcmin (in order: weighted average, minimum, median, maximum, quartile 1 and quartile 3) for soil carbon density in MgC/ha for a depth of 0-30 cm for the year 2010. There are 3 estimate levels to choose from (from 2 different data sources).
- * The user can choose any level by updating the input file `moirai_input_basins235.txt` or `moirai_input_aez_orig.txt`. The table below summarizes the levels that are available along with the appropriate citations.
- * Raw raster files were processed using gdal to get values for each state, and this code (`get_soil_grids_mean.sh`, `get_soil_grids_95th_percentile.sh`, and `get_FAO_HWS_data.sh`) is located in `…/moirai/ancillary/bash_scripts`.
-
-
-| file names                    | data description                                                                                 | source                                                                                                     | citation                                                                                                                                                                                                                                |
-|-------------------------------|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| soil_carbon_`<state>`_95pct.bil | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on 95th perecntile of soil characteristics, for the year 2010. **Note that the Q3 state of this dataset is the current default for soil carbon calculations in moirai**                          | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
-| soil_carbon_`<state>`.bil       | soil grids (2.0) carbon density in MgC/ha for 0-30 cm, based on mean of all soil characteristics, for the year 2010                                     | https://www.isric.org/explore/soilgrids                                                                    | Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., … & Guevara, M. A. (2017). SoilGrids250m: Global gridded soil information based on machine learning. PLoS one, 12(2), e0169748. |
-| FAO_HWS_`<state>`.bil           | FAO harmonized world soil database (v1.2), soil carbon density in MgC/ha for a depth of 0-30 cm, for the year 2010 | http://www.fao.org/soils-portal/soil-survey/soil-maps-and-databases/harmonized-world-soil-database-v12/en/ | Fischer, G., F. Nachtergaele, S. Prieler, H.T. van Velthuizen, L. Verelst, D. Wiberg, 2008. Global Agro-ecological Zones Assessment for Agriculture (GAEZ 2008). IIASA, Laxenburg, Austria and FAO, Rome, Italy.                        |
-
-* **Vegetation carbon density rasters (12)** (`veg_carbon_<state>.bil` and `veg_BG_carbon_<state>.bil`):
-	A set of 12 rasters that represents above ground carbon biomass and below ground biomass (in MgC/ha) for 6 different carbon states (above first, then below, in the following order: weighted average, minimum, median, maximum, quartile 1 and quartile 3) for the year 2010.
-	* The raw rasters were downloaded from- https://daac.ornl.gov/VEGETATION/guides/Global_Maps_C_Density_2010.html. The rasters for each state were derived using gdal, the code for which is available in `…/moirai/ancillary/bash_scripts`.
-	* **Note that the Q3 state of this dataset is the current default for vegetation carbon calculations in moirai**
-	* These data should be cited as-
-	Spawn, S.A., Sullivan, C.C., Lark, T.J. et al. Harmonized global maps of above and belowground biomass carbon density in the year 2010. Sci Data 7, 112 (2020). https://doi.org/10.1038/s41597-020-0444-4
-
-
-* The table below summarizes global soil and vegetation carbon numbers calculated in MOIRAI in Petagrams (Pg) from the data sources above for each carbon state for the year 2010.
-* Note that the carbon below represents the carbon on unmanaged land i.e. it does not include soil and vegetation carbon on cropland, land used for pastures and urban land.
-
-|                  | Soil carbon (0-30 cm)     |                       |                                  | Vegetation carbon (above ground) | Vegetation carbon (below ground) |
-|------------------|----------------------------|-----------------------|----------------------------------|----------------------------------|----------------------------------|
-| State/Source     | HWS database from FAO (Pg) | Soil grids (mean)(Pg) | Soil grids (95th Percentile)(Pg) | Spawn et al (Pg)                 | Spawn et al (Pg)                 |
-| Weighted average | 473                        | 393                   | 1019                             | 234                              | 88                               |
-| Median           | 435                        | 391                   | 971                              | 205                              | 73                               |
-| Minimum          | 2                          | 1                     | 296                              | 0.8                              | 1                                |
-| Maximum          | 697                        | 551                   | 2781                              | 990                              | 633                              |
-| Q1               | 284                        | 311                   | 814                              | 90                               | 31                               |
-| Q3               | 630                        | 468                   | 1182                             | 343                              | 134                              |
-
-* The table below summarizes global soil and vegetation carbon numbers by unmanaged land type in 2010 calculated in MOIRAI in Petagrams (Pg) using the soil_grids_95th_percentile dataset for soil carbon and the Spawn et al dataset for vegetation carbon. Note that the "Evergreen/DeciduousMixedForest/Woodland" category has very little area as it is a default when a more specific category is unavailable. Also note that Spawn et al. don't provide detailed information on vegetation carbon in the Tundra region, therefore the numbers for that particular land type in the table below may be unreliable.
-
-
-| Unmanaged land type                         | soil carbon (Petagrams) | vegetation carbon (above ground) | vegetation carbon (belowground) | Total |
-|---------------------------------------------|-------------------------|----------------------------------|---------------------------------|-------|
-| BorealDeciduousForest/Woodland              | 55                      | 12                               | 6                               | 73    |
-| BorealEvergreenForest/Woodland              | 126                     | 32                               | 14                              | 172   |
-| DenseShrubland                              | 38                      | 7                                | 6                               | 51    |
-| Desert                                      | 72                      | 0                                | 1                               | 73    |
-| Evergreen/DeciduousMixedForest/Woodland     | 2                       | 0                                | 0                               | 2     |
-| Grassland/Steppe                            | 225                     | 49                               | 23                              | 297   |
-| OpenShrubland                               | 123                     | 9                                | 8                               | 140   |
-| PolarDesert/Rock/Ice                        | 24                      | 1                                | 0                               | 25    |
-| Savanna                                     | 74                      | 24                               | 15                              | 113   |
-| TemperateBroadleafEvergreenForest/Woodland  | 10                      | 4                                | 1                               | 15    |
-| TemperateDeciduousForest/Woodland           | 41                      | 17                               | 6                               | 64    |
-| TemperateNeedleleafEvergreenForest/Woodland | 47                      | 19                               | 6                               | 72    |
-| TropicalDeciduousForest/Woodland            | 26                      | 9                                | 4                               | 39    |
-| TropicalEvergreenForest/Woodland            | 177                     | 151                              | 37                              | 365   |
-| Tundra                                      | 140                     | 6                                | 7                               | 153   |
-| Unknown                                     | 5                       | 1                                | 0                               | 6     |
-| Total                                       | 1183                    | 341                              | 134                             | 1658  |
-
-
+* **Soil carbon density (0-30 cm) rasters (6)** (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
+* **Vegetation carbon density rasters (12)**(Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
 
 ### CSV input data (filename without path)
 * **Original GTAP LU2.1 land rent data** (`GTAP_value_milUSD.csv`): Please cite these data when using Moirai: Lee, H.-L., Hhertel, T. W., Rose, S., Avetisyan, M. An integrated global land use data base for CGE analysis of climate policy options. Chapter 4, pp. 72-88, in Hertel, T. W., S. Rose and R. Tol  (eds.) (2009). Economic Analysis of Land Use in Global Climate Change Policy. Abingdon: Routledge.

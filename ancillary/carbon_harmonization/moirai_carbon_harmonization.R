@@ -1,0 +1,454 @@
+# Created by Kanishka Narayan and Alan Di Vittorio
+
+# Moirai Land Data System (Moirai) Copyright (c) 2020, The
+# Regents of the University of California, through Lawrence Berkeley National
+# Laboratory (subject to receipt of any required approvals from the U.S.
+# Dept. of Energy).  All rights reserved.
+
+# If you have questions about your rights to use or distribute this software,
+# please contact Berkeley Lab's Intellectual Property Office at
+# IPO@lbl.gov.
+
+# NOTICE.  This Software was developed under funding from the U.S. Department
+# of Energy and the U.S. Government consequently retains certain rights.  As
+# such, the U.S. Government has been granted for itself and others acting on
+# its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit other to do
+# so.
+
+# This file is part of Moirai.
+
+# Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
+
+#Purpose : This script harmonizes the 1026 rasters stored in the zip file Carbon_rasters.zip to the moirai refrence
+#vegetation classes (currently in 2010). This script generates 18 final rasters that are used within the moirai code.  
+#This script performs the harmonization for data for soil carbon from the soil grids (0-100 cms) and vegetation carbon
+#from Spawn et al. for above and below ground vegetation.
+
+#Load libraries
+library(raster)
+library(dplyr)
+library(data.table)
+library(FNN)
+library(ggplot2)
+
+#Scheme for plots
+scheme_basic <- theme_bw() +
+  theme(legend.text = element_text(size = 12)) +
+  theme(legend.title = element_text(size = 12)) +
+  theme(axis.text = element_text(size = 11)) +
+  theme(axis.title = element_text(size = 11, face = "bold")) +
+  theme(plot.title = element_text(size = 12, face = "bold", vjust = 1)) +
+  theme(plot.subtitle = element_text(size = 9, face = "bold", vjust = 1))+ 
+  theme(strip.text = element_text(size = 7))+
+  theme(strip.text.x = element_text(size = 11, face = "bold"))+
+  theme(strip.text.y = element_text(size = 11, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.text = element_text(size = 11))+
+  theme(legend.title = element_text(size = 11,color = "black",face="bold"))+
+  theme(axis.text.x= element_text(angle=60,hjust=1))+
+  theme(legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))+
+  theme(legend.key.width=unit(4,"cm"))
+
+#Set the working directory to .../moirai/ancillary/carbon_harmonizastion
+path_to_working_directory <- "./"
+setwd(path_to_working_directory)
+
+#Create some directories
+dir.create("outputs/",showWarnings = FALSE)
+dir.create("diagnostics/",showWarnings = FALSE)
+
+#moirai no data value (specified in moirai.h)
+moirai_no_data_value <- -9999
+
+#Scalers (Vegetation numbers need to be multiplied by 0.1 to get values, soil by 10)
+veg_scaler <- 0.1
+soil_scaler <- 10
+
+# These are the SAGE HYDE land use classes. These need to be ignored since we are only interested in LC.
+sage_hyde_land_use_codes <- 23:34
+
+#Check if files have been unzipped. If not unzip them
+if(!dir.exists("Carbon_rasters/")){
+  
+  unzip("Carbon_rasters.zip")
+  
+  
+}
+
+#Set basin for debugging. Select basin of your choice from the input file 
+#input_files/basin_to_country_mapping.csv 
+basin_debug <- 168
+
+#Helper function for nearest neighbor interpolation
+find_nearest_reighbor <- function(sample_data){
+  colnames(sample_data)<- final_col_names
+  
+  
+  sample_data_zero <- sample_data %>% 
+    filter(Carbon_AG == 0) %>% 
+    left_join(nn_index, by = c("ID"))
+  
+  zero_cells <- c(sample_data_zero$ID)
+  
+  sample_data_non_zero <- sample_data %>% 
+    filter(Carbon_AG != 0)
+  
+  sample_data_zero %>% tidyr::gather("Nearest_neighbor","nn_value","V1":"V40") %>% 
+    filter(nn_value %in% c(sample_data$ID)) %>% 
+    left_join(sample_data %>% dplyr::select(ID,Carbon_AG) %>% 
+                rename(nn_value=ID, Carbon_nn = Carbon_AG),by = c("nn_value")) %>% 
+    group_by(ID) %>% 
+    mutate(Carbon_AG= Carbon_nn,
+           Carbon_AG = max(Carbon_nn, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    dplyr::select(final_col_names) %>% 
+    distinct() %>% 
+    filter(Carbon_AG != 0)->t
+  
+  sample_data_zero %>% 
+    dplyr::filter(!ID %in% c(t$ID)) %>% 
+    dplyr::select(colnames(sample_data))->sample_data_zero
+  
+  bind_rows(sample_data_zero, sample_data_non_zero, t)->sample_data_transformed
+  
+  
+  return(sample_data_transformed)
+  
+}
+
+
+#Read in carbon thematic file for moirai. The below can be set to `AG` for above
+#ground vegetation, `BG` for below ground vegetation and `soil` for soil. It is recommended that the user run 
+#these one by one given the time it takes to generate the final rasters.  
+veg_type <- "soil"
+
+#This will print out diagnostics (.csv files) for the World (Global) and the Amazon basin
+print_diagnostics <- TRUE
+#This will generate maps for the World and the selected basin for the selected veg type
+print_plots <- TRUE
+
+#This is the current thematic map in moirai. Ensure the model has been run.
+Carbon_thematic <- raster("input_files/refveg_carbon_thematic.bil")
+Carbon_thematic_data <- as.data.frame(rasterToPoints(Carbon_thematic)) %>% 
+  dplyr::filter(refveg_carbon_thematic != moirai_no_data_value)
+
+#Current carbon area
+Carbon_area <- as.data.frame(rasterToPoints(raster("input_files/refveg_area_carbon.bil"))) %>% 
+  filter(refveg_area_carbon != moirai_no_data_value)
+
+#GLU mapping
+GLU_data <- as.data.frame(rasterToPoints(raster("input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif")))
+#Read in ESA land cover classes
+ESA_classes <- read.csv("input_files/ESA_classes.csv", stringsAsFactors = FALSE)
+
+#Can set states of carbon here.
+states_of_carbon <- c("q3","median","q1","weighted_average","min","max")
+
+for (i in states_of_carbon){
+  Carbon_thematic_data_joined <- Carbon_thematic_data
+    for (j in c(ESA_classes[1:nrow(ESA_classes),])){
+      
+      
+    
+      tmp_raster <- as.data.frame(rasterToPoints(raster(paste0("Carbon_rasters/",veg_type,"/",j,"_",veg_type,"_",i,".bil"))))
+      
+      
+      Carbon_thematic_data_joined %>% left_join(tmp_raster, by= c("x","y"))->Carbon_thematic_data_joined
+      
+    }
+  
+  #Replace NA values with zeroes
+  Carbon_thematic_data_joined[is.na(Carbon_thematic_data_joined)] <- 0
+  
+  #Set scaler here
+  if(veg_type == "soil"){
+    
+    scaler = soil_scaler
+    
+  }else{
+    
+    scaler = veg_scaler
+  }
+  
+  SAGE_names <- read.csv("../../indata/isam_2_sage_hyde_mapping.csv", stringsAsFactors = FALSE) %>%
+    #Don't use land use types. Only use land covers
+    dplyr::filter(!isam_code %in% sage_hyde_land_use_codes) %>% 
+    dplyr::select(sage_hyde32_code, sage_hyde32_name) %>% 
+    rename(refveg_carbon_thematic = sage_hyde32_code ) %>%
+    mutate(sage_hyde32_name = gsub("_","",sage_hyde32_name)) %>% 
+    distinct()
+  
+  Carbon_thematic_data_joined %>% left_join(SAGE_names, by = c("refveg_carbon_thematic")) %>% 
+    mutate(Carbon_AG = 0)->Carbon_thematic_data_temp
+  
+  colnames(Carbon_thematic_data_temp)<- gsub(paste0("_",veg_type,"_",i),"",colnames(Carbon_thematic_data_temp))
+  
+  #Rule based mapping of carbon. These are specified in the file input_files/ESA_moirai_classes.csv
+  Carbon_thematic_data_temp %>% 
+    mutate(Carbon_AG = if_else(sage_hyde32_name=="TropicalEvergreenForest/Woodland",
+                               if_else(Evergreen_Combined > 0, Evergreen_Combined,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="TropicalDeciduousForest/Woodland",
+                               if_else(Decidous_Combined > 0, Decidous_Combined,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="TemperateBroadleafEvergreenForest/Woodland",
+                               if_else(Broadleaf_Evergreen > 0, Broadleaf_Evergreen,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="TemperateNeedleleafEvergreenForest/Woodland",
+                               if_else(Needleleaved_Evergreen > 0, Needleleaved_Evergreen,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="TemperateDeciduousForest/Woodland",
+                               if_else(Decidous_Combined > 0, Decidous_Combined,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="BorealEvergreenForest/Woodland",
+                               if_else(Evergreen_Combined > 0, Evergreen_Combined,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="BorealDeciduousForest/Woodland",
+                               if_else(Decidous_Combined > 0, Decidous_Combined,
+                                       if_else(Mixed_Forests > 0,Mixed_Forests,
+                                               if_else(Mosaic_Tree > 0, Mosaic_Tree,
+                                                       if_else(Flood_Tree_Cover> 0,Flood_Tree_Cover,
+                                                               if_else(Unknown_Tree > 0, Unknown_Tree,Sparse_Tree))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Savanna",
+                               if_else(Mosaic_Herb > 0, Mosaic_Herb,
+                                       if_else(Grasslands > 0,Grasslands,
+                                               if_else(Unknown_Herb > 0, Unknown_Herb,
+                                                       if_else(Flood_Shrub> 0,Flood_Shrub,0
+                                                       )))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Grassland/Steppe",
+                               if_else(Grasslands > 0, Grasslands,
+                                       if_else(Unknown_Herb > 0, Unknown_Herb, 0)),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="DenseShrubland",
+                               if_else(Shrubland > 0, Shrubland,
+                                       if_else(Unknown_Tree > 0,Unknown_Tree,
+                                               if_else(Flood_Shrub > 0, Flood_Shrub,
+                                                       if_else(Mosaic_Herb> 0,Mosaic_Herb,0
+                                                       )))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="OpenShrubland",
+                               if_else(Sparse_Shrub > 0, Sparse_Shrub,
+                                       if_else(Mosaic_Herb > 0,Mosaic_Herb,
+                                               if_else(Flood_Shrub > 0, Flood_Shrub,
+                                                       if_else(Unknown_Herb> 0,Unknown_Herb,if_else(Shrubland > 0, Shrubland, 0)
+                                                       )))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Tundra",if_else(Polar_Desert_Rock_Ice > 0, Polar_Desert_Rock_Ice, 
+                                                                  if_else(Sparse_Shrub >0,Sparse_Shrub,
+                                                                          if_else(Mosaic_Herb>0,Mosaic_Herb,
+                                                                                  if_else(Unknown_Herb>0,Unknown_Herb,
+                                                                                          if_else(Unknown_Tree>0,Unknown_Tree,
+                                                                                                  if_else(Sparse_Tree >0,Sparse_Tree,0,
+                                                                                                          if_else(Shrubland>0,Shrubland,
+                                                                                                                  if_else(Mosaic_Tree>0,Mosaic_Tree,0)))))))),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Desert",if_else(Desert > 0, Desert, 0),Carbon_AG),
+           Carbon_AG = if_else(sage_hyde32_name=="Polardesert/Rock/Ice",if_else(Polar_Desert_Rock_Ice > 0, Polar_Desert_Rock_Ice, 0),Carbon_AG))->temp_data
+  
+  #Replace NA values with zeroes
+  Carbon_thematic_data[is.na(Carbon_thematic_data)] <- 0
+  
+  if(print_diagnostics){
+  temp_data %>% mutate(temp_id =1) %>% group_by(sage_hyde32_name) %>% 
+    mutate(total = sum(temp_id)) %>% 
+    ungroup() %>% 
+    filter(Carbon_AG== 0) %>% 
+    group_by(sage_hyde32_name) %>% 
+    mutate(total_zero = sum(temp_id)) %>%
+    ungroup() %>% 
+    dplyr::select(sage_hyde32_name, total, total_zero) %>% 
+    distinct() %>% 
+    mutate(perc = (total_zero/total)*100)->completeness_analytics
+    
+    write.csv(completeness_analytics, paste0("diagnostics/completeness_",veg_type,"_",i,".csv"))
+    }
+  
+  #Read in carbon areas
+  
+  
+  temp_data %>% inner_join(Carbon_area, by =c("x","y")) %>% 
+    filter(refveg_area_carbon > 0)->temp_area
+  
+  temp_area %>% mutate(ID = 1:nrow(temp_area))->temp_area_w_IDS
+  
+  #Get nearest neighbors (10 nearest geographic neighbors)
+  near_data <- get.knn(temp_area_w_IDS[, 1:2], k = 40)
+  nn_index <- as.data.frame(near_data$nn.index) %>% 
+    mutate(ID = 1:nrow(temp_area_w_IDS))
+  
+  #Now split the data 
+  temp_area_boundaries_split <-split(temp_area_w_IDS,temp_area_w_IDS$refveg_carbon_thematic) 
+  
+  #Save final column names
+  final_col_names <- colnames(temp_area_w_IDS)
+  
+  boundaries_list <- lapply(temp_area_boundaries_split , find_nearest_reighbor)
+  boundaries_final <- rbindlist(boundaries_list)
+  
+  if(print_diagnostics){
+  boundaries_final %>% mutate(temp_id =1) %>% group_by(sage_hyde32_name) %>% 
+    mutate(total = sum(temp_id)) %>% 
+    ungroup() %>% 
+    filter(Carbon_AG== 0) %>% 
+    group_by(sage_hyde32_name) %>% 
+    mutate(total_zero = sum(temp_id)) %>%
+    ungroup() %>% 
+    dplyr::select(sage_hyde32_name, total, total_zero) %>% 
+    distinct() %>% 
+    mutate(perc = (total_zero/total)*100)->completeness_analytics_interpolated
+    
+    write.csv(completeness_analytics_interpolated, paste0("diagnostics/completeness_interpolated_",veg_type,"_",i,".csv"))
+    }
+  
+  if(print_diagnostics){
+    
+    boundaries_final %>% left_join(GLU_data, by = c("x","y"))->boundaries_glu            
+    
+    boundaries_glu %>% filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin==basin_debug)->temp_area_Amazon
+    
+    temp_area_Amazon %>% filter(Carbon_AG != 0) %>% 
+      group_by(sage_hyde32_name) %>% 
+      mutate(Carbon_AG = if_else(i =="q3",quantile(Carbon_AG*scaler,0.75),
+                                 if_else(i =="q1",quantile(Carbon_AG*scaler,0.25),
+                                         if_else(i == "median", median(Carbon_AG*scaler),
+                                                 if_else(i == "min", min(Carbon_AG*scaler),
+                                                         if_else(i == "max", max(Carbon_AG*scaler),
+                                                                 sum(Carbon_AG*scaler*refveg_area_carbon)/sum(refveg_area_carbon)))))),
+             sum_area = sum(refveg_area_carbon)) %>% 
+      ungroup() %>% 
+      dplyr::select(sage_hyde32_name, Carbon_AG, sum_area) %>% 
+      distinct()->Amazon_carbon_summary
+    
+    write.csv(Amazon_carbon_summary,paste0("diagnostics/basin_",veg_type,i,".csv"))
+    
+    boundaries_glu ->temp_area_global
+    
+    temp_area_global %>% filter(Carbon_AG != 0) %>% 
+      group_by(sage_hyde32_name) %>% 
+      mutate(Carbon_AG = if_else(i =="q3",quantile(Carbon_AG*scaler,0.75),
+                                 if_else(i =="q1",quantile(Carbon_AG*scaler,0.25),
+                                         if_else(i == "median", median(Carbon_AG*scaler),
+                                                 if_else(i == "min", min(Carbon_AG*scaler),
+                                                         if_else(i == "max", max(Carbon_AG*scaler),
+                                                                 sum(Carbon_AG*scaler*refveg_area_carbon)/sum(refveg_area_carbon)))))),
+             sum_area = sum(refveg_area_carbon)) %>% 
+      ungroup() %>% 
+      dplyr::select(sage_hyde32_name, Carbon_AG, sum_area) %>% 
+      distinct()->Global_carbon_summary
+    
+    write.csv(Global_carbon_summary,paste0("diagnostics/Global_carbon_",veg_type,i,".csv"))
+  
+  }
+   #Remove some rasters for space and time
+   rm(temp_data)
+   rm(temp_area_w_IDS)
+   rm(temp_area)
+   rm(nn_index)
+   rm(near_data)
+   rm(temp_area_boundaries_split)
+   rm(tmp_raster)
+   rm(Carbon_thematic_data_temp)
+   rm(Carbon_thematic_data_joined)
+  
+   if(print_plots){
+
+
+     g <- ggplot(data= boundaries_final %>% filter(Carbon_AG != 0) %>% mutate(Carbon_AG = Carbon_AG*scaler), aes(x=x, y =y))+
+       geom_tile(aes(fill=Carbon_AG))+
+       facet_wrap(~sage_hyde32_name)+
+       scale_fill_distiller(palette = "Spectral", direction = -1)+
+       ggtitle("Distribution of carbon in MgC/ha for moirai land types")
+
+
+
+     g + scheme_basic
+     ggsave(paste0("diagnostics/Carbon_values_by_moirai_land_type",veg_type,i,".png"),width = 18, height = 10 )
+
+     boundaries_glu %>% filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin==basin_debug)->temp_area_Amazon
+
+     g <- ggplot(data= temp_area_Amazon %>% filter(Carbon_AG != 0) %>% mutate(Carbon_AG=Carbon_AG*scaler ), aes(x=x, y =y))+
+       geom_tile(aes(fill=Carbon_AG))+
+       facet_wrap(~sage_hyde32_name)+
+       scale_fill_distiller(palette = "Spectral", direction = -1)
+
+     g + scheme_basic
+     ggsave(paste0("diagnostics/basin_values",veg_type,i,".png"),width = 18, height = 10 )
+   }
+   
+   
+  boundaries_final %>%  dplyr::select(x, y, Carbon_AG) %>% 
+    dplyr::filter(Carbon_AG != 0 )->raster_data_frame    
+  
+  #Final carbon_map
+  Carbon_map <- as.data.frame(rasterToPoints(Carbon_thematic))
+  if(veg_type== "soil"){
+  Carbon_map %>% left_join(raster_data_frame, by = c("x","y")) %>% 
+    mutate(Carbon_AG = if_else(is.na(Carbon_AG),moirai_no_data_value,Carbon_AG*scaler)) %>% 
+    dplyr::select(x,y,Carbon_AG) %>% 
+    distinct()->raster_data_joined}else{
+      Carbon_map %>% left_join(raster_data_frame,by =c("x","y")) %>% 
+        mutate(Carbon_AG = if_else(is.na(Carbon_AG),moirai_no_data_value,Carbon_AG)) %>% 
+        dplyr::select(x,y,Carbon_AG) %>% 
+        distinct()->raster_data_joined    
+    }
+  
+  raster_print<- rasterize(raster_data_joined[,1:2],Carbon_thematic,raster_data_joined[,3])
+  writeRaster(raster_print,paste0("outputs/",veg_type,"_carbon_",i), format= "ENVI",options="INTERLEAVE=BIL", overwrite = TRUE,bandorder="BIL")  
+  
+  gc()
+  
+}
+
+
+
+
+
+
+#Additional Code to fix soil carbon NAs
+# The weighted average values for soil carbon are different than those for other states.
+# There are some NAs (approx 1158 values) that we replace with the medians. 
+rdata_q1 <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_q1.envi"))) %>% filter(soil_carbon_q1 != moirai_no_data_value)
+rdata_q3 <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_q3.envi"))) %>% filter(soil_carbon_q3 != moirai_no_data_value)
+rdata_min <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_min.envi"))) %>% filter(soil_carbon_min != moirai_no_data_value)
+rdata_max <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_max.envi"))) %>% filter(soil_carbon_max != moirai_no_data_value)
+rdata_median <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_median.envi")))%>% filter(soil_carbon_median != moirai_no_data_value) 
+rdata_wavg <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_weighted_average.envi"))) %>% filter(soil_carbon_weighted_average != moirai_no_data_value)
+
+rdata_median %>% left_join(rdata_min) %>% left_join(rdata_max)%>% left_join(rdata_q1)%>% left_join(rdata_q3) %>% left_join(rdata_wavg)->j 
+
+na_cells <- j[is.na(j$soil_carbon_weighted_average),]
+
+
+na_cells$soil_carbon_weighted_average <- na_cells$soil_carbon_median
+
+rdata_wavg <- as.data.frame(rasterToPoints(raster("outputs/soil_carbon_weighted_average.envi"))) %>% 
+  left_join(na_cells %>% rename(replace_values = soil_carbon_weighted_average), by= c("x","y")) %>% 
+  mutate(soil_carbon_weighted_average = if_else(is.na(replace_values),soil_carbon_weighted_average,replace_values)) %>% 
+  dplyr::select(x,y,soil_carbon_weighted_average) %>% distinct() 
+
+raster_print<- rasterize(rdata_wavg[,1:2],Carbon_thematic,rdata_wavg[,3])
+
+
+writeRaster(raster_print,"outputs/soil_carbon_weighted_average", format= "ENVI",options="INTERLEAVE=BIL", overwrite = TRUE,bandorder="BIL")
+
+
+
+
+
