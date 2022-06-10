@@ -9,7 +9,7 @@ Evan Margiotta, Global Change Research Institute, Pacific Northwest National Lab
 ## Current Version: 3.1.1
 
 ## Version History
-* **Version 3.1.1:** May 2022; DOI TBD
+* **Version 3.1.1:** May 2022; DOI: 10.5281/zenodo.6632745
 	* Harmonizes carbon data for Moirai by matching land cover types between source data and Moirai
 		* This improves carbon density estimates
 	* New capacity to include deeper soil carbon (30-100cm) in addition to topsoil carbon (0-30cm)
