@@ -218,89 +218,251 @@ int get_in_args(const char *fname, args_struct *in_args) {
 					break;
 				case 48:
 					strcpy(in_args->veg_BG_q3_fname, fld_str);
-					break;		
+					break;
 				case 49:
-					strcpy(in_args->rent_orig_fname, fld_str);
+					strcpy(in_args->soil_carbon_pasture_wavg_fname, fld_str);
 					break;
 				case 50:
-					strcpy(in_args->country87_gtap_fname, fld_str);
+					strcpy(in_args->soil_carbon_pasture_min_fname, fld_str);
 					break;
 				case 51:
-					strcpy(in_args->country87map_fao_fname, fld_str);
+					strcpy(in_args->soil_carbon_pasture_median_fname, fld_str);
 					break;
 				case 52:
-					strcpy(in_args->country_all_fname, fld_str);
+					strcpy(in_args->soil_carbon_pasture_max_fname, fld_str);
 					break;
-            case 53:
-               strcpy(in_args->aez_new_info_fname, fld_str);
-               break;
-            case 54:
-					strcpy(in_args->countrymap_iso_gcam_region_fname, fld_str);
+				case 53:
+					strcpy(in_args->soil_carbon_pasture_q1_fname, fld_str);
 					break;
+				case 54:
+					strcpy(in_args->soil_carbon_pasture_q3_fname, fld_str);
+					break;				
 				case 55:
-					strcpy(in_args->regionlist_gcam_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_wavg_fname, fld_str);
 					break;
 				case 56:
-					strcpy(in_args->use_gtap_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_min_fname, fld_str);
 					break;
 				case 57:
-					strcpy(in_args->lt_sage_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_median_fname, fld_str);
 					break;
 				case 58:
-					strcpy(in_args->lu_hyde_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_max_fname, fld_str);
 					break;
 				case 59:
-					strcpy(in_args->lulc_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_q1_fname, fld_str);
 					break;
 				case 60:
-					strcpy(in_args->crop_fname, fld_str);
+					strcpy(in_args->veg_carbon_pasture_q3_fname, fld_str);
 					break;
 				case 61:
-					strcpy(in_args->production_fao_fname, fld_str);
+					strcpy(in_args->veg_BG_pasture_wavg_fname, fld_str);
 					break;
 				case 62:
-					strcpy(in_args->yield_fao_fname, fld_str);
+					strcpy(in_args->veg_BG_pasture_median_fname, fld_str);
 					break;
 				case 63:
-					strcpy(in_args->harvestarea_fao_fname, fld_str);
-					break;
+					strcpy(in_args->veg_BG_pasture_min_fname, fld_str);
+					break;				
 				case 64:
-					strcpy(in_args->prodprice_fao_fname, fld_str);
+					strcpy(in_args->veg_BG_pasture_max_fname, fld_str);
 					break;
 				case 65:
-					strcpy(in_args->convert_usd_fname, fld_str);
+					strcpy(in_args->veg_BG_pasture_q1_fname, fld_str);
 					break;
-            case 66:
-               strcpy(in_args->lds_logname, fld_str);
-               break;
+				case 66:
+					strcpy(in_args->veg_BG_pasture_q3_fname, fld_str);
+					break;
+				case 49:
+					strcpy(in_args->soil_carbon_crop_wavg_fname, fld_str);
+					break;
+				case 50:
+					strcpy(in_args->soil_carbon_crop_min_fname, fld_str);
+					break;
+				case 51:
+					strcpy(in_args->soil_carbon_crop_median_fname, fld_str);
+					break;
+				case 52:
+					strcpy(in_args->soil_carbon_crop_max_fname, fld_str);
+					break;
+				case 53:
+					strcpy(in_args->soil_carbon_crop_q1_fname, fld_str);
+					break;
+				case 54:
+					strcpy(in_args->soil_carbon_crop_q3_fname, fld_str);
+					break;				
+				case 55:
+					strcpy(in_args->veg_carbon_crop_wavg_fname, fld_str);
+					break;
+				case 56:
+					strcpy(in_args->veg_carbon_crop_min_fname, fld_str);
+					break;
+				case 57:
+					strcpy(in_args->veg_carbon_crop_median_fname, fld_str);
+					break;
+				case 58:
+					strcpy(in_args->veg_carbon_crop_max_fname, fld_str);
+					break;
+				case 59:
+					strcpy(in_args->veg_carbon_crop_q1_fname, fld_str);
+					break;
+				case 60:
+					strcpy(in_args->veg_carbon_crop_q3_fname, fld_str);
+					break;
+				case 61:
+					strcpy(in_args->veg_BG_crop_wavg_fname, fld_str);
+					break;
+				case 62:
+					strcpy(in_args->veg_BG_crop_median_fname, fld_str);
+					break;
+				case 63:
+					strcpy(in_args->veg_BG_crop_min_fname, fld_str);
+					break;				
+				case 64:
+					strcpy(in_args->veg_BG_crop_max_fname, fld_str);
+					break;
+				case 65:
+					strcpy(in_args->veg_BG_crop_q1_fname, fld_str);
+					break;
+				case 66:
+					strcpy(in_args->veg_BG_crop_q3_fname, fld_str);
+					break;
 				case 67:
-					strcpy(in_args->harvestarea_fname, fld_str);
+					strcpy(in_args->soil_carbon_urban_wavg_fname, fld_str);
 					break;
 				case 68:
-					strcpy(in_args->production_fname, fld_str);
+					strcpy(in_args->soil_carbon_urban_min_fname, fld_str);
 					break;
 				case 69:
+					strcpy(in_args->soil_carbon_urban_median_fname, fld_str);
+					break;
+				case 70:
+					strcpy(in_args->soil_carbon_urban_max_fname, fld_str);
+					break;
+				case 71:
+					strcpy(in_args->soil_carbon_urban_q1_fname, fld_str);
+					break;
+				case 72:
+					strcpy(in_args->soil_carbon_urban_q3_fname, fld_str);
+					break;				
+				case 73:
+					strcpy(in_args->veg_carbon_urban_wavg_fname, fld_str);
+					break;
+				case 74:
+					strcpy(in_args->veg_carbon_urban_min_fname, fld_str);
+					break;
+				case 75:
+					strcpy(in_args->veg_carbon_urban_median_fname, fld_str);
+					break;
+				case 76:
+					strcpy(in_args->veg_carbon_urban_max_fname, fld_str);
+					break;
+				case 77:
+					strcpy(in_args->veg_carbon_urban_q1_fname, fld_str);
+					break;
+				case 78:
+					strcpy(in_args->veg_carbon_urban_q3_fname, fld_str);
+					break;
+				case 79:
+					strcpy(in_args->veg_BG_urban_wavg_fname, fld_str);
+					break;
+				case 80:
+					strcpy(in_args->veg_BG_urban_median_fname, fld_str);
+					break;
+				case 81:
+					strcpy(in_args->veg_BG_urban_min_fname, fld_str);
+					break;				
+				case 82:
+					strcpy(in_args->veg_BG_urban_max_fname, fld_str);
+					break;
+				case 83:
+					strcpy(in_args->veg_BG_urban_q1_fname, fld_str);
+					break;
+				case 84:
+					strcpy(in_args->veg_BG_urban_q3_fname, fld_str);
+					break;						
+				case 85:
+					strcpy(in_args->rent_orig_fname, fld_str);
+					break;
+				case 86:
+					strcpy(in_args->country87_gtap_fname, fld_str);
+					break;
+				case 87:
+					strcpy(in_args->country87map_fao_fname, fld_str);
+					break;
+				case 88:
+					strcpy(in_args->country_all_fname, fld_str);
+					break;
+            case 89:
+               strcpy(in_args->aez_new_info_fname, fld_str);
+               break;
+            case 90:
+					strcpy(in_args->countrymap_iso_gcam_region_fname, fld_str);
+					break;
+				case 91:
+					strcpy(in_args->regionlist_gcam_fname, fld_str);
+					break;
+				case 92:
+					strcpy(in_args->use_gtap_fname, fld_str);
+					break;
+				case 93:
+					strcpy(in_args->lt_sage_fname, fld_str);
+					break;
+				case 94:
+					strcpy(in_args->lu_hyde_fname, fld_str);
+					break;
+				case 95:
+					strcpy(in_args->lulc_fname, fld_str);
+					break;
+				case 96:
+					strcpy(in_args->crop_fname, fld_str);
+					break;
+				case 97:
+					strcpy(in_args->production_fao_fname, fld_str);
+					break;
+				case 98:
+					strcpy(in_args->yield_fao_fname, fld_str);
+					break;
+				case 99:
+					strcpy(in_args->harvestarea_fao_fname, fld_str);
+					break;
+				case 100:
+					strcpy(in_args->prodprice_fao_fname, fld_str);
+					break;
+				case 101:
+					strcpy(in_args->convert_usd_fname, fld_str);
+					break;
+            case 102:
+               strcpy(in_args->lds_logname, fld_str);
+               break;
+				case 103:
+					strcpy(in_args->harvestarea_fname, fld_str);
+					break;
+				case 104:
+					strcpy(in_args->production_fname, fld_str);
+					break;
+				case 105:
 					strcpy(in_args->rent_fname, fld_str);
 					break;
-            case 70:
+            case 106:
                strcpy(in_args->mirca_irr_fname, fld_str);
                break;
-            case 71:
+            case 107:
                strcpy(in_args->mirca_rfd_fname, fld_str);
                break;
-            case 72:
+            case 108:
                strcpy(in_args->land_type_area_fname, fld_str);
                break;
-            case 73:
+            case 109:
                strcpy(in_args->refveg_carbon_fname, fld_str);
                break;
-            case 74:
+            case 110:
                strcpy(in_args->wf_fname, fld_str);
                break;
-            case 75:
+            case 111:
                strcpy(in_args->iso_map_fname, fld_str);
                break;
-            case 76:
+            case 112:
                strcpy(in_args->lt_map_fname, fld_str);
                break;
 					
