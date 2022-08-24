@@ -901,7 +901,7 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
                 //assign the actual soil carbon numbers
                // Don't assign a value if the value is a NODATA value. 
                
-
+				//unmanaged
                 if( wavg_array[grid_ind] < 0){
                 
                 soil_carbon_sage[0][grid_ind]= NODATA;
@@ -919,6 +919,66 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
                 soil_carbon_sage[3][grid_ind]=max_array[grid_ind];
                 soil_carbon_sage[4][grid_ind]=q1_array[grid_ind];
                 soil_carbon_sage[5][grid_ind]=q3_array[grid_ind];    
+				
+                }
+				//cropland
+				if( wavg_crop_array[grid_ind] < 0){
+                
+                soil_carbon_crop_sage[0][grid_ind]= NODATA;
+                soil_carbon_crop_sage[1][grid_ind]= NODATA;
+                soil_carbon_crop_sage[2][grid_ind]= NODATA;
+                soil_carbon_crop_sage[3][grid_ind]= NODATA;
+                soil_carbon_crop_sage[4][grid_ind]= NODATA;
+                soil_carbon_crop_sage[5][grid_ind]= NODATA;
+                
+                }else{
+
+                soil_carbon_crop_sage[0][grid_ind]=wavg_crop_array[grid_ind];
+                soil_carbon_crop_sage[1][grid_ind]=median_crop_array[grid_ind];
+                soil_carbon_crop_sage[2][grid_ind]=min_crop_array[grid_ind];
+                soil_carbon_crop_sage[3][grid_ind]=max_crop_array[grid_ind];
+                soil_carbon_crop_sage[4][grid_ind]=q1_crop_array[grid_ind];
+                soil_carbon_crop_sage[5][grid_ind]=q3_crop_array[grid_ind];    
+				
+                }
+				//pasture
+				if( wavg_pasture_array[grid_ind] < 0){
+                
+                soil_carbon_pasture_sage[0][grid_ind]= NODATA;
+                soil_carbon_pasture_sage[1][grid_ind]= NODATA;
+                soil_carbon_pasture_sage[2][grid_ind]= NODATA;
+                soil_carbon_pasture_sage[3][grid_ind]= NODATA;
+                soil_carbon_pasture_sage[4][grid_ind]= NODATA;
+                soil_carbon_pasture_sage[5][grid_ind]= NODATA;
+                
+                }else{
+
+                soil_carbon_pasture_sage[0][grid_ind]=wavg_pasture_array[grid_ind];
+                soil_carbon_pasture_sage[1][grid_ind]=median_pasture_array[grid_ind];
+                soil_carbon_pasture_sage[2][grid_ind]=min_pasture_array[grid_ind];
+                soil_carbon_pasture_sage[3][grid_ind]=max_pasture_array[grid_ind];
+                soil_carbon_pasture_sage[4][grid_ind]=q1_pasture_array[grid_ind];
+                soil_carbon_pasture_sage[5][grid_ind]=q3_pasture_array[grid_ind];    
+				
+                }
+				//urban
+				if( wavg_urban_array[grid_ind] < 0){
+                
+                soil_carbon_urban_sage[0][grid_ind]= NODATA;
+                soil_carbon_urban_sage[1][grid_ind]= NODATA;
+                soil_carbon_urban_sage[2][grid_ind]= NODATA;
+                soil_carbon_urban_sage[3][grid_ind]= NODATA;
+                soil_carbon_urban_sage[4][grid_ind]= NODATA;
+                soil_carbon_urban_sage[5][grid_ind]= NODATA;
+                
+                }else{
+
+                soil_carbon_urban_sage[0][grid_ind]=wavg_urban_array[grid_ind];
+                soil_carbon_urban_sage[1][grid_ind]=median_urban_array[grid_ind];
+                soil_carbon_urban_sage[2][grid_ind]=min_urban_array[grid_ind];
+                soil_carbon_urban_sage[3][grid_ind]=max_urban_array[grid_ind];
+                soil_carbon_urban_sage[4][grid_ind]=q1_urban_array[grid_ind];
+                soil_carbon_urban_sage[5][grid_ind]=q3_urban_array[grid_ind];    
 				
                 }
 

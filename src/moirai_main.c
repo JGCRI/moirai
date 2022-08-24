@@ -977,6 +977,18 @@ int main(int argc, const char * argv[]) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
+	if((error_code = proc_refveg_crop_carbon(in_args, raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    }
+	if((error_code = proc_refveg_pasture_carbon(in_args, raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    }
+	if((error_code = proc_refveg_urban_carbon(in_args, raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    }
     
   //  fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
     for (i = 0; i < NUM_FAO_CTRY; i++) {

@@ -260,6 +260,9 @@ float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid 
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
 int ***soil_carbon_array_cells;//These are the total number of cells contained within each array
 float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
+float *****soil_carbon_crop_array; //soil carbon array to calculate the soil carbon values for each state
+float *****soil_carbon_pasture_array; //soil carbon array to calculate the soil carbon values for each state
+float *****soil_carbon_urban_array; //soil carbon array to calculate the soil carbon values for each state
 float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
 float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
 //Add above and below ground ratio for vegetation carbon
@@ -541,6 +544,66 @@ typedef struct {
 	char veg_BG_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
 	char veg_BG_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
  
+ 
+	//2022-08-23 Introducing file names for managed carbon rasters
+	//crop
+	char soil_carbon_crop_wavg_fname[MAXCHAR];   //Soil carbon weighted average raster
+	char soil_carbon_crop_median_fname[MAXCHAR]; //Soil carbon median raster
+	char soil_carbon_crop_min_fname[MAXCHAR];    //Soil carbon minimum raster
+	char soil_carbon_crop_max_fname[MAXCHAR];    //Soil carbon maximum raster
+	char soil_carbon_crop_q1_fname[MAXCHAR];     //Soil carbon q1 raster
+	char soil_carbon_crop_q3_fname[MAXCHAR];     //Soil carbon q3 raster
+	char veg_carbon_crop_wavg_fname[MAXCHAR];    //Above ground vegetation carbon weighted average raster
+	char veg_carbon_crop_median_fname[MAXCHAR];  //Above ground vegetation carbon median raster
+	char veg_carbon_crop_min_fname[MAXCHAR];     //Above ground vegetation carbon minimum raster
+	char veg_carbon_crop_max_fname[MAXCHAR];     //Above ground vegetation carbon maximum raster
+	char veg_carbon_crop_q1_fname[MAXCHAR];      //Above ground vegetation carbon q1 raster
+	char veg_carbon_crop_q3_fname[MAXCHAR];      //Above ground vegetation carbon q3 raster 
+	char veg_BG_crop_wavg_fname[MAXCHAR];        //Below ground vegetation carbon weighted averge raster
+	char veg_BG_crop_median_fname[MAXCHAR];      //Below ground vegetation carbon median raster
+	char veg_BG_crop_min_fname[MAXCHAR];         //Below ground vegetation carbon minimum raster 
+	char veg_BG_crop_max_fname[MAXCHAR];         //Below ground vegetation carbon maximum raster
+	char veg_BG_crop_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
+	char veg_BG_crop_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
+	//pasture
+	char soil_carbon_pasture_wavg_fname[MAXCHAR];   //Soil carbon weighted average raster
+	char soil_carbon_pasture_median_fname[MAXCHAR]; //Soil carbon median raster
+	char soil_carbon_pasture_min_fname[MAXCHAR];    //Soil carbon minimum raster
+	char soil_carbon_pasture_max_fname[MAXCHAR];    //Soil carbon maximum raster
+	char soil_carbon_pasture_q1_fname[MAXCHAR];     //Soil carbon q1 raster
+	char soil_carbon_pasture_q3_fname[MAXCHAR];     //Soil carbon q3 raster
+	char veg_carbon_pasture_wavg_fname[MAXCHAR];    //Above ground vegetation carbon weighted average raster
+	char veg_carbon_pasture_median_fname[MAXCHAR];  //Above ground vegetation carbon median raster
+	char veg_carbon_pasture_min_fname[MAXCHAR];     //Above ground vegetation carbon minimum raster
+	char veg_carbon_pasture_max_fname[MAXCHAR];     //Above ground vegetation carbon maximum raster
+	char veg_carbon_pasture_q1_fname[MAXCHAR];      //Above ground vegetation carbon q1 raster
+	char veg_carbon_pasture_q3_fname[MAXCHAR];      //Above ground vegetation carbon q3 raster 
+	char veg_BG_pasture_wavg_fname[MAXCHAR];        //Below ground vegetation carbon weighted averge raster
+	char veg_BG_pasture_median_fname[MAXCHAR];      //Below ground vegetation carbon median raster
+	char veg_BG_pasture_min_fname[MAXCHAR];         //Below ground vegetation carbon minimum raster 
+	char veg_BG_pasture_max_fname[MAXCHAR];         //Below ground vegetation carbon maximum raster
+	char veg_BG_pasture_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
+	char veg_BG_pasture_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
+	//urban
+	char soil_carbon_urban_wavg_fname[MAXCHAR];   //Soil carbon weighted average raster
+	char soil_carbon_urban_median_fname[MAXCHAR]; //Soil carbon median raster
+	char soil_carbon_urban_min_fname[MAXCHAR];    //Soil carbon minimum raster
+	char soil_carbon_urban_max_fname[MAXCHAR];    //Soil carbon maximum raster
+	char soil_carbon_urban_q1_fname[MAXCHAR];     //Soil carbon q1 raster
+	char soil_carbon_urban_q3_fname[MAXCHAR];     //Soil carbon q3 raster
+	char veg_carbon_urban_wavg_fname[MAXCHAR];    //Above ground vegetation carbon weighted average raster
+	char veg_carbon_urban_median_fname[MAXCHAR];  //Above ground vegetation carbon median raster
+	char veg_carbon_urban_min_fname[MAXCHAR];     //Above ground vegetation carbon minimum raster
+	char veg_carbon_urban_max_fname[MAXCHAR];     //Above ground vegetation carbon maximum raster
+	char veg_carbon_urban_q1_fname[MAXCHAR];      //Above ground vegetation carbon q1 raster
+	char veg_carbon_urban_q3_fname[MAXCHAR];      //Above ground vegetation carbon q3 raster 
+	char veg_BG_urban_wavg_fname[MAXCHAR];        //Below ground vegetation carbon weighted averge raster
+	char veg_BG_urban_median_fname[MAXCHAR];      //Below ground vegetation carbon median raster
+	char veg_BG_urban_min_fname[MAXCHAR];         //Below ground vegetation carbon minimum raster 
+	char veg_BG_urban_max_fname[MAXCHAR];         //Below ground vegetation carbon maximum raster
+	char veg_BG_urban_q1_fname[MAXCHAR];          //Below ground vegetation carbon q1 raster
+	char veg_BG_urban_q3_fname[MAXCHAR];          //Below ground vegetation carbon q3 raster
+	
 	// input csv file names
 	char rent_orig_fname[MAXCHAR];			// file name only of the orginal GTAP land rent csv file
 	char country87_gtap_fname[MAXCHAR];		// file name only of the GTAP/GCAM ctry87 list
@@ -629,6 +692,11 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info);
 int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
+int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info);
+int proc_refveg_pasture_carbon(args_struct in_args, rinfo_struct raster_info);
+int proc_refveg_urban_carbon(args_struct in_args, rinfo_struct raster_info);
+
+
 
 // text parsing utility functions (parse_utils.c)
 int get_float_field(char *line, const char *delim, int findex, float *fltval);
