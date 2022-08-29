@@ -315,7 +315,7 @@ int get_in_args(const char *fname, args_struct *in_args) {
 				case 80:
 					strcpy(in_args->veg_BG_crop_median_fname, fld_str);
 					break;
-				case 87:
+				case 81:
 					strcpy(in_args->veg_BG_crop_min_fname, fld_str);
 					break;				
 				case 82:

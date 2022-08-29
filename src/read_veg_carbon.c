@@ -415,6 +415,978 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
         return ERROR_FILE;
     }
 
+	//Crop
+	// create file name and open it
+	//1. Allocate weighted average array
+    wavg_crop_array = calloc(ncells, sizeof(float));
+    if(wavg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    wavg_bg_crop_array =calloc(ncells, sizeof(float));
+    if(wavg_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_bg_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    //1a. Above ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+   
+   //1b. Below ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+   //2a. Median array
+    median_crop_array = calloc(ncells, sizeof(float));
+    if(median_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //2b. Median array (below ground biomass)
+    median_bg_crop_array = calloc(ncells, sizeof(float));
+    if(median_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+   
+
+    //3a min array (above ground biomass)
+    min_crop_array = calloc(ncells, sizeof(float));
+    if(min_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //3b min array (below ground biomass)
+    min_bg_crop_array = calloc(ncells, sizeof(float));
+    if(min_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+     
+
+    //4a. max array
+    max_crop_array = calloc(ncells, sizeof(float));
+    if(max_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //4b. max array (below ground biomass)
+    max_bg_crop_array = calloc(ncells, sizeof(float));
+    if(max_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+
+
+    //5a q1 array
+    q1_crop_array = calloc(ncells, sizeof(float));
+    if(q1_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //5b q1 array (below ground biomass)
+    q1_bg_crop_array = calloc(ncells, sizeof(float));
+    if(q1_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+
+    //6a. q3 array
+    q3_crop_array = calloc(ncells, sizeof(float));
+    if(q3_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_crop_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //6b. q3 array (below ground biomass)
+    q3_bg_crop_array = calloc(ncells, sizeof(float));
+    if(q3_bg_crop_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_crop_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_crop_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_bg_crop_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+	//Pasture
+	// create file name and open it
+	//1. Allocate weighted average array
+    wavg_pasture_array = calloc(ncells, sizeof(float));
+    if(wavg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    wavg_bg_pasture_array =calloc(ncells, sizeof(float));
+    if(wavg_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_bg_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    //1a. Above ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+   
+   //1b. Below ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+   //2a. Median array
+    median_pasture_array = calloc(ncells, sizeof(float));
+    if(median_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //2b. Median array (below ground biomass)
+    median_bg_pasture_array = calloc(ncells, sizeof(float));
+    if(median_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+   
+
+    //3a min array (above ground biomass)
+    min_pasture_array = calloc(ncells, sizeof(float));
+    if(min_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //3b min array (below ground biomass)
+    min_bg_pasture_array = calloc(ncells, sizeof(float));
+    if(min_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+     
+
+    //4a. max array
+    max_pasture_array = calloc(ncells, sizeof(float));
+    if(max_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //4b. max array (below ground biomass)
+    max_bg_pasture_array = calloc(ncells, sizeof(float));
+    if(max_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+
+
+    //5a q1 array
+    q1_pasture_array = calloc(ncells, sizeof(float));
+    if(q1_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //5b q1 array (below ground biomass)
+    q1_bg_pasture_array = calloc(ncells, sizeof(float));
+    if(q1_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+
+    //6a. q3 array
+    q3_pasture_array = calloc(ncells, sizeof(float));
+    if(q3_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_pasture_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //6b. q3 array (below ground biomass)
+    q3_bg_pasture_array = calloc(ncells, sizeof(float));
+    if(q3_bg_pasture_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_pasture_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_pasture_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_bg_pasture_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+
+	//Urban
+	// create file name and open it
+	//1. Allocate weighted average array
+    wavg_urban_array = calloc(ncells, sizeof(float));
+    if(wavg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    wavg_bg_urban_array =calloc(ncells, sizeof(float));
+    if(wavg_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for wavg_bg_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+    //1a. Above ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+   
+   //1b. Below ground biomass (weighted average) 
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_wavg_fname);
+    
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(wavg_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_soil_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+   //2a. Median array
+    median_urban_array = calloc(ncells, sizeof(float));
+    if(median_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_soil_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //2b. Median array (below ground biomass)
+    median_bg_urban_array = calloc(ncells, sizeof(float));
+    if(median_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_median_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(median_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+   
+
+    //3a min array (above ground biomass)
+    min_urban_array = calloc(ncells, sizeof(float));
+    if(min_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //3b min array (below ground biomass)
+    min_bg_urban_array = calloc(ncells, sizeof(float));
+    if(min_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_min_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(min_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+     
+
+    //4a. max array
+    max_urban_array = calloc(ncells, sizeof(float));
+    if(max_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //4b. max array (below ground biomass)
+    max_bg_urban_array = calloc(ncells, sizeof(float));
+    if(max_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_max_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(max_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+
+
+    //5a q1 array
+    q1_urban_array = calloc(ncells, sizeof(float));
+    if(q1_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //5b q1 array (below ground biomass)
+    q1_bg_urban_array = calloc(ncells, sizeof(float));
+    if(q1_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_q1_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q1_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+
+    //6a. q3 array
+    q3_urban_array = calloc(ncells, sizeof(float));
+    if(q3_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_carbon_urban_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    //6b. q3 array (below ground biomass)
+    q3_bg_urban_array = calloc(ncells, sizeof(float));
+    if(q3_bg_urban_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for L1_urban_array: read_protected()\n");
+        return ERROR_MEM;
+    }
+
+    // create file name and open it
+    strcpy(fname, in_args.inpath);
+    strcat(fname, in_args.veg_BG_urban_q3_fname);
+    if((fpin = fopen(fname, "rb")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  read_veg_c()\n", fname);
+        return ERROR_FILE;
+    }
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(q3_bg_urban_array, insize, ncells, fpin);
+    fclose(fpin);
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_veg_c(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+
+
+
+
       //kbn calc category data from input arrays
     for (i = 0; i < ncells; i++) {
         //above ground +below ground * scaling factor (0.1)
@@ -501,6 +1473,9 @@ int read_veg_carbon(args_struct in_args, rinfo_struct *raster_info) {
          
     }
 
+
+
+	
    //Write diagnostics
     if (in_args.diagnostics) {
         if ((err = write_raster_float(veg_carbon_sage[0], ncells, out_name1, in_args))) {

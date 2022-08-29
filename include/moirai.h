@@ -258,11 +258,14 @@ float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid 
 //kbn 2020-06-01 Changing soil carbon variable
 //kbn 2020-06-29 Changing vegetation carbon variable
 float **soil_carbon_sage; //dim 1 is the type of state, dim 2 is the grid cell
+float **soil_carbon_crop_sage; //dim 1 is the type of state, dim 2 is the grid cell
+float **soil_carbon_pasture_sage; //dim 1 is the type of state, dim 2 is the grid cell
+float **soil_carbon_urban_sage; //dim 1 is the type of state, dim 2 is the grid cell
 int ***soil_carbon_array_cells;//These are the total number of cells contained within each array
 float *****soil_carbon_array; //soil carbon array to calculate the soil carbon values for each state
-float *****soil_carbon_crop_array; //soil carbon array to calculate the soil carbon values for each state
-float *****soil_carbon_pasture_array; //soil carbon array to calculate the soil carbon values for each state
-float *****soil_carbon_urban_array; //soil carbon array to calculate the soil carbon values for each state
+//float *****soil_carbon_crop_array; //soil carbon array to calculate the soil carbon values for each state
+//float *****soil_carbon_pasture_array; //soil carbon array to calculate the soil carbon values for each state
+//float *****soil_carbon_urban_array; //soil carbon array to calculate the soil carbon values for each state
 float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
 float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
 //Add above and below ground ratio for vegetation carbon

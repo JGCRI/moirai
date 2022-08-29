@@ -811,6 +811,46 @@ int main(int argc, const char * argv[]) {
 			return ERROR_MEM;
 		}
 	}
+	//erm 2022/08/04 Add code for read_soil for managed land
+	//crop
+	soil_carbon_crop_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(soil_carbon_crop_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_crop_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		soil_carbon_crop_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(soil_carbon_crop_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_crop_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+	//pasture
+	soil_carbon_pasture_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(soil_carbon_pasture_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_pasture_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		soil_carbon_pasture_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(soil_carbon_pasture_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_pasture_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+	//urban
+	soil_carbon_urban_sage = calloc(NUM_CARBON, sizeof(float*));
+    if(soil_carbon_urban_sage == NULL) {
+        fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_urban_sage: main()\n", get_systime(), ERROR_MEM);
+        return ERROR_MEM;
+    }
+    for (i = 0; i < NUM_CARBON; i++) {
+		soil_carbon_urban_sage[i] = calloc(NUM_CELLS, sizeof(float));
+		if(soil_carbon_urban_sage[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_urban_sage[%i]: main()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
     
     //Allocate the arrays to hold the number of cells
     soil_carbon_array_cells = calloc(NUM_FAO_CTRY, sizeof(int**));
@@ -1031,6 +1071,18 @@ int main(int argc, const char * argv[]) {
 		free(soil_carbon_sage[i]);
 	}
 	free(soil_carbon_sage);
+	for (i = 0; i < NUM_CARBON; i++) {
+		free(soil_carbon_crop_sage[i]);
+	}
+	free(soil_carbon_crop_sage);
+	for (i = 0; i < NUM_CARBON; i++) {
+		free(soil_carbon_pasture_sage[i]);
+	}
+	free(soil_carbon_pasture_sage);
+	for (i = 0; i < NUM_CARBON; i++) {
+		free(soil_carbon_urban_sage[i]);
+	}
+	free(soil_carbon_urban_sage);
     //kbn 2020/06/30 Add code for veg carbon here
     for (i = 0; i < NUM_CARBON; i++) {
 		free(veg_carbon_sage[i]);

@@ -65,11 +65,6 @@
 #include "moirai.h"
 #include <stdlib.h>
 
- //create a function for comparisons. This function will be used later with qsort    
-   int cmpfunc (const void * a, const void * b) {
-   return ( *(float*)a - *(float*)b );
-}
-
 int proc_refveg_urban_carbon(args_struct in_args, rinfo_struct raster_info) {
     
     // valid values in the hyde land area data set determine the land cells to process

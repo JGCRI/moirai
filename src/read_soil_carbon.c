@@ -859,9 +859,9 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 				// crop
 				cur_lt_cat = rv_value * SCALE_POTVEG + CROP_LT_CODE + k;
 				cur_lt_cat_ind = NOMATCH;
-				for (m = 0; m < num_lt_cats; m++) {
-					if (lt_cats[m] == cur_lt_cat) {
-						cur_lt_cat_ind = m;
+				for (i = 0; i < num_lt_cats; i++) {
+					if (lt_cats[i] == cur_lt_cat) {
+						cur_lt_cat_ind = i;
 						break;
 					}
 				}
@@ -873,9 +873,9 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 				// pasture
 				cur_lt_cat = rv_value * SCALE_POTVEG + PASTURE_LT_CODE + k;
 				cur_lt_cat_ind = NOMATCH;
-				for (m = 0; m < num_lt_cats; m++) {
-					if (lt_cats[m] == cur_lt_cat) {
-						cur_lt_cat_ind = m;
+				for (i = 0; i < num_lt_cats; i++) {
+					if (lt_cats[i] == cur_lt_cat) {
+						cur_lt_cat_ind = i;
 						break;
 					}
 				}
@@ -887,9 +887,9 @@ int read_soil_carbon(args_struct in_args, rinfo_struct *raster_info) {
 				// urban
 				cur_lt_cat = rv_value * SCALE_POTVEG + URBAN_LT_CODE + k;
 				cur_lt_cat_ind = NOMATCH;
-				for (m = 0; m < num_lt_cats; m++) {
-					if (lt_cats[m] == cur_lt_cat) {
-						cur_lt_cat_ind = m;
+				for (i = 0; i < num_lt_cats; i++) {
+					if (lt_cats[i] == cur_lt_cat) {
+						cur_lt_cat_ind = i;
 						break;
 					}
 				}
@@ -1110,7 +1110,7 @@ if (in_args.diagnostics) {
     free(min_urban_array);
     free(max_urban_array);
     free(q1_urban_array);
-    free(q3_urban_array)
+    free(q3_urban_array);
 	// also free up the crop pasture urban arrays
     
     return OK;}
