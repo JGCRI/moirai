@@ -98,7 +98,7 @@ compare_iso_glu_sage_land_data(path_to_Original_LDS_Data = "../example_outputs/b
 
 
 
-
+#Unmanaged soil carbon
 
 ```{r}
 
@@ -122,14 +122,16 @@ scheme_basic <- theme_bw() +
 
 moirai_land_classes <- read.csv("../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv")
 
+basin_names <- c("Amazon")
 
+c_type <- "above ground biomass"
 for (i in c("TropicalEvergreenForest/Woodland",
             "Savanna",
             "Grassland/Steppe")){
-
-  c_type <- "above ground biomass"
+for (j in basin_names){
+  
 g <- compare_carbon_distribution_ESA(carbon_type = c_type,
-                            basin_for_testing = "Amazon",
+                            basin_for_testing = j,
                             moirai_LC = i,
                             harmonized_carbon_raster_file_names = c("AG_carbon_q1.envi",
                                                                     "AG_carbon_q3.envi",
@@ -140,7 +142,93 @@ g <- compare_carbon_distribution_ESA(carbon_type = c_type,
                             plot_lim = 8000,
                             produce_ESA_distribution = FALSE)
 name_for_plot <- gsub("/","_",i)  
-ggsave(plot= g+ scheme_basic ,filename= paste0("carbon_plots/",c_type,name_for_plot,"Amazon", ".jpeg"), width = 10, height = 6, device= "jpeg")
-    }
+ggsave(plot= g+ scheme_basic ,filename= paste0("carbon_plots/",c_type,name_for_plot,j, ".jpeg"), width = 10, height = 6, device= "jpeg")
+}    
+}
 ```
 
+#Cropland soil carbon values
+
+```{r}
+scheme_basic <- theme_bw() +
+  theme(legend.text = element_text(size = 15)) +
+  theme(legend.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(axis.title = element_text(size = 18, face = "bold")) +
+  theme(plot.title = element_text(size = 15, face = "bold", vjust = 1)) +
+  theme(plot.subtitle = element_text(size = 9, face = "bold", vjust = 1))+ 
+  theme(strip.text = element_text(size = 7))+
+  theme(strip.text.x = element_text(size = 18, face = "bold"))+
+  theme(strip.text.y = element_text(size = 15, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.text = element_text(size = 12))+
+  theme(legend.title = element_text(size = 12,color = "black",face="bold"))+
+  theme(axis.text.x= element_text(hjust=1))+
+  theme(legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+moirai_land_classes <- read.csv("../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv")
+
+basin_names <- c("Amazon","Ganges_Bramaputra","Missouri_River_Basin")
+
+c_type <- "above ground biomass"
+for (i in c("Cropland")){
+   for (j in basin_names){
+  
+g <- compare_carbon_distribution_HYDE(carbon_type = c_type,
+                            basin_for_testing = j,
+                            moirai_LC = i,
+                            harmonized_carbon_raster_file_names = c("AG_carbon_crop_q1.envi",
+                                          "AG_carbon_crop_q3.envi",
+                                          "AG_carbon_crop_max.envi",
+                                          "AG_carbon_crop_min.envi",
+                                          "AG_carbon_crop_weighted_average.envi"),
+                            plot_lim = 8000,
+                            produce_ESA_distribution = FALSE)
+name_for_plot <- gsub("/","_",i)  
+ggsave(plot= g+ scheme_basic ,filename= paste0("carbon_plots/",c_type,name_for_plot,j, ".jpeg"), width = 10, height = 6, device= "jpeg")
+}
+}
+```
+#Pasture soil carbon values
+
+```{r}
+scheme_basic <- theme_bw() +
+  theme(legend.text = element_text(size = 15)) +
+  theme(legend.title = element_text(size = 15)) +
+  theme(axis.text = element_text(size = 18)) +
+  theme(axis.title = element_text(size = 18, face = "bold")) +
+  theme(plot.title = element_text(size = 15, face = "bold", vjust = 1)) +
+  theme(plot.subtitle = element_text(size = 9, face = "bold", vjust = 1))+ 
+  theme(strip.text = element_text(size = 7))+
+  theme(strip.text.x = element_text(size = 18, face = "bold"))+
+  theme(strip.text.y = element_text(size = 15, face = "bold"))+
+  theme(legend.position = "bottom")+
+  theme(legend.text = element_text(size = 12))+
+  theme(legend.title = element_text(size = 12,color = "black",face="bold"))+
+  theme(axis.text.x= element_text(hjust=1))+
+  theme(legend.background = element_blank(),
+        legend.box.background = element_rect(colour = "black"))
+
+moirai_land_classes <- read.csv("../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv")
+
+basin_names <- c("Amazon","Ganges_Bramaputra","Missouri_River_Basin")
+
+c_type <- "soil"
+for (i in c("Pasture")){
+   for (j in basin_names){
+  
+g <- compare_carbon_distribution_HYDE(carbon_type = c_type,
+                            basin_for_testing = j,
+                            moirai_LC = i,
+                            harmonized_carbon_raster_file_names = c("AG_carbon_pasture_q1.envi",
+                                          "AG_carbon_pasture_q3.envi",
+                                          "AG_carbon_pasture_min.envi",
+                                          "AG_carbon_pasture_weighted_average.envi"),
+                            plot_lim = 8000,
+                            produce_ESA_distribution = FALSE)
+name_for_plot <- gsub("/","_",i)  
+ggsave(plot= g+ scheme_basic ,filename= paste0("carbon_plots/",c_type,name_for_plot,j, ".jpeg"), width = 10, height = 6, device= "jpeg")
+}
+}
+```

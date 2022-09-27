@@ -364,7 +364,7 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 			
             //Calculate temporary land type category. The carbon per fraction of protected area is the same. This will get split out later when we multiply each fraction's total land.
             //To save on time, we are calculating a temporary land type category.
-            cur_lt_cat_temp = rv_value * SCALE_POTVEG + 0;
+            cur_lt_cat_temp = rv_value * SCALE_POTVEG + CROP_LT_CODE+ 0;
             cur_lt_cat_ind_temp = NOMATCH;
             
             for (i = 0; i < num_lt_cats; i++) {
@@ -388,7 +388,7 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 				
                 
 				// get index of land category
-				cur_lt_cat = rv_value * SCALE_POTVEG + k;
+				cur_lt_cat = rv_value * SCALE_POTVEG + CROP_LT_CODE + k;
 				cur_lt_cat_ind = NOMATCH;
 				for (i = 0; i < num_lt_cats; i++) {
 					if (lt_cats[i] == cur_lt_cat) {
@@ -400,7 +400,8 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 					fprintf(fplog, "Failed to match lt_cat %i: proc_refveg_carbon()\n", cur_lt_cat);
 					return ERROR_IND;
 				}
-                
+                 
+
                 
                 //fprintf(stdout, "\nStarting cell %i country %i aez %i lt_cat %i started at %s\n", grid_ind,ctry_ind,aez_ind,cur_lt_cat_ind, get_systime());
               if (cur_lt_cat_ind==cur_lt_cat_ind_temp){  
@@ -413,7 +414,7 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
                soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp] = soil_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;   
               }
              
-             if(veg_carbon_sage[1][grid_ind] == NODATA && veg_carbon_sage[2][grid_ind] == NODATA && veg_carbon_sage[3][grid_ind] == NODATA && veg_carbon_sage[4][grid_ind] == NODATA && veg_carbon_sage[5][grid_ind] == NODATA){
+             if(veg_carbon_crop_sage[1][grid_ind] == NODATA && veg_carbon_crop_sage[2][grid_ind] == NODATA && veg_carbon_crop_sage[3][grid_ind] == NODATA && veg_carbon_crop_sage[4][grid_ind] == NODATA && veg_carbon_crop_sage[5][grid_ind] == NODATA){
                veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp] = veg_carbon_array_size_NODATA[ctry_ind][aez_ind][cur_lt_cat_ind_temp]+1;   
               }
 
@@ -438,12 +439,12 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
              soil_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5][memory_q3]=soil_carbon_crop_sage[5][grid_ind];
 
 
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][0][memory_median]=veg_carbon_sage[0][grid_ind];
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][1][memory_median]=veg_carbon_sage[1][grid_ind];
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][memory_min]=veg_carbon_sage[2][grid_ind];
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][memory_max]=veg_carbon_sage[3][grid_ind];
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][memory_q1]=veg_carbon_sage[4][grid_ind];
-             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5][memory_q3]=veg_carbon_sage[5][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][0][memory_median]=veg_carbon_crop_sage[0][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][1][memory_median]=veg_carbon_crop_sage[1][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][2][memory_min]=veg_carbon_crop_sage[2][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][3][memory_max]=veg_carbon_crop_sage[3][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][4][memory_q1]=veg_carbon_crop_sage[4][grid_ind];
+             veg_carbon_array[ctry_ind][aez_ind][cur_lt_cat_ind_temp][5][memory_q3]=veg_carbon_crop_sage[5][grid_ind];
 				
                
 				// calculate an area weighted average based on ref veg area for REF_YEAR
@@ -484,7 +485,7 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
                if(soil_carbon_crop_sage[0][grid_ind] != NODATA){
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][soilc_ind][0] +
-				soil_carbon_crop_sage[0][grid_ind] * refcarbon_area[grid_ind]*temp_frac;
+				soil_carbon_crop_sage[0][grid_ind] * crop_grid_carbon[grid_ind]*temp_frac;
                }
 
                 //2. Median
@@ -549,14 +550,14 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
                 
                 
                 
-                if(veg_carbon_sage[0][grid_ind] != NODATA){
+                if(veg_carbon_crop_sage[0][grid_ind] != NODATA){
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0] =
 				refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][0] +
-				veg_carbon_sage[0][grid_ind] * refcarbon_area[grid_ind] * temp_frac * above_ground_ratio[0][grid_ind];
+				veg_carbon_crop_sage[0][grid_ind] * crop_grid_carbon[grid_ind] * temp_frac * above_ground_ratio_crop[0][grid_ind];
 				
                refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] =
 			   refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] +
-			   veg_carbon_sage[0][grid_ind] * refcarbon_area[grid_ind] * temp_frac * below_ground_ratio[0][grid_ind];
+			   veg_carbon_crop_sage[0][grid_ind] * crop_grid_carbon[grid_ind] * temp_frac * below_ground_ratio_crop[0][grid_ind];
                
 
                //Calculate the above ground and below ground biomass ratios below for each country-aez-landuse-carbonstate category. This ratio is calculated on the basis of weighted average value,
@@ -632,7 +633,7 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 				// area
 				refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind] =
 				refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind] +
-				refcarbon_area[grid_ind]*temp_frac;
+				crop_grid_carbon[grid_ind]*temp_frac;
 				
 	          			
 			//fprintf(stdout, "\nSuccessfully processed cell %i country %i aez %i lt_cat %i size %d size_temp %d started at %s\n", grid_ind,ctry_ind,aez_ind,cur_lt_cat_ind,size,size_temp, get_systime());	
@@ -644,19 +645,13 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 	//fprintf(stdout, "\nSuccessfully processed all cells at %s\n", get_systime());
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.refveg_carbon_fname);
-    fpout = fopen(fname,"w"); //float
+    fpout = fopen(fname,"a"); //float
     if(fpout == NULL)
     {
         fprintf(fplog,"Failed to open file  %s for write:  proc_refveg_carbon()\n", fname);
         return ERROR_FILE;
     }
-    // write header lines
-    fprintf(fpout,"# File: %s\n", fname);
-    fprintf(fpout,"# Author: %s\n", CODENAME);
-    fprintf(fpout,"# Description: ref veg soil and veg carbon density (Mg/ha) for hyde land cells in country X glu X land type\n");
-    fprintf(fpout,"# Original source: soil c for sage pot veg; veg c for sage pot veg; reference veg; country raster; new glu raster; hyde land area\n");
-    fprintf(fpout,"# ----------\n");
-    fprintf(fpout,"iso,glu_code,land_type,c_type,weighted_average,median_value,min_value,max_value,q1_value,q3_value");
+    
     
     // write the records (rounded to integer)
     //Trying to free memory here since the free command seems to crash below
@@ -745,6 +740,23 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
                     temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][5];
 					outval_vegc_ag_q3 = (float) floor((double) 0.5 + temp_float);
 
+                    //There are some basins where we get wierd results, likely since the biomass can include 0 values. Add a check here to ensure values line up. 
+                    
+                    if(outval_vegc_ag_median < outval_vegc_ag_min){
+
+                        outval_vegc_ag_median = outval_vegc_ag_min;
+                    }
+                    
+                    if(outval_vegc_ag_q1 < outval_vegc_ag_median){
+
+                        outval_vegc_ag_q1 = outval_vegc_ag_median;
+                    }
+                   
+                   if(outval_vegc_ag_q3 < outval_vegc_ag_q1){
+
+                        outval_vegc_ag_q3 = outval_vegc_ag_q1;
+                    }
+
                    // below ground biomass carbon for each state
 					temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] /
 					refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind];
@@ -764,7 +776,23 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                     temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][5];
 					outval_vegc_bg_q3 = (float) floor((double) 0.5 + temp_float);
+                    
+                    //There are some basins where we get wierd results, likely since the biomass can include 0 values. Add a check here to ensure values line up. 
+                    
+                    if(outval_vegc_bg_median < outval_vegc_bg_min){
 
+                        outval_vegc_bg_median = outval_vegc_bg_min;
+                    }
+                    
+                    if(outval_vegc_bg_q1 < outval_vegc_bg_median){
+
+                        outval_vegc_bg_q1 = outval_vegc_bg_median;
+                    }
+                   
+                   if(outval_vegc_bg_q3 < outval_vegc_bg_q1){
+
+                        outval_vegc_bg_q3 = outval_vegc_bg_q1;
+                    }
 
                     // sum the total. Need to multiply by 100 for converting land from km2 to ha
                     if (outval_vegc_ag >= 0 &&  outval_vegc_ag_median >=0 && outval_vegc_ag_min >=0 && outval_vegc_ag_max >=0 &&  outval_vegc_ag_q1 >=0  && outval_vegc_ag_q3 >= 0 ) {
@@ -818,25 +846,26 @@ int proc_refveg_crop_carbon(args_struct in_args, rinfo_struct raster_info) {
 
     // also write the total global carbon values to the log file
     // in Mg 
-    fprintf(fplog, "\nGlobal reference carbon values, in Mg: proc_refveg_carbon()\n");
-    fprintf(fplog, "Soil C = %f\n", global_soilc);
-    fprintf(fplog, "Soil C Median = %f\n", global_soilc_median);
-    fprintf(fplog, "Soil C Min = %f\n", global_soilc_min);
-    fprintf(fplog, "Soil C Max = %f\n", global_soilc_max);
-    fprintf(fplog, "Soil C Q1 = %f\n", global_soilc_q1);
-    fprintf(fplog, "Soil C Q3 = %f\n", global_soilc_q3);
-    fprintf(fplog, "Veg C (above ground biomass) = %f\n\n", global_vegc_ag);
-    fprintf(fplog, "Veg C (above ground biomass) Median = %f\n", global_vegc_median_ag);
-    fprintf(fplog, "Veg C (above ground biomass) Min = %f\n", global_vegc_min_ag);
-    fprintf(fplog, "Veg C (above ground biomass) Max = %f\n", global_vegc_max_ag);
-    fprintf(fplog, "Veg C (above ground biomass) Q1 = %f\n", global_vegc_q1_ag);
-    fprintf(fplog, "Veg C (above ground biomass) Q3 = %f\n", global_vegc_q3_ag);
-    fprintf(fplog, "Veg C (below ground biomass) = %f\n\n", global_vegc_bg);
-    fprintf(fplog, "Veg C (below ground biomass) Median = %f\n", global_vegc_median_bg);
-    fprintf(fplog, "Veg C (below ground biomass) Min = %f\n", global_vegc_min_bg);
-    fprintf(fplog, "Veg C (below ground biomass) Max = %f\n", global_vegc_max_bg);
-    fprintf(fplog, "Veg C (below ground biomass) Q1 = %f\n", global_vegc_q1_bg);
-    fprintf(fplog, "Veg C (below ground biomass) Q3 = %f\n", global_vegc_q3_bg);
+    fprintf(fplog, "\nGlobal reference cropland carbon values, in Mg: proc_refveg_carbon()\n");
+    fprintf(fplog, "Soil C cropland = %f\n", global_soilc);
+    fprintf(fplog, "Soil C Median cropland = %f\n", global_soilc_median);
+    fprintf(fplog, "Soil C Min cropland = %f\n", global_soilc_min);
+    fprintf(fplog, "Soil C Max cropland = %f\n", global_soilc_max);
+    fprintf(fplog, "Soil C Q1 cropland = %f\n", global_soilc_q1);
+    fprintf(fplog, "Soil C Q3 cropland = %f\n", global_soilc_q3);
+    fprintf(fplog, "Veg C (above ground biomass) cropland = %f\n\n", global_vegc_ag);
+    fprintf(fplog, "Veg C (above ground biomass) Median cropland = %f\n", global_vegc_median_ag);
+    fprintf(fplog, "Veg C (above ground biomass) Min cropland = %f\n", global_vegc_min_ag);
+    fprintf(fplog, "Veg C (above ground biomass) Max cropland = %f\n", global_vegc_max_ag);
+    fprintf(fplog, "Veg C (above ground biomass) Q1 cropland = %f\n", global_vegc_q1_ag);
+    fprintf(fplog, "Veg C (above ground biomass) Q3 cropland = %f\n", global_vegc_q3_ag);
+    fprintf(fplog, "Veg C (below ground biomass) cropland = %f\n\n", global_vegc_bg);
+    fprintf(fplog, "Veg C (below ground biomass) Median cropland = %f\n", global_vegc_median_bg);
+    fprintf(fplog, "Veg C (below ground biomass) Min cropland = %f\n", global_vegc_min_bg);
+    fprintf(fplog, "Veg C (below ground biomass) Max cropland = %f\n", global_vegc_max_bg);
+    fprintf(fplog, "Veg C (below ground biomass) Q1 cropland = %f\n", global_vegc_q1_bg);
+    fprintf(fplog, "Veg C (below ground biomass) Q3 cropland = %f\n", global_vegc_q3_bg);
+    fprintf(fplog, "\nJust processed all crop carbon!, in Mg: proc_refveg_carbon()\n");
 
   //Free all arrays
     for (i = 0; i < NUM_FAO_CTRY; i++) {

@@ -98,6 +98,7 @@
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
+#define NUM_CARBON_TYPES        4              //Types of carbon
 #define LULC_START_YEAR         1800            // the first lulc year
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
@@ -252,6 +253,9 @@ int *land_mask_fao;                     // 1=land; 0=no land
 int *land_mask_potveg;                  // 1=land; 0=no land
 int *land_mask_refveg;                  // 1=land; 0=no land
 int *land_mask_forest;                  // 1=forest; 0=no forest
+float *crop_grid_carbon;
+float *pasture_grid_carbon;
+float *urban_grid_carbon;
 
 //kbn 2020-02-29 Introducing objects for protected area rasters from Category 1 to 7
 float **protected_EPA; //dim 1 is the type of protected area, dim 2 is the grid cell
@@ -267,10 +271,20 @@ float *****soil_carbon_array; //soil carbon array to calculate the soil carbon v
 //float *****soil_carbon_pasture_array; //soil carbon array to calculate the soil carbon values for each state
 //float *****soil_carbon_urban_array; //soil carbon array to calculate the soil carbon values for each state
 float *****veg_carbon_array; //vegetation carbon array to calculate vegetation carbon values for each state
+float **veg_carbon_crop_sage;  //dim 1 is the type of state, dim 2 is the grid cell
+float **veg_carbon_urban_sage;  //dim 1 is the type of state, dim 2 is the grid cell
+float **veg_carbon_pasture_sage;  //dim 1 is the type of state, dim 2 is the grid cell
 float **veg_carbon_sage;  //dim 1 is the type of state, dim 2 is the grid cell
 //Add above and below ground ratio for vegetation carbon
 float **above_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
 float **below_ground_ratio; //dim 1 is the type of state, dim 2 is the grid cell
+float **above_ground_ratio_crop; //dim 1 is the type of state, dim 2 is the grid cell
+float **below_ground_ratio_crop; //dim 1 is the type of state, dim 2 is the grid cell
+float **above_ground_ratio_pasture; //dim 1 is the type of state, dim 2 is the grid cell
+float **below_ground_ratio_pasture; //dim 1 is the type of state, dim 2 is the grid cell
+float **above_ground_ratio_urban; //dim 1 is the type of state, dim 2 is the grid cell
+float **below_ground_ratio_urban; //dim 1 is the type of state, dim 2 is the grid cell
+
 // raster arrays for inputs with different resolution
 // these are also stored starting at upper left corner with lon varying fastest
 float **lulc_input_grid;						// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
