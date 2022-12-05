@@ -97,9 +97,9 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 	double int_dbl;				// used to get the integer of a decimal number
 	
 
-    float *crop_grid;  // 1d array to store current crop data; start up left corner, row by row; lon varies faster
-    float *pasture_grid;  // 1d array to store current pasture data; start up left corner, row by row; lon varies faster
-    float *urban_grid;  // 1d array to store current urban data; start up left corner, row by row; lon varies faster
+    //float *crop_grid_carbon;  // 1d array to store current crop data; start up left corner, row by row; lon varies faster
+    //float *pasture_grid_carbon;  // 1d array to store current pasture data; start up left corner, row by row; lon varies faster
+    //float *urban_grid_carbon;  // 1d array to store current urban data; start up left corner, row by row; lon varies faster
 	float **lu_detail_grid;		// for the rest of the hyde types; dim1=hyde types, dim2=cells
 	float **lulc_temp_grid;		// lulc input area (km^2); dim 1 = land types; dim 2 = grid cells
 
@@ -154,18 +154,18 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 		return ERROR_MEM;
 	}
 
-	crop_grid = calloc(NUM_CELLS, sizeof(float));
-    if(crop_grid == NULL) {
+	crop_grid_carbon = calloc(NUM_CELLS, sizeof(float));
+    if(crop_grid_carbon == NULL) {
         fprintf(fplog,"Failed to allocate memory for crop_grid: proc_land_type_area()\n");
         return ERROR_MEM;
     }
-    pasture_grid = calloc(NUM_CELLS, sizeof(float));
-    if(pasture_grid == NULL) {
+    pasture_grid_carbon = calloc(NUM_CELLS, sizeof(float));
+    if(pasture_grid_carbon == NULL) {
         fprintf(fplog,"Failed to allocate memory for pasture_grid: proc_land_type_area()\n");
         return ERROR_MEM;
     }
-    urban_grid = calloc(NUM_CELLS, sizeof(float));
-    if(urban_grid == NULL) {
+    urban_grid_carbon = calloc(NUM_CELLS, sizeof(float));
+    if(urban_grid_carbon == NULL) {
         fprintf(fplog,"Failed to allocate memory for urban_grid: proc_land_type_area()\n");
         return ERROR_MEM;
     }
@@ -198,7 +198,7 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 
 
 	// first read in the appropriate hyde land use area data
-	if((err = read_hyde32(in_args, &raster_info, REF_CARBON_YEAR, crop_grid, pasture_grid, urban_grid, lu_detail_grid)) != OK)
+	if((err = read_hyde32(in_args, &raster_info, REF_CARBON_YEAR, crop_grid_carbon, pasture_grid_carbon, urban_grid_carbon, lu_detail_grid)) != OK)
 	{
 		fprintf(fplog, "Failed to read lu hyde data for reference year: calc_refveg_area()\n");
 		return err;
@@ -234,9 +234,9 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 		for (m = grid_y_ul; m < grid_y_ul + num_split; m++) {
 			for (n = grid_x_ul; n < grid_x_ul + num_split; n++) {
 				lu_indices[count] = m * NUM_LON + n;
-				lu_area[count][urban_ind] = (double) urban_grid[lu_indices[count]];
-				lu_area[count][crop_ind] = (double) crop_grid[lu_indices[count]];
-				lu_area[count][pasture_ind] = (double) pasture_grid[lu_indices[count]];
+				lu_area[count][urban_ind] = (double) urban_grid_carbon[lu_indices[count]];
+				lu_area[count][crop_ind] = (double) crop_grid_carbon[lu_indices[count]];
+				lu_area[count][pasture_ind] = (double) pasture_grid_carbon[lu_indices[count]];
 				for (j = NUM_HYDE_TYPES_MAIN; j < NUM_HYDE_TYPES; j++) {
 					lu_area[count][j] = (double) lu_detail_grid[j-NUM_HYDE_TYPES_MAIN][lu_indices[count]];
 				}
@@ -264,9 +264,9 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 		luarea_check = 0;
 		for (j = 0; j < NUM_LU_CELLS; j++) {
 			if (land_area_hyde[lu_indices[j]] != raster_info.land_area_hyde_nodata) {
-				crop_grid[lu_indices[j]] = (float) lu_area[j][crop_ind];
-				pasture_grid[lu_indices[j]] = (float) lu_area[j][pasture_ind];
-				urban_grid[lu_indices[j]] = (float) lu_area[j][urban_ind];
+				crop_grid_carbon[lu_indices[j]] = (float) lu_area[j][crop_ind];
+				pasture_grid_carbon[lu_indices[j]] = (float) lu_area[j][pasture_ind];
+				urban_grid_carbon[lu_indices[j]] = (float) lu_area[j][urban_ind];
 				for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
 					lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][lu_indices[j]] = (float) lu_area[j][m];
 				}
@@ -278,9 +278,9 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 				
 				
 			} else {
-				crop_grid[lu_indices[j]] = NODATA;
-				pasture_grid[lu_indices[j]] = NODATA;
-				urban_grid[lu_indices[j]] = NODATA;
+				crop_grid_carbon[lu_indices[j]] = NODATA;
+				pasture_grid_carbon[lu_indices[j]] = NODATA;
+				urban_grid_carbon[lu_indices[j]] = NODATA;
 				for (m = NUM_HYDE_TYPES_MAIN; m < NUM_HYDE_TYPES; m++) {
 					lu_detail_grid[m-NUM_HYDE_TYPES_MAIN][lu_indices[j]] = NODATA;
 				}
@@ -308,6 +308,19 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 			fprintf(fplog, "Error writing file %s: calc_refveg_area()\n", "refveg_carbon_thematic.bil");
 			return err;
 		}
+		if ((err = write_raster_float(crop_grid_carbon, NUM_CELLS, "crop_area_carbon.bil", in_args))) {
+			fprintf(fplog, "Error writing file %s: calc_refveg_area()\n", "refveg_area_carbon.bil");
+			return err;
+		}
+		if ((err = write_raster_float(pasture_grid_carbon, NUM_CELLS, "pasture_area_carbon.bil", in_args))) {
+			fprintf(fplog, "Error writing file %s: calc_refveg_area()\n", "refveg_area_carbon.bil");
+			return err;
+		}
+		if ((err = write_raster_float(urban_grid_carbon, NUM_CELLS, "urban_area_carbon.bil", in_args))) {
+			fprintf(fplog, "Error writing file %s: calc_refveg_area()\n", "refveg_area_carbon.bil");
+			return err;
+		}
+
 	}	// end if output diagnostics
 	
 	free(lulc_area);
@@ -318,9 +331,6 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 		free(lu_area[i]);
 	}
 	free(lu_area);
-	free(crop_grid);
-    free(pasture_grid);
-    free(urban_grid);
 	for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
 		free(lu_detail_grid[i]);
 	}

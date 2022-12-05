@@ -750,6 +750,24 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
                     temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_ag_ind][5];
 					outval_vegc_ag_q3 = (float) floor((double) 0.5 + temp_float);
 
+                    //There are some basins where we get wierd results, likely since the biomass can include 0 values. Add a check here to ensure values line up. 
+                    
+                    if(outval_vegc_ag_median < outval_vegc_ag_min){
+
+                        outval_vegc_ag_median = outval_vegc_ag_min;
+                    }
+                    
+                    if(outval_vegc_ag_q1 < outval_vegc_ag_median){
+
+                        outval_vegc_ag_q1 = outval_vegc_ag_median;
+                    }
+                   
+                   if(outval_vegc_ag_q3 < outval_vegc_ag_q1){
+
+                        outval_vegc_ag_q3 = outval_vegc_ag_q1;
+                    }
+
+
                    // below ground biomass carbon for each state
 					temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][0] /
 					refveg_carbon_area[ctry_ind][aez_ind][cur_lt_cat_ind];
@@ -769,6 +787,23 @@ int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info) {
 
                     temp_float = refveg_carbon_out[ctry_ind][aez_ind][cur_lt_cat_ind][vegc_bg_ind][5];
 					outval_vegc_bg_q3 = (float) floor((double) 0.5 + temp_float);
+                    
+                    //There are some basins where we get wierd results, likely since the biomass can include 0 values. Add a check here to ensure values line up. 
+                    
+                    if(outval_vegc_bg_median < outval_vegc_bg_min){
+
+                        outval_vegc_bg_median = outval_vegc_bg_min;
+                    }
+                    
+                    if(outval_vegc_bg_q1 < outval_vegc_bg_median){
+
+                        outval_vegc_bg_q1 = outval_vegc_bg_median;
+                    }
+                   
+                   if(outval_vegc_bg_q3 < outval_vegc_bg_q1){
+
+                        outval_vegc_bg_q3 = outval_vegc_bg_q1;
+                    }
 
 
                     // sum the total. Need to multiply by 100 for converting land from km2 to ha

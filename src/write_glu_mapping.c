@@ -114,7 +114,7 @@ int write_glu_mapping(args_struct in_args, rinfo_struct raster_info) {
    FILE *fpout3;					// file 2 pointer
    
    char *lult_names[NUM_LU_CATS] = {"Unmanaged","Cropland","Pasture","UrbanLand"};
-   char *protected_names[NUM_EPA_PROTECTED] = {"Unknown","UnsuitableUnprotected","SuitableUnprotected","SuitableHighProtectionIntact","SuitbaleHighProtectionDeforested","SuitableLow Protection","UnsuitableHighProtection","UnsuitableLowProtection"};
+   char *protected_names[NUM_EPA_PROTECTED] = {"Unknown","UnsuitableUnprotected","SuitableUnprotected","SuitableHighProtectionIntact","SuitableHighProtectionDeforested","SuitableLowProtection","UnsuitableHighProtection","UnsuitableLowProtection"};
    
    // get the output mapping file names
    strcpy(oname1, in_args.iso_map_fname);
