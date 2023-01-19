@@ -321,12 +321,6 @@ int main(int argc, const char * argv[]) {
 	
 	fprintf(stdout, "\nProgram %s started at %s\n", CODENAME, get_systime());
 	
-    // Check if carbon enabled
-    if(in_args.carbon_enabled == 1)
-    {
-        RUN_CARBON = 1;
-    }
-
 	// set the rand() seed
 	// want it the same each time the program is run
 	srand(0);
@@ -398,6 +392,14 @@ int main(int argc, const char * argv[]) {
 	*/
 	 
     //////////
+   
+    // Check if carbon enabled
+    int set_RUN_CARBON(args_struct in_args, int carbon_enabled) {
+        if (carbon_enabled) {
+            RUN_CARBON = 1;
+    };
+    };
+
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
     
@@ -591,8 +593,9 @@ int main(int argc, const char * argv[]) {
 		if(lu_detail_area[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_area[%i]: main()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
-		}
-    if(RUN_CARBON == 1) {     
+	};
+    }
+   if(RUN_CARBON == 1); {     
 	
     refveg_area = calloc(NUM_CELLS, sizeof(float));
     if(refveg_area == NULL) {
@@ -1305,7 +1308,7 @@ veg_carbon_urban_sage = calloc(NUM_CARBON, sizeof(float*));
             }free(veg_carbon_array[i][j]);
         }free(veg_carbon_array[i]);
    }free(veg_carbon_array);
-    } 
+   } 
  
 
     // allocate the arrays for all the fao input data (initialized to zero)
@@ -1698,5 +1701,5 @@ veg_carbon_urban_sage = calloc(NUM_CARBON, sizeof(float*));
 	
 	//fclose(debug_file);
 	//fclose(cell_file);
-	
+    
     return OK;}	// end moirai_main()
