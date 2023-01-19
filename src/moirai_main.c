@@ -324,7 +324,7 @@ int main(int argc, const char * argv[]) {
     // Check if carbon enabled
     if(in_args.carbon_enabled == 1)
     {
-        RUN_CARBON = 1
+        RUN_CARBON = 1;
     }
 
 	// set the rand() seed
