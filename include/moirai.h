@@ -61,11 +61,15 @@
 #include <time.h>
 #include <ctype.h>
 #include <netcdf.h>
+#include <stdbool.h>
 
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.1"           			// current version
 #define MAXCHAR					1000						// maximum string length
 #define MAXRECSIZE				10000						// maximum record (csv line) length in characters
+
+// bool determining if carbon is run: 0=no, 1=yes
+#define RUN_CARBON				0
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
 #define REF_YEAR				2000
@@ -652,6 +656,9 @@ typedef struct {
     char wf_fname[MAXCHAR];                 // file name for water footprint output
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
+
+	//carbon enabled 1 or disabled 0
+	bool carbon_enabled
 } args_struct;
 
 // function declarations
