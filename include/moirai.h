@@ -657,8 +657,8 @@ typedef struct {
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
-	//carbon enabled 1 or disabled 0
-	bool carbon_enabled
+    //carbon enabled 1 or disabled 0
+    bool carbon_enabled
 } args_struct;
 
 // function declarations
