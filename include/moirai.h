@@ -61,15 +61,12 @@
 #include <time.h>
 #include <ctype.h>
 #include <netcdf.h>
-#include <stdbool.h>
+
 
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.1"           			// current version
 #define MAXCHAR					1000						// maximum string length
 #define MAXRECSIZE				10000						// maximum record (csv line) length in characters
-
-// bool determining if carbon is run: 0=no, 1=yes
-#define RUN_CARBON				0
 
 // year of HYDE data to read in for calculating potential vegetation area (for carbon and forest land rent) and pasture animal land rent
 #define REF_YEAR				2000
@@ -82,7 +79,8 @@
 
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
-#define NUM_IN_ARGS						130					// number of input variables in the input file
+//map 2023-01-19 update input arguments to include carbon boolean
+#define NUM_IN_ARGS						131					// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -169,6 +167,9 @@
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
 
+//  if carbon is run: 0=no, 1=yes
+#define carbon_default			0
+int RUN_CARBON;
 
 // variables for number of records based on input files
 int NUM_FAO_CTRY;                       // number of FAO/VMAP0 countries, including additions (see FAO_iso_VMAP0_ctry.csv)
@@ -657,12 +658,14 @@ typedef struct {
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
-    //carbon enabled 1 or disabled 0
-    bool carbon_enabled;
+	//carbon enabled 1 or disabled 0
+	int carbon_enabled;
 } args_struct;
 
 // function declarations
 
+// read carbon_enabled from input file
+int set_RUN_CARBON(args_struct in_args, int carbon_enabled);
 // read raster file functions
 int get_cell_area(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_sage(args_struct in_args, rinfo_struct *raster_info);
