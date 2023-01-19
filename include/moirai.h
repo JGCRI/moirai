@@ -658,7 +658,7 @@ typedef struct {
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
     //carbon enabled 1 or disabled 0
-    bool carbon_enabled
+    bool carbon_enabled;
 } args_struct;
 
 // function declarations
