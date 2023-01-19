@@ -147,3 +147,6 @@ Ref_veg_carbon_Mg_per_ha.csv    # refveg_carbon_fname: file name for reference v
 Water_footprint_m3.csv          # wf_fname: file name for water footprint output
 MOIRAI_ctry_GLU.csv             # iso_map_fname: maps the raaster fao country codes to iso
 MOIRAI_land_types.csv           # lt_map_fname: maps the land type category codes to descriptions
+
+# Run carbon calculations?
+0
