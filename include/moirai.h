@@ -167,9 +167,6 @@
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
 
-//  if carbon is run: 0=no, 1=yes
-#define carbon_default			0
-int RUN_CARBON;
 
 // variables for number of records based on input files
 int NUM_FAO_CTRY;                       // number of FAO/VMAP0 countries, including additions (see FAO_iso_VMAP0_ctry.csv)
@@ -187,6 +184,9 @@ int NUM_LULC_TYPES;						// number of input lulc types
 int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
 float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
 float *****refveg_carbon_out;		// the potveg carbon out table;4th dim is the state of carbon; 5th dim is the two carbon density values and the area
+
+// int* run_carbon;
+
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
@@ -658,15 +658,13 @@ typedef struct {
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
-	//carbon enabled 1 or disabled 0
+	//carbon enabled 1 or disabled 0 (0 by default)
 	int carbon_enabled;
 } args_struct;
 
 // function declarations
-
-// read carbon_enabled from input file
-int set_RUN_CARBON(args_struct in_args, int carbon_enabled);
 // read raster file functions
+
 int get_cell_area(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_sage(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info);
@@ -705,6 +703,11 @@ int read_yield_fao(args_struct in_args);
 int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
 int read_water_footprint(char *fname, float *wf_grid);
+
+// read carbon_enabled from input file
+// int set_RUN_CARBON(args_struct in_args, RUN_CARBON);
+// *int set_RUN_CARBON(args_struct in_args, int* carbon_enabled);
+int run_carbon(args_struct in_args);
 
 
 // raster processing functions
