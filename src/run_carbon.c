@@ -20,5 +20,5 @@ bool run_carbon(args_struct in_args) {
         carbon_enabled_bool = false;
         strcpy(false_string, "false");
         }
-    fprintf(fplog, "carbon_enabled_bool variable value in run_carbon.c is: %s %s\n", false_string, true_string);
+    fprintf(fplog, "carbon_enabled_bool variable value in run_carbon.c is: %s %s\n", false_string, true_string); // can comment out if not debugging
 }
