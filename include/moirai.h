@@ -61,7 +61,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <netcdf.h>
-
+#include <stdbool.h>
 
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.1"           			// current version
@@ -658,11 +658,15 @@ typedef struct {
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
-	//carbon enabled 1 or disabled 0 (0 by default)
-	int carbon_enabled;
+	//carbon enabled 1 or disabled 0 
+	bool carbon_enabled;
 } args_struct;
 
 // function declarations
+
+// declaration for read carbon_enabled from input file
+bool run_carbon(args_struct in_args);
+
 // read raster file functions
 
 int get_cell_area(args_struct in_args, rinfo_struct *raster_info);
@@ -704,10 +708,7 @@ int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
 int read_water_footprint(char *fname, float *wf_grid);
 
-// read carbon_enabled from input file
-// int set_RUN_CARBON(args_struct in_args, RUN_CARBON);
-// *int set_RUN_CARBON(args_struct in_args, int* carbon_enabled);
-int run_carbon(args_struct in_args);
+
 
 
 // raster processing functions
