@@ -42,7 +42,9 @@
  
  **********/
 
+#include <stdbool.h>
 #include "moirai.h"
+
 
 int get_in_args(const char *fname, args_struct *in_args) {
 	
@@ -465,13 +467,14 @@ int get_in_args(const char *fname, args_struct *in_args) {
             case 130:
                strcpy(in_args->lt_map_fname, fld_str);
                break;
-					
-                    
-				default:
-					break;
-			}	// end switch
-		}	// end if record
-	}	// end while loop over input file lines
+	    case 131:
+		in_args->carbon_enabled = atoi(fld_str);
+	       break;
+	    default:
+		break;
+		}	// end switch
+	}	// end if record
+}	// end while loop over input file lines
 	
 	fclose(fpin);
 	
