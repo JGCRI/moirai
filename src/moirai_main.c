@@ -295,6 +295,7 @@ soil carbon (soil only for a depth of 0-30 cms)
 #include "moirai.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 int main(int argc, const char * argv[]) {
     
@@ -353,13 +354,6 @@ int main(int argc, const char * argv[]) {
 		return ERROR_FILE;
 	}
 	
-    // Check if carbon enabled
-    int *p;
-    p = &in_args.carbon_enabled;
-    if((error_code = set_run_carbon(in_args))) {
-        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
-    }
-
 	// create the paths for copying outputs to
 	// data files
 	strcpy(mkoutputpathcmd, "\nmkdir -p ");
@@ -375,8 +369,12 @@ int main(int argc, const char * argv[]) {
 	fprintf(fplog, "\nProgram %s started at %s\n", CODENAME, get_systime());
 	
 	fprintf(fplog, "\nFor more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file\n");
-
-    fprintf(fplog, "\nVariable p is %d\n", p);
+	// Check if carbon enabled
+    	run_carbon(in_args);
+   	 extern bool carbon_enabled_bool; // this is a global variable that is set in the run_carbon function
+    	carbon_enabled_bool = in_args.carbon_enabled;
+    	// uncomment below for debugging carbon input variable 
+    	fprintf(fplog, "\nCarbon_enabled has been read in from the input file as %d and in_args.carbon_enabled as %d\n", carbon_enabled_bool, in_args.carbon_enabled);
 
 	/*
 	// create a file to check each lulc cell that is easy to read into r and compare area values
@@ -402,21 +400,29 @@ int main(int argc, const char * argv[]) {
 	 
     //////////
    
-
-
-    
-    // int set_run_carbon(args_struct in_args, int run_carbon) {
-    //     run_carbon = in_args.carbon_enabled;
-    // }
-
-
-    // run_carbon = in_args.carbon_enabled;
-    // printf("%d\n", run_carbon);
-    // int set_run_carbon(in_args.carbon_enabled) {
-    //     run_carbon = &in_args->carbon_enabled;
-    // };
-    // }
-
+	/*
+	// create a file to check each lulc cell that is easy to read into r and compare area values
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_area.csv");
+	if ((debug_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(debug_file, "func,year,lulc_cell,rf_area,lu_area,land_area\n");
+	
+	// create a file for particular lu values for a given lulc cell
+	strcpy(fname, in_args.outpath);
+	strcat(fname, "check_lulc_cell.csv");
+	if ((cell_file = fopen(fname, "w")) == NULL) {
+		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
+				get_systime(), ERROR_FILE, fname);
+		return ERROR_FILE;
+	}
+	fprintf(cell_file, "func,lu_index,wg_index,lulc_index,land_area,rf_area,lu_area,u_area,c_area,p_area\n");
+	*/
+	 
+    //////////
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
     
@@ -610,10 +616,8 @@ int main(int argc, const char * argv[]) {
 		if(lu_detail_area[i] == NULL) {
 			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_area[%i]: main()\n", get_systime(), ERROR_MEM, i);
 			return ERROR_MEM;
-	};
     }
-if((*p)== 1) {  
-    
+}     
         refveg_area = calloc(NUM_CELLS, sizeof(float));
         if(refveg_area == NULL) {
             fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
@@ -625,8 +629,6 @@ if((*p)== 1) {
             fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_area: main()\n", get_systime(), ERROR_MEM);
             return ERROR_MEM;
         }
-    return 0;
-    } //end run_carbon
 
     region_gcam = calloc(NUM_CELLS, sizeof(int));
     if(region_gcam == NULL) {
@@ -715,13 +717,13 @@ if((*p)== 1) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-   if((*p)== 1) {
+	
         refvegcarbon_thematic = calloc(NUM_CELLS, sizeof(int));
         if(refvegcarbon_thematic == NULL) {
             fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for refveg_thematic: main()\n", get_systime(), ERROR_MEM);
             return ERROR_MEM;
         }
-    }
+	
     // allocate some arrays to keep track of valid raster cells
     land_cells_aez_new = calloc(NUM_CELLS, sizeof(int));
     if(land_cells_aez_new == NULL) {
@@ -743,7 +745,6 @@ if((*p)== 1) {
         fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for forest_cells: main()\n", get_systime(), ERROR_MEM);
         return ERROR_MEM;
     }
-    
     // it would be more efficient to write a loop over all cells here,
     //  and write the following two functions to operate on a single cell
     // the second function would be called only if the first one finds a land cell
@@ -754,7 +755,7 @@ if((*p)== 1) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
-    if((*p)== 1) {
+
     ////
     // convert the hyde land use, lulc, and sage potential veg input data to working grid area
     // the rand_order array is allocated here in calc_refvef_area and is deallocated in proc_refveg_carbon
@@ -767,8 +768,6 @@ if((*p)== 1) {
             fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
             return error_code;
         }
-    return 0;
-    }
     // free some raster arrays
     free(region_gcam);
     free(sage_minus_hyde_land_area);
@@ -828,8 +827,12 @@ if(hkg_glu_area == NULL) {
         fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
         return error_code;
     }
+	
+	
+if (carbon_enabled_bool == true) { 
+	
+	
     //kbn 2020/06/01 Add code for read_soil_c here
-if((*p)== 1) {
         soil_carbon_sage = calloc(NUM_CARBON, sizeof(float*));
         if(soil_carbon_sage == NULL) {
             fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for soil_carbon_sage: main()\n", get_systime(), ERROR_MEM);
@@ -842,7 +845,8 @@ if((*p)== 1) {
                 return ERROR_MEM;
             }
         }
-        //erm 2022/08/04 Add code for read_soil for managed land
+        
+	//erm 2022/08/04 Add code for read_soil for managed land
         //crop
         soil_carbon_crop_sage = calloc(NUM_CARBON, sizeof(float*));
         if(soil_carbon_crop_sage == NULL) {
@@ -1156,7 +1160,7 @@ if((*p)== 1) {
             fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
             return error_code;
         }
-    // }
+ } //end carbon_enabled
 
         // process the land type area data
         //  lu grids are allocated/freed within proc_land_type_area()
@@ -1165,7 +1169,7 @@ if((*p)== 1) {
             return error_code;
         }
     
-    // if(run_carbon == 1) {
+if (carbon_enabled_bool == true) { 
         // process the reference vegetation carbon data
         //  needed arrays are allocated/freed within proc_refveg_carbon()
         // the rand_order array that is allocated in calc_refvef_area is deallocated in proc_refveg_carbon
@@ -1265,26 +1269,26 @@ if((*p)== 1) {
         }
         free(below_ground_ratio_urban);
         
-        //  fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
+          fprintf(stdout, "\nStart freeing other carbon arrays %s\n", get_systime());
         for (i = 0; i < NUM_FAO_CTRY; i++) {
             for (j = 0; j < ctry_aez_num[i]; j++) {
                 free(soil_carbon_array_cells[i][j]);
             }free(soil_carbon_array_cells[i]);
         }free(soil_carbon_array_cells);
-    //fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
+    fprintf(stdout, "\n Freed carbon array cells  %s\n", get_systime());
             
-
+} //end carbon_enabled
 
     // process the water footprint data
     //  needed arrays are allocated/freed within proc_water_footprint()
 
-    //fprintf(stdout, "\n Start water footprint %s\n", get_systime());
+    fprintf(stdout, "\n Start water footprint %s\n", get_systime());
 
         if((error_code = proc_water_footprint(in_args, raster_info))) {
             fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
             return error_code;
         }
-        
+if (carbon_enabled_bool == true ) {         
         // free the land type category array
         free(lt_cats);
         
@@ -1298,7 +1302,25 @@ if((*p)== 1) {
         for (i = 0; i < NUM_EPA_PROTECTED; i++) {
             free(protected_EPA[i]);
         }
-        free(protected_EPA);   
+        free(protected_EPA);
+	//kbn 2020/06/01 Add code for soil carbon here    
+    	for (i = 0; i < NUM_CARBON; i++) {
+		free(soil_carbon_sage[i]);
+	}
+	free(soil_carbon_sage);
+    	//kbn 2020/06/30 Add code for veg carbon here
+    	for (i = 0; i < NUM_CARBON; i++) {
+		free(veg_carbon_sage[i]);
+	}
+	free(veg_carbon_sage);
+    	for (i = 0; i < NUM_CARBON; i++) {
+		free(above_ground_ratio[i]);
+	}
+	free(above_ground_ratio);
+    	for (i = 0; i < NUM_CARBON; i++) {
+		free(below_ground_ratio[i]);
+	}
+	free(below_ground_ratio);
         free(potveg_thematic);
         free(refveg_thematic);
         free(refvegcarbon_thematic);
@@ -1327,8 +1349,7 @@ if((*p)== 1) {
                 }free(veg_carbon_array[i][j]);
             }free(veg_carbon_array[i]);
     }free(veg_carbon_array);
-    return 0;
-    } //end if carbon
+    } //end carbon_enabled
     
 
     // allocate the arrays for all the fao input data (initialized to zero)
@@ -1561,12 +1582,8 @@ if((*p)== 1) {
     // free some raster arrays
     free(aez_bounds_new);
     free(aez_bounds_orig);
-    
-    if((*p)== 1) {
-        free(refveg_area);
-        free(refcarbon_area);
-        return 0;
-    }
+    free(refveg_area);
+    free(refcarbon_area);
     free(country87_gtap);
     free(forest_cells);
     free(land_cells_hyde);
