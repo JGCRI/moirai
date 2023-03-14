@@ -94,5 +94,5 @@ Water_footprint_m3.csv          # wf_fname: file name for water footprint output
 MOIRAI_ctry_GLU.csv             # iso_map_fname: maps the raaster fao country codes to iso
 MOIRAI_land_types.csv           # lt_map_fname: maps the land type category codes to descriptions
 
-# Enable carbon
-0		                                #Use 1 for enabled or 0 for disabled.		
+# Enable carbon processing
+0		                            #Set to 1 to process carbon by land type in moirai. Setting to zero only produces land accounts.
