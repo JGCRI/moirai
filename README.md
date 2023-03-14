@@ -179,7 +179,7 @@ The easiest and most common input data substitution will be for the GLU data tha
 
 ### Moirai LDS input file
 (e.g., `…/moirai/input_files/moirai_input_basins235.txt`)
-The Moirai LDS input file specifies the input and output paths, the file names of the primary input and output files, and whether additional diagnostic files are output. The output year for production, harvested area, and land rent outputs, is specified, as well as the input year of the required crop data to determine whether or not recalibration is necessary. Similarly, the output USD value year for land rent is specified along with the input USD value year of the FAO price data in order to perform the correct price calibration. The input file code variables are filled based on the order of the uncommented lines in the input file, rather than by keyword (# is the comment character), and there are 131[INCLUDE ADDITIONAL CARBON INPUT DESCRIPTIONS] input values read from the input file. Thus, the following input descriptions follow the order in the input file.
+The Moirai LDS input file specifies the input and output paths, the file names of the primary input and output files, and whether additional diagnostic files are output. The output year for production, harvested area, and land rent outputs, is specified, as well as the input year of the required crop data to determine whether or not recalibration is necessary. Similarly, the output USD value year for land rent is specified along with the input USD value year of the FAO price data in order to perform the correct price calibration. The input file code variables are filled based on the order of the uncommented lines in the input file, rather than by keyword (# is the comment character), and there are 131 input values read from the input file. Thus, the following input descriptions follow the order in the input file.
 
 ### Flags
 * diagnostics: 0 = no, 1 = output diagnostics files
@@ -277,6 +277,9 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * The crop water volume consumption output file (`Water_footprint_m3.csv`)
 * The country X GLU mapping output file (`MOIRAI_ctry_GLU.csv`)
 * The land type mapping output file (`MOIRAI_land_types.csv`)
+
+### Carbon Flag
+* carbon_enabled: Set to 1 to process carbon by land type in moirai. Setting to 0 only produces land accounts.
 
 ## Diagnostics
 A detailed description of all the diagnostics features is available in:  `…/moirai/diagnostics/readme.md`
