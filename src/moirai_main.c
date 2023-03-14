@@ -295,7 +295,7 @@ soil carbon (soil only for a depth of 0-30 cms)
 #include "moirai.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
+
 
 int main(int argc, const char * argv[]) {
     
@@ -371,57 +371,14 @@ int main(int argc, const char * argv[]) {
 	fprintf(fplog, "\nFor more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file\n");
 	// Check if carbon enabled
     	run_carbon(in_args);
-   	 extern bool carbon_enabled_bool; // this is a global variable that is set in the run_carbon function
+   	extern int carbon_enabled_bool; // this is a global variable that is set in the run_carbon function
     	carbon_enabled_bool = in_args.carbon_enabled;
-    	// uncomment below for debugging carbon input variable 
+   	//Check if diagnostics enabled for carbon input diagnostic message
+   	int diagnostics;
+   	if (diagnostics == 1) {
     	fprintf(fplog, "\nCarbon_enabled has been read in from the input file as %d and in_args.carbon_enabled as %d\n", carbon_enabled_bool, in_args.carbon_enabled);
-
-	/*
-	// create a file to check each lulc cell that is easy to read into r and compare area values
-	strcpy(fname, in_args.outpath);
-	strcat(fname, "check_area.csv");
-	if ((debug_file = fopen(fname, "w")) == NULL) {
-		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
-				get_systime(), ERROR_FILE, fname);
-		return ERROR_FILE;
-	}
-	fprintf(debug_file, "func,year,lulc_cell,rf_area,lu_area,land_area\n");
+   	}
 	
-	// create a file for particular lu values for a given lulc cell
-	strcpy(fname, in_args.outpath);
-	strcat(fname, "check_lulc_cell.csv");
-	if ((cell_file = fopen(fname, "w")) == NULL) {
-		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
-				get_systime(), ERROR_FILE, fname);
-		return ERROR_FILE;
-	}
-	fprintf(cell_file, "func,lu_index,wg_index,lulc_index,land_area,rf_area,lu_area,u_area,c_area,p_area\n");
-	*/
-	 
-    //////////
-   
-	/*
-	// create a file to check each lulc cell that is easy to read into r and compare area values
-	strcpy(fname, in_args.outpath);
-	strcat(fname, "check_area.csv");
-	if ((debug_file = fopen(fname, "w")) == NULL) {
-		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
-				get_systime(), ERROR_FILE, fname);
-		return ERROR_FILE;
-	}
-	fprintf(debug_file, "func,year,lulc_cell,rf_area,lu_area,land_area\n");
-	
-	// create a file for particular lu values for a given lulc cell
-	strcpy(fname, in_args.outpath);
-	strcat(fname, "check_lulc_cell.csv");
-	if ((cell_file = fopen(fname, "w")) == NULL) {
-		fprintf(stderr, "\nProgram terminated at %s with error_code = %i; could not open %s\n",
-				get_systime(), ERROR_FILE, fname);
-		return ERROR_FILE;
-	}
-	fprintf(cell_file, "func,lu_index,wg_index,lulc_index,land_area,rf_area,lu_area,u_area,c_area,p_area\n");
-	*/
-	 
     //////////
     // start with the text info data
     // these are csv files that determine mappings and number of aezs, crops, counties, regions
@@ -829,7 +786,7 @@ if(hkg_glu_area == NULL) {
     }
 	
 	
-if (carbon_enabled_bool == true) { 
+if (carbon_enabled_bool == 1) { 
 	
 	
     //kbn 2020/06/01 Add code for read_soil_c here
@@ -1169,7 +1126,7 @@ if (carbon_enabled_bool == true) {
             return error_code;
         }
     
-if (carbon_enabled_bool == true) { 
+if (carbon_enabled_bool == 1) { 
         // process the reference vegetation carbon data
         //  needed arrays are allocated/freed within proc_refveg_carbon()
         // the rand_order array that is allocated in calc_refvef_area is deallocated in proc_refveg_carbon
@@ -1288,7 +1245,7 @@ if (carbon_enabled_bool == true) {
             fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
             return error_code;
         }
-if (carbon_enabled_bool == true ) {         
+if (carbon_enabled_bool == 1 ) {         
         // free the land type category array
         free(lt_cats);
         
