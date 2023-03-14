@@ -42,7 +42,6 @@
  
  **********/
 
-#include <stdbool.h>
 #include "moirai.h"
 
 
@@ -56,6 +55,7 @@ int get_in_args(const char *fname, args_struct *in_args) {
 	char cln_str[MAXRECSIZE];		// whitespace removed string
 	char fld_str[MAXRECSIZE];		// whitespace removed input value
 	const char comment[] = "#";		// character that denotes a comment to disregard rest of line
+	
 	
 	// open input file
 	if((fpin = fopen(fname, "r")) == NULL)
@@ -467,17 +467,18 @@ int get_in_args(const char *fname, args_struct *in_args) {
             case 130:
                strcpy(in_args->lt_map_fname, fld_str);
                break;
-	    case 131:
-		in_args->carbon_enabled = atoi(fld_str);
-	       break;
-	    default:
-		break;
-		}	// end switch
-	}	// end if record
-}	// end while loop over input file lines
+			case 131:
+				in_args->carbon_enabled = atoi(fld_str);
+				break;					
+			default:
+				break;
+			}	// end switch
+		}	// end if record
+	}	// end while loop over input file lines
+	
 	
 	fclose(fpin);
-	
+
 	if(count != nrecords)
 	{
 		fprintf(stderr, "Error reading file %s: get_in_args(); records read=%i != nrecords=%i\n",
