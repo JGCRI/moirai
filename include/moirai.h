@@ -61,7 +61,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <netcdf.h>
-#include <stdbool.h>
+
 
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.1"           			// current version
@@ -166,6 +166,7 @@
 #define ERROR_MEM				5							// error associated with failed memory allocation
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
+// #define ERROR_CARBON			8							// error associated with carbon enabler
 
 
 // variables for number of records based on input files
@@ -185,7 +186,7 @@ int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res l
 float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
 float *****refveg_carbon_out;		// the potveg carbon out table;4th dim is the state of carbon; 5th dim is the two carbon density values and the area
 
-// int* run_carbon;
+
 
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
@@ -658,14 +659,15 @@ typedef struct {
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
 
+	
 	//carbon enabled 1 or disabled 0 
-	bool carbon_enabled;
+	int carbon_enabled;
 } args_struct;
 
 // function declarations
+// read carbon_enabled from input file
+int run_carbon(args_struct in_args);
 
-// declaration for read carbon_enabled from input file
-bool run_carbon(args_struct in_args);
 
 // read raster file functions
 
