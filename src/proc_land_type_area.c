@@ -90,7 +90,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     // valid values in the hyde land area data set determine the land cells to process
     
     int i, j, k, m, n = 0;
-	//int p=0;					// for running only one year for testing
+	//int p=0;					// for running only one year for testing -- this line can be uncommented for debugging
 	int year_ind;               // the index for looping over the years
     int grid_ind;               // the index within the 1d grid of the current land cell
     int rv_ind;                 // the index of the current reference veg land type
@@ -314,7 +314,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
     // process each year
     //
 	//just do REF_YEAR for testing
-	/*
+	/*  -- this block can be uncommented for debugging
 	p = NOMATCH;
 	for (m = 0; m < NUM_HYDE_YEARS; m++) {
 		if (hyde_years[m] == REF_YEAR) {
@@ -324,6 +324,7 @@ int proc_land_type_area(args_struct in_args, rinfo_struct raster_info) {
 	}
 	for (year_ind = p; year_ind < p+1; year_ind++) {
 	*/
+	// swap the above line for the next one to run a single year for testing
 	for (year_ind = 0; year_ind < NUM_HYDE_YEARS; year_ind++) {
 		
 		fprintf(fplog,"\nCurrently processing Year: %i",year_ind+1);
