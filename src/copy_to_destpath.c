@@ -4,14 +4,14 @@
  copy the gcam data system input files to the lds destination directory
     the lds destination directory is set in the lds_input.txt file as the 'ldsdestpath'
  
- copy the two mapping files o the mappings destination directory
+ copy the two mapping files to the mappings destination directory
     the mapping destination directory is set in the lds_input.txt file as the 'mapdestpath'
  
  the names of these files are set in the lds_input.txt file
  
  NOTE: this call automatically overwrites any file of the same name
  
- there are currenlty 9, and there will be one more
+ there are currently 9, and there will be one more
  
  to do: add the water footprint file
  
