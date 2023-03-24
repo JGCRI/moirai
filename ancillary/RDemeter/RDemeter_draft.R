@@ -4,7 +4,7 @@
 # install.packages("reticulate") # Do the first time
 library(reticulate)
 
-source_python("RDemeter.py")
+source_python("RDemeter_draft.py")
 # now python function can be called() as normal within R body
 config_file_path = '~\\config_gcam_reference.ini' # your path here
 write_outputs_flag = TRUE
