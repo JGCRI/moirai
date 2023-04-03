@@ -17,7 +17,7 @@ shp_name <- '~/example/path/example_shapefile.shp'
 input_shapefile <- st_read(shp_name)
 
 # Define the raster extents and resolution
-output_raster <- raster(extent(input_shapefile), res = 0.0833333) # Change 'res' value to desired raster resolution
+output_raster <- raster(extent(input_shapefile), res = 0.0833333) # Change 'res' value to desired raster resolution.  0.083333 degrees = 5 arcmin)
 
 ##############
 #out_raster_prompt <- function(){    # "~/example/path/example_output_raster.tif"
