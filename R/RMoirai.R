@@ -4,32 +4,33 @@
 
 
 library(raster)
-library(rgdal)
 library(sf)
 # setwd('')
 
-values <- suppressWarnings(readLines(file.choose()))  
-values <- gsub("#.*", "", values)   
-values <- gsub("\\t", "", values) 
-values <- gsub("\\s+$", "", values)  
+# read_input
+read_input <- function(input_txt_file) {
+  values <- suppressWarnings(readLines(input_txt_file))  
+  values <- gsub("#.*", "", values)   
+  values <- gsub("\\t", "", values) 
+  values <- gsub("\\s+$", "", values)  
+  
+  input <- values[values != ""]      
+  return(input)
+}
 
-input <- values[values != ""]      
-input
+input <- read_input(input_txt_file)
 
-shp_name <- '~/example/path/example_shapefile.shp'  
-## shp_name <- input[#index_of_shp] #read in from input
 
-input_shapefile <- st_read(shp_name)
+shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
+    read_shp = st_read(input_shp, crs = crs)
+    input_res = res(read_shp)
+    output_specs <- raster(extent(read_shp), res = 0.0833333) # may need to change output extent
+    raster_out <- rasterize(input_shp, output_specs, field = value_field)
+    rasterized_shp <- writeRaster(raster_out, out_raster_name, format = "GTiff", overwrite = TRUE) 
+    # Can create a separate file for each layer with a vector of filenames provided with "bylayer = TRUE"
+    # Can output CRS to a .prj file with "prj = TRUE"
+    # Can store min/max cell values (per format) with "setStatistics = TRUE"
+    return(rasterized_shp)
+}
 
-# Define the raster extents and resolution
-output_raster <- raster(extent(input_shapefile), res = 0.0833333) # Change 'res' value to desired raster resolution
-
-out_raster_file <- "~/yourpath/name_the_output_raster.tif" # change extension as appropriate for desired output raster format
-## out_raster_file <- input[#index_for_output_Raster_name] #read in from input
-
-head(input_shapefile)  
-    
-raster_value = "Shape_Area"  # Add additional line to end of input text file for this? Otherwise user modifies inline or potentially selects
-
-final_raster <- rasterize(input_shapefile, output_raster, field = raster_value) 
-writeRaster(final_raster, out_raster_file, format = "GTiff", overwrite = TRUE) # Can change raster format to .bil or other if preferred but match extension in out_raster_file
+rasterized_shp <- shp_to_raster(input_shp, crs, value_field, out_raster_name)
