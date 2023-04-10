@@ -18,7 +18,20 @@ read_input <- function(input_txt_file) {
   return(input)
 }
 
-read_input(input_txt_file)
+input <- read_input(input_txt_file)
+
+# Quick reference for input index number and info
+input_index <- function(input_txt_file) {
+  values <- suppressWarnings(readLines(input_txt_file))  
+  values <- values[!grepl("^#", values)] 
+  values <- gsub("\\t", "", values) 
+  values <- gsub("\\s+$", "", values)  
+  
+  input <- values[values != ""]      
+  return(input)
+}
+input_info <- input_index(input_txt_file)
+
 
 
 shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
@@ -33,4 +46,4 @@ shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     return(rasterized_shp)
 }
 
-shp_to_raster(input_shp, crs, value_field, out_raster_name)
+rasterized_shp <- shp_to_raster(input_shp, crs, value_field, out_raster_name)
