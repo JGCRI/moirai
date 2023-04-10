@@ -18,7 +18,7 @@ read_input <- function(input_txt_file) {
   return(input)
 }
 
-input <- read_input(input_txt_file)
+read_input(input_txt_file)
 
 
 shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
@@ -33,4 +33,4 @@ shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     return(rasterized_shp)
 }
 
-rasterized_shp <- shp_to_raster(input_shp, crs, value_field, out_raster_name)
+shp_to_raster(input_shp, crs, value_field, out_raster_name)
