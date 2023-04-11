@@ -35,8 +35,8 @@ input_info <- input_index(input_txt_file)
 
 
 shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
-    read_shp = st_read(input_shp, crs = crs)
-    input_res = res(read_shp)
+    read_shp <- st_read(input_shp, crs = crs)
+    input_res <- res(read_shp)
     output_specs <- raster(extent(read_shp), res = 0.0833333) # may need to change output extent
     raster_out <- rasterize(input_shp, output_specs, field = value_field)
     rasterized_shp <- writeRaster(raster_out, out_raster_name, format = "GTiff", overwrite = TRUE) 
