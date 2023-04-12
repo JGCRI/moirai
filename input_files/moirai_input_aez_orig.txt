@@ -95,4 +95,4 @@ MOIRAI_ctry_GLU.csv             # iso_map_fname: maps the raaster fao country co
 MOIRAI_land_types.csv           # lt_map_fname: maps the land type category codes to descriptions
 
 # Enable carbon processing
-0		                            #Set to 1 to process carbon by land type in moirai. Setting to zero only produces land accounts.
+0		                            # carbon_enabled: Set to 1 to process carbon by land type in moirai. Setting to zero only produces land accounts.
