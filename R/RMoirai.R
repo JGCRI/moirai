@@ -34,7 +34,7 @@ input_index <- function(input_txt_file) {
 input_info <- input_index(input_txt_file)
 
 
-## Assign input filenames, paths, years, and values to their corresponding variables (except carbon boolean)
+## Assign input filenames, paths, years, and values to their corresponding variables
 
 process_input <- function(input_info) {
   # Initialize an empty list to store the results
