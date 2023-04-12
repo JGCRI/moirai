@@ -96,4 +96,4 @@ shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     # Can store min/max cell values (per format) with "setStatistics = TRUE"
     return(rasterized_shp)
 }
-rasterized_shp <- shp_to_raster(input_shp, crs, value_field, out_raster_name)
+shp_to_raster(input_shp, crs, value_field, out_raster_name)
