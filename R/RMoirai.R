@@ -5,9 +5,10 @@
 
 library(raster)
 library(sf)
+library(stringr)
 # setwd('')
 
-# read_input
+## read_input
 read_input <- function(input_txt_file) {
   values <- suppressWarnings(readLines(input_txt_file))  
   values <- gsub("#.*", "", values)   
@@ -17,10 +18,10 @@ read_input <- function(input_txt_file) {
   input <- values[values != ""]      
   return(input)
 }
-
 input <- read_input(input_txt_file)
 
-# Quick reference for input index number and info
+
+## Quick reference for input index number and info
 input_index <- function(input_txt_file) {
   values <- suppressWarnings(readLines(input_txt_file))  
   values <- values[!grepl("^#", values)] 
@@ -33,6 +34,32 @@ input_index <- function(input_txt_file) {
 input_info <- input_index(input_txt_file)
 
 
+## Assign input filenames, paths, years, and values to their corresponding variables (except carbon boolean)
+
+process_input <- function(input_info) {
+  # Initialize an empty list to store the results
+  result <- list()
+  
+  # Iterate through the input vector
+  #for (i in seq(1,130)) {                   # Change index values as appropriate for file names or for all use seq_along(input_info)) {
+  for (i in seq_along(input_info)) {
+    # Extract the file name (with extension) and the variable name
+    file_name <- str_extract(input_info[i], "^[^#\\s]+")
+    variable_name <- str_extract(input_info[i], "(?<=#)[^:]+")
+    
+    # If both file name and variable name are found, store them in the result list
+    if (!is.na(file_name) && !is.na(variable_name)) {
+      result[[variable_name]] <- file_name
+    }
+  }
+  # Assign the file names to their corresponding variables in the global environment
+  list2env(result, envir = .GlobalEnv) 
+  
+  
+  return(result)
+}
+
+result <- process_input(input_info)
 
 shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     read_shp <- st_read(input_shp, crs = crs)
