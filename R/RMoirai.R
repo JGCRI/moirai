@@ -9,6 +9,8 @@ library(stringr)
 ### Make sure you set working directory from which new directories will be created
 # setwd('')
 
+input_txt_file <- file.choose()
+
 #### read_input
 read_input <- function(input_txt_file) {
   values <- suppressWarnings(readLines(input_txt_file))  
