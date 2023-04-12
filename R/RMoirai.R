@@ -6,9 +6,10 @@
 library(raster)
 library(sf)
 library(stringr)
+### Make sure you set working directory from which new directories will be created
 # setwd('')
 
-## read_input
+#### read_input
 read_input <- function(input_txt_file) {
   values <- suppressWarnings(readLines(input_txt_file))  
   values <- gsub("#.*", "", values)   
@@ -21,7 +22,7 @@ read_input <- function(input_txt_file) {
 input <- read_input(input_txt_file)
 
 
-## Quick reference for input index number and info
+#### Quick reference for input index number and info, retrieve values and variable names for later
 input_index <- function(input_txt_file) {
   values <- suppressWarnings(readLines(input_txt_file))  
   values <- values[!grepl("^#", values)] 
@@ -34,7 +35,7 @@ input_index <- function(input_txt_file) {
 input_info <- input_index(input_txt_file)
 
 
-## Assign input filenames, paths, years, and values to their corresponding variables
+#### Assign input filenames, paths, years, and values to their corresponding variables
 
 process_input <- function(input_info) {
   # Initialize an empty list to store the results
@@ -58,8 +59,29 @@ process_input <- function(input_info) {
   
   return(result)
 }
-
 result <- process_input(input_info)
+
+#### Create variables from indexed input values with which to create directories if they don't exist  
+## Note ensure working directory is set e.g. setwd('')
+
+create_directories <- function(result) {
+  # Iterate through the result list from process_input()
+  for (value in result) {
+    # Check if the value is a path via starts with "./" and ends with "/"
+    if (startsWith(value, "./") && endsWith(value, "/")) {
+      # Create the directory if it doesn't exist
+      if (!dir.exists(value)) {
+        dir.create(value, recursive = TRUE)
+        cat("Created directory:", value, "\n")
+      }
+    }
+  }
+}
+# Call with the result list from process_input()
+create_directories(result)
+
+
+$$$$ Rasterize shapefile
 
 shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     read_shp <- st_read(input_shp, crs = crs)
@@ -72,5 +94,4 @@ shp_to_raster <- function(input_shp, crs, value_field, out_raster_name) {
     # Can store min/max cell values (per format) with "setStatistics = TRUE"
     return(rasterized_shp)
 }
-
 rasterized_shp <- shp_to_raster(input_shp, crs, value_field, out_raster_name)
