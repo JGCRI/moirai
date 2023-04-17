@@ -14,7 +14,7 @@
 2001							# in_year_lr_usd: the US dollar value year for the input land rent data
 
 # year to write output land use/cover rasters (outputs only if year is processed)
-2000							# lulc_out_year set this to invalid year (e.g., 0) for no output 
+2000							# lulc_out_year: set this to invalid year (e.g., 0) for no output 
 
 # file paths; must include final "/"
 ./indata/	                                        # inpath: path to input data files
