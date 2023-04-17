@@ -14,7 +14,7 @@
 2001		# in_year_lr_usd: the US dollar value year for the input land rent data
 
 # year to write output land use/cover rasters (outputs only if year is processed)
-2015		# set this to invalid year (e.g., 0) for no output
+2015		# lulc_out_year: set this to invalid year (e.g., 0) for no output
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
@@ -50,17 +50,17 @@ soil_carbon_max_95pct.bil                 #soil_carbon_max_fname: maximum carbon
 soil_carbon_q1_95pct.bil                  #soil_carbon_q1_fname: q1 carbon state
 soil_carbon_q3_95pct.bil                  #soil_carbon_q3_fname: q3 carbon state
 veg_carbon_wavg.bil                 # veg_carbon_wavg_fname: weighted average vegetation carbon state
-veg_carbon_min.bil                 #veg_carbon_min_fname: minimum vegetation carbon state
-veg_carbon_median.bil              #veg_carbon_median_fname: median vegetation carbon state
-veg_carbon_max.bil                 #veg_carbon_max_fname: maximum vegetation carbon state
-veg_carbon_q1.bil                  #veg_carbon_q1_fname: q1 vegetation carbon state
-veg_carbon_q3.bil                  #veg_carbon_q3_fname: q3 vegetation carbon state
+veg_carbon_min.bil                 # veg_carbon_min_fname: minimum vegetation carbon state
+veg_carbon_median.bil              # veg_carbon_median_fname: median vegetation carbon state
+veg_carbon_max.bil                 # veg_carbon_max_fname: maximum vegetation carbon state
+veg_carbon_q1.bil                  # veg_carbon_q1_fname: q1 vegetation carbon state
+veg_carbon_q3.bil                  # veg_carbon_q3_fname: q3 vegetation carbon state
 veg_BG_carbon_weighted_average.bil        #veg_BG_wavg_fname: weighted average below ground biomass
-veg_BG_carbon_median.bil           #veg_BG_median_fname: weighted average below ground biomass
-veg_BG_carbon_min.bil              #veg_BG_min_fname: minimum below ground biomass
-veg_BG_carbon_max.bil              #veg_BG_max_fname: max below ground biomass
+veg_BG_carbon_median.bil           # veg_BG_median_fname: weighted average below ground biomass
+veg_BG_carbon_min.bil              # veg_BG_min_fname: minimum below ground biomass
+veg_BG_carbon_max.bil              # veg_BG_max_fname: max below ground biomass
 veg_BG_carbon_q1.bil                      #veg_BG_q1_fname: q1 below ground biomass
-veg_BG_carbon_q3.bil               #veg_BG_q3_fname: q3 below ground biomass
+veg_BG_carbon_q3.bil               # veg_BG_q3_fname: q3 below ground biomass
 
 # input csv file names (without path)
 GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
