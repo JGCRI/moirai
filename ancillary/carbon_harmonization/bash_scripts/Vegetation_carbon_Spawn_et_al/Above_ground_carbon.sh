@@ -1,5 +1,5 @@
 #First cut the data to fit ESA resolution 
-gdalwarp -ts 129588 52198 -r average belowground_biomass_carbon_2010.tif ag_carbon_clipped.tif -ot Int16 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9977320 -61.0048800 179.997320 84.0011640 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
+gdalwarp -ts 129588 52198 -r average aboveground_biomass_carbon_2010.tif ag_carbon_clipped.tif -ot Int16 -t_srs "+proj=longlat +ellps=WGS84" -te -179.9977320 -61.0048800 179.997320 84.0011640 -dstnodata 0 -co TILED=YES -co COMPRESS=DEFLATE -co BIGTIFF=YES
 
 
 ##Unknown_Herb
