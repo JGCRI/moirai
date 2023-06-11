@@ -1,24 +1,22 @@
 # Carbon data implementation and harmonization for  `moirai`  
 
 ## Description:
-This folder contains a number of scripts which are used to generate 36 raster files (12 for soil carbon, 12 for above ground carbon, 12 for below ground carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land cover classes from the ESA/IGBP land classes.    
+This folder contains a number of scripts which are used to generate 36 raster files (12 for soil carbon, 12 for above ground carbon, 12 for below ground carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land use and land cover classes from the ESA/IGBP land classes.    
 
 ## Input carbon rasters (and the shell scripts used to generate them)
-1230 raster (.bil) files containing carbon by state and ESA/IGBP land class at a 5 arcmin resolution. These are generated using the bash scripts in the folder `bash_scripts`. To run the bash scripts, the user would need following,
+396 raster (.bil) files containing carbon by state and ESA/IGBP land class at a 5 arcmin resolution. These are generated using the bash scripts in the folder `bash_scripts`. To run the bash scripts, the user would need following,
 
 * The ESA land cover data (300 m resolution) that is available at https://www.esa-landcover-cci.org/?q=node/164
 
-
 * The IGBP land cover data (1 km resolution) that is available at https://climatedataguide.ucar.edu/climate-data/ceres-igbp-land-classification
 
-* Soil carbon density data (250 m resolution) that is available at https://data.isric.org/geonetwork/srv/eng/catalog.search#/metadata/ea80098c-bb18-44d8-84dc-a8a1fbadc061
-
+* Soil carbon density data (~250 m resolution) that is available at https://data.isric.org/geonetwork/srv/eng/catalog.search#/metadata/ea80098c-bb18-44d8-84dc-a8a1fbadc061
 
 * FAO Soil carbon density data (1km resolution) that is available at https://daac.ornl.gov/SOILS/guides/HWSD.html
 
-* Above and below ground vegetation carbon data from Spawn et al. that is available at https://www.nature.com/articles/s41597-020-0444-4
+* Above and below ground vegetation carbon data from Spawn et al (~300m). that is available at https://www.nature.com/articles/s41597-020-0444-4
 
-Note that the user should run the above ground script (`Generate_vegetation_rasters.sh`) first since this script will generate land cover files that are used by the other four scripts.The total run time of the four scripts is 10 hours (2.5 hours per script). 
+Note that the user should run the above ground script (`Stage1_Pre_Process_Generate_LC.sh`) first since this script will generate land cover files that are used by the other four scripts.The total run time of the four scripts is 10 hours (2.5 hours per script). 
 
 For the sake of convenience the final output files from the above are made available as a zip file (`Carbon_rasters.zip` for the moirai default and `FAO_carbon_rasters.zip` for the HWSD inputs. These are described in detail below.)
 
@@ -35,9 +33,12 @@ These are the files in the folder `input_files`
 * (8) `refveg_carbon_thematic.bil`: Land cover classes from moirai in the reference carbon year (currently set to 2010). This file is also copied from the base outputs of moirai.
 * (9)  `refveg_area_carbon_2000.bil`: Carbon area for the reference year (2000) set in `moirai.h`. Currently set to 2010. This file is copied from the base outputs of moirai. (Only used when using FAO HWSD data )
 * (10) `refveg_carbon_thematic_2000.bil`: Land cover classes from moirai in the reference year  (2000). This file is also copied from the base outputs of moirai.(Only used when using FAO HWSD data )
+* (11) Land use classes from moirai in the reference year  (2000 & 2010). These are .bil files corresponding to land use types (cropland, pasture & urbanland). 
 
 ## Main harmonization script
-`moirai_carbon_harmonization.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). 
+`moirai_carbon_harmonization_Land_cover.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each unmanaged land type. Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). 
+
+`moirai_managedland_carbon_harmonization_LandUse.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each managed land type. Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). 
 
 `moirai_carbon_harmonization_FAO.R` which performs the harmonization for soil carbon  for 6 states (weighted_average, min, max, q1, q3, median). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). This script is specifically used only when using the FAO HWSD soil carbon data.
 
@@ -79,22 +80,25 @@ The figure below describes the harmonization process from start to finish.We beg
 As a part of the final harmonization we also use a nearest neighbor interpolation to increase coverage. The current nearest neighbor interpolation is based on 10 nearest neighbors within the same land class. The table below shows the results of NODATA cells remaining by land class after interpolation (both for vegetation and soil). As indicated by the table, even after the interpolation no data is found for the Polar desert and rock ice and Tundra land types.   
 
 
-| LC type                                     | Total cells | Vegetation carbon Percentage unfound (NO DATA cells after interpolation) | Soil carbon Percentage unfound (NO DATA cells after interpolation) |
-|---------------------------------------------|-------------|--------------------------------------------------------------------------|--------------------------------------------------------------------|
-| Polardesert/rock/ice                        | 132021      | 100.0                                                                    | 100.0                                                              |
-| Tundra                                      | 25000      | 29.02                                                                   | 24.89                                                               |
-| OpenShrubland                               | 274296      | 16.0                                                                     | 16.0                                                               |
-| BorealDeciduousForest/Woodland              | 65824       | 0.0                                                                      | 0.4                                                                |
-| Grassland/Steppe                            | 498404      | 15.0                                                                     | 14.6                                                               |
-| Desert                                      | 195579      | 1.0                                                                      | 1.1                                                                |
-| BorealEvergreenForest/Woodland              | 148756      | 0.0                                                                      | 0.0                                                                |
-| Savanna                                     | 173776      | 8.0                                                                      | 7.6                                                                |
-| TemperateNeedleleafEvergreenForest/Woodland | 71600       | 1.0                                                                      | 0.5                                                                |
-| TemperateDeciduousForest/Woodland           | 86922       | 1.0                                                                      | 1.1                                                                |
-| DenseShrubland                              | 78065       | 10.0                                                                     | 9.5                                                                |
-| TropicalEvergreenForest/Woodland            | 190780      | 0.0                                                                      | 0.3                                                                |
-| TemperateBroadleafEvergreenForest/Woodland  | 14395       | 0.0                                                                      | 0.3                                                                |
-| TropicalDeciduousForest/Woodland            | 56377       | 1.0                                                                      | 1.4                                                                |
+*Land type**                               | **Total 5arcmin grid cells** | **Vegetation carbon Percentage unfound (NO DATA cells after interpolation)** | **Soil carbon Percentage unfound (NO DATA cells after interpolation)** |
+| ------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Pasture                                     | 1195396                      | 2.3                                                                          | 2.3                                                                    |
+| Cropland                                    | 952850                       | 17.0                                                                         | 17.0                                                                   |
+| Grassland/Steppe                            | 498404                       | 15.0                                                                         | 14.6                                                                   |
+| OpenShrubland                               | 274296                       | 16.0                                                                         | 16.0                                                                   |
+| Desert                                      | 195579                       | 1.0                                                                          | 1.1                                                                    |
+| TropicalEvergreenForest/Woodland            | 190780                       | 0.0                                                                          | 0.3                                                                    |
+| Savanna                                     | 173776                       | 8.0                                                                          | 7.6                                                                    |
+| BorealEvergreenForest/Woodland              | 148756                       | 0.0                                                                          | 0.0                                                                    |
+| Polardesert/rock/ice                        | 132021                       | 29.0                                                                         | 24.9                                                                   |
+| Urban                                       | 119597                       | 22.3                                                                         | 22.3                                                                   |
+| TemperateDeciduousForest/Woodland           | 86922                        | 1.0                                                                          | 1.1                                                                    |
+| DenseShrubland                              | 78065                        | 10.0                                                                         | 9.5                                                                    |
+| TemperateNeedleleafEvergreenForest/Woodland | 71600                        | 1.0                                                                          | 0.5                                                                    |
+| BorealDeciduousForest/Woodland              | 65824                        | 0.0                                                                          | 0.4                                                                    |
+| TropicalDeciduousForest/Woodland            | 56377                        | 1.0                                                                          | 1.4                                                                    |
+| Tundra                                      | 25000                        | 29.0                                                                         | 24.9                                                                   |
+| TemperateBroadleafEvergreenForest/Woodland  | 14395                        | 0.0                                                                          | 0.3                                                                    |
 
 ## Summary of Outputs
 
