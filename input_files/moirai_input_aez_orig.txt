@@ -5,7 +5,7 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-0			# diagnostics: 0 = no, 1 = yes
+1			# diagnostics: 0 = no, 1 = yes
 
 # data years for recalibration
 0			# out_year_prod_ha_lr: output year for crop production, harvest area, and land rent
@@ -42,25 +42,79 @@ L4_processed.bil            # L4_fname: suitability pixels (fraction)
 All_IUCN_processed.bil      # ALL_IUCN_fname: all protected pixels (fraction)
 1a_1b_2_processed.bil       # IUCN_1a_1b_2_fname: high level protected pixels (fraction)
 Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
-Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
-soil_carbon_weighted_average_95pct.bil    # soil_carbon_wavg_fname: weighted average carbon state
-soil_carbon_min_95pct.bil                 #soil_carbon_min_fname: minimum carbon state
-soil_carbon_median_95pct.bil              #soil_carbon_median_fname: median carbon state
-soil_carbon_max_95pct.bil                 #soil_carbon_max_fname: maximum carbon state
-soil_carbon_q1_95pct.bil                  #soil_carbon_q1_fname: q1 carbon state
-soil_carbon_q3_95pct.bil                  #soil_carbon_q3_fname: q3 carbon state
-veg_carbon_wavg.bil                 # veg_carbon_wavg_fname: weighted average vegetation carbon state
-veg_carbon_min.bil                 #veg_carbon_min_fname: minimum vegetation carbon state
-veg_carbon_median.bil              #veg_carbon_median_fname: median vegetation carbon state
-veg_carbon_max.bil                 #veg_carbon_max_fname: maximum vegetation carbon state
-veg_carbon_q1.bil                  #veg_carbon_q1_fname: q1 vegetation carbon state
-veg_carbon_q3.bil                  #veg_carbon_q3_fname: q3 vegetation carbon state
-veg_BG_carbon_weighted_average.bil        #veg_BG_wavg_fname: weighted average below ground biomass
-veg_BG_carbon_median.bil           #veg_BG_median_fname: weighted average below ground biomass
-veg_BG_carbon_min.bil              #veg_BG_min_fname: minimum below ground biomass
-veg_BG_carbon_max.bil              #veg_BG_max_fname: max below ground biomass
-veg_BG_carbon_q1.bil                      #veg_BG_q1_fname: q1 below ground biomass
-veg_BG_carbon_q3.bil               #veg_BG_q3_fname: q3 below ground biomass
+Cropland2000_5min.nc         # cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
+soil_carbon_weighted_average.envi     # soil_carbon_wavg_fname: weighted average carbon state
+soil_carbon_min.envi                 #soil_carbon_min_fname: minimum carbon state
+soil_carbon_median.envi              #soil_carbon_median_fname: median carbon state
+soil_carbon_max.envi                 #soil_carbon_max_fname: maximum carbon state
+soil_carbon_q1.envi                  #soil_carbon_q1_fname: q1 carbon state
+soil_carbon_q3.envi                  #soil_carbon_q3_fname: q3 carbon state
+AG_carbon_weighted_average.envi                 # veg_carbon_wavg_fname: weighted average vegetation carbon state
+AG_carbon_min.envi                 #veg_carbon_min_fname: minimum vegetation carbon state
+AG_carbon_median.envi              #veg_carbon_median_fname: median vegetation carbon state
+AG_carbon_max.envi                 #veg_carbon_max_fname: maximum vegetation carbon state
+AG_carbon_q1.envi                  #veg_carbon_q1_fname: q1 vegetation carbon state
+AG_carbon_q3.envi                  #veg_carbon_q3_fname: q3 vegetation carbon state
+BG_carbon_weighted_average.envi        #veg_BG_wavg_fname: weighted average below ground biomass
+BG_carbon_median.envi           #veg_BG_median_fname: weighted average below ground biomass
+BG_carbon_min.envi              #veg_BG_min_fname: minimum below ground biomass
+BG_carbon_max.envi              #veg_BG_max_fname: max below ground biomass
+BG_carbon_q1.envi                      #veg_BG_q1_fname: q1 below ground biomass
+BG_carbon_q3.envi               #veg_BG_q3_fname: q3 below ground biomass
+soil_carbon_pasture_weighted_average.envi     # soil_carbon_pasture_wavg_fname: weighted average carbon state
+soil_carbon_pasture_min.envi                 #soil_carbon_pasture_min_fname: minimum carbon state
+soil_carbon_pasture_median.envi              #soil_carbon_pasture_median_fname: median carbon state
+soil_carbon_pasture_max.envi                 #soil_carbon_pasture_max_fname: maximum carbon state
+soil_carbon_pasture_q1.envi                  #soil_carbon_pasture_q1_fname: q1 carbon state
+soil_carbon_pasture_q3.envi                  #soil_carbon_pasture_q3_fname: q3 carbon state
+AG_carbon_pasture_weighted_average.envi                 # veg_carbon_pasture_wavg_fname: weighted average vegetation carbon state
+AG_carbon_pasture_min.envi                 #veg_carbon_pasture_min_fname: minimum vegetation carbon state
+AG_carbon_pasture_median.envi              #veg_carbon_pasture_median_fname: median vegetation carbon state
+AG_carbon_pasture_max.envi                 #veg_carbon_pasture_max_fname: maximum vegetation carbon state
+AG_carbon_pasture_q1.envi                  #veg_carbon_pasture_q1_fname: q1 vegetation carbon state
+AG_carbon_pasture_q3.envi                  #veg_carbon_pasture_q3_fname: q3 vegetation carbon state
+BG_carbon_pasture_weighted_average.envi        #veg_BG_pasture_wavg_fname: weighted average below ground biomass
+BG_carbon_pasture_median.envi           #veg_BG_pasture_median_fname: weighted average below ground biomass
+BG_carbon_pasture_min.envi              #veg_BG_pasture_min_fname: minimum below ground biomass
+BG_carbon_pasture_max.envi              #veg_BG_pasture_max_fname: max below ground biomass
+BG_carbon_pasture_q1.envi                      #veg_BG_pasture_q1_fname: q1 below ground biomass
+BG_carbon_pasture_q3.envi               #veg_BG_pasture_q3_fname: q3 below ground biomass
+soil_carbon_crop_weighted_average.envi     # soil_carbon_crop_wavg_fname: weighted average carbon state
+soil_carbon_crop_min.envi                 #soil_carbon_crop_min_fname: minimum carbon state
+soil_carbon_crop_median.envi              #soil_carbon_crop_median_fname: median carbon state
+soil_carbon_crop_max.envi                 #soil_carbon_crop_max_fname: maximum carbon state
+soil_carbon_crop_q1.envi                  #soil_carbon_crop_q1_fname: q1 carbon state
+soil_carbon_crop_q3.envi                  #soil_carbon_crop_q3_fname: q3 carbon state
+AG_carbon_crop_weighted_average.envi                 # veg_carbon_crop_wavg_fname: weighted average vegetation carbon state
+AG_carbon_crop_min.envi                 #veg_carbon_crop_min_fname: minimum vegetation carbon state
+AG_carbon_crop_median.envi              #veg_carbon_crop_median_fname: median vegetation carbon state
+AG_carbon_crop_max.envi                 #veg_carbon_crop_max_fname: maximum vegetation carbon state
+AG_carbon_crop_q1.envi                  #veg_carbon_crop_q1_fname: q1 vegetation carbon state
+AG_carbon_crop_q3.envi                  #veg_carbon_crop_q3_fname: q3 vegetation carbon state
+BG_carbon_crop_weighted_average.envi        #veg_BG_crop_wavg_fname: weighted average below ground biomass
+BG_carbon_crop_median.envi           #veg_BG_crop_median_fname: weighted average below ground biomass
+BG_carbon_crop_min.envi              #veg_BG_crop_min_fname: minimum below ground biomass
+BG_carbon_crop_max.envi              #veg_BG_crop_max_fname: max below ground biomass
+BG_carbon_crop_q1.envi                      #veg_BG_crop_q1_fname: q1 below ground biomass
+BG_carbon_crop_q3.envi               #veg_BG_crop_q3_fname: q3 below ground biomass
+soil_carbon_urban_weighted_average.envi     # soil_carbon_urban_wavg_fname: weighted average carbon state
+soil_carbon_urban_min.envi                 #soil_carbon_urban_min_fname: minimum carbon state
+soil_carbon_urban_median.envi              #soil_carbon_urban_median_fname: median carbon state
+soil_carbon_urban_max.envi                 #soil_carbon_urban_max_fname: maximum carbon state
+soil_carbon_urban_q1.envi                  #soil_carbon_urban_q1_fname: q1 carbon state
+soil_carbon_urban_q3.envi                  #soil_carbon_urban_q3_fname: q3 carbon state
+AG_carbon_urban_weighted_average.envi                 # veg_carbon_urban_wavg_fname: weighted average vegetation carbon state
+AG_carbon_urban_min.envi                 #veg_carbon_urban_min_fname: minimum vegetation carbon state
+AG_carbon_urban_median.envi              #veg_carbon_urban_median_fname: median vegetation carbon state
+AG_carbon_urban_max.envi                 #veg_carbon_urban_max_fname: maximum vegetation carbon state
+AG_carbon_urban_q1.envi                  #veg_carbon_urban_q1_fname: q1 vegetation carbon state
+AG_carbon_urban_q3.envi                  #veg_carbon_urban_q3_fname: q3 vegetation carbon state
+BG_carbon_urban_weighted_average.envi       #veg_BG_urban_wavg_fname: weighted average below ground biomass
+BG_carbon_urban_median.envi           #veg_BG_urban_median_fname: weighted average below ground biomass
+BG_carbon_urban_min.envi              #veg_BG_urban_min_fname: minimum below ground biomass
+BG_carbon_urban_max.envi              #veg_BG_urban_max_fname: max below ground biomass
+BG_carbon_urban_q1.envi                      #veg_BG_urban_q1_fname: q1 below ground biomass
+BG_carbon_urban_q3.envi               #veg_BG_urban_q3_fname: q3 below ground biomass
 
 # input csv file names (without path)
 GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
