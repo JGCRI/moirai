@@ -190,7 +190,10 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->wf_fname, '\0', MAXCHAR);
     memset(in_args->iso_map_fname, '\0', MAXCHAR);
     memset(in_args->lt_map_fname, '\0', MAXCHAR);
-	
+	// carbon enabled
+	in_args->carbon_enabled = 0;
+
+
 	// number of land cells
 	num_land_cells_aez_new = 0;			// the actual number of land cell indices in land_cells_aez_new[]
 	num_land_cells_sage = 0;			// the actual number of land cell indices in land_cells_sage[]

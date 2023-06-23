@@ -62,6 +62,7 @@
 #include <ctype.h>
 #include <netcdf.h>
 
+
 #define CODENAME				"moirai"				// name of the compiled program
 #define VERSION         		"3.1"           			// current version
 #define MAXCHAR					1000						// maximum string length
@@ -78,7 +79,8 @@
 
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
-#define NUM_IN_ARGS						130					// number of input variables in the input file
+//map 2023-01-19 update input arguments to include carbon boolean
+#define NUM_IN_ARGS						131					// number of input variables in the input file
 #define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -164,6 +166,7 @@
 #define ERROR_MEM				5							// error associated with failed memory allocation
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
+// #define ERROR_CARBON			8							// error associated with carbon enabler
 
 
 // variables for number of records based on input files
@@ -182,6 +185,9 @@ int NUM_LULC_TYPES;						// number of input lulc types
 int NUM_LU_CELLS;		// the number of lu working grid cells within a coarser res lulc cell
 float **rand_order;		// the array to store the within-coarse-cell-index of the lu cell, or each lulc cell
 float *****refveg_carbon_out;		// the potveg carbon out table;4th dim is the state of carbon; 5th dim is the two carbon density values and the area
+
+
+
 // useful utility variables
 char systime[MAXCHAR];					// array to store current time
 FILE *fplog;							// file pointer to log file for runtime output
@@ -652,11 +658,19 @@ typedef struct {
     char wf_fname[MAXCHAR];                 // file name for water footprint output
     char iso_map_fname[MAXCHAR];            // file name for mapping the raaster fao country codes to iso
     char lt_map_fname[MAXCHAR];             // file name for mapping the land type category codes to descriptions
+
+	
+	//carbon enabled 1 or disabled 0 
+	int carbon_enabled;
 } args_struct;
 
 // function declarations
+// read carbon_enabled from input file
+int run_carbon(args_struct in_args);
+
 
 // read raster file functions
+
 int get_cell_area(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_sage(args_struct in_args, rinfo_struct *raster_info);
 int read_land_area_hyde(args_struct in_args, rinfo_struct *raster_info);
@@ -695,6 +709,8 @@ int read_yield_fao(args_struct in_args);
 int read_harvestarea_fao(args_struct in_args);
 int read_prodprice_fao(args_struct in_args);
 int read_water_footprint(char *fname, float *wf_grid);
+
+
 
 
 // raster processing functions
