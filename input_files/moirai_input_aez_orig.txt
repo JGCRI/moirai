@@ -5,7 +5,8 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-1			# diagnostics: 0 = no, 1 = yes
+0			# diagnostics: 0 = no, 1 = yes
+1        # carbon outputs: 0 = no, 1 = yes
 
 # data years for recalibration
 0			# out_year_prod_ha_lr: output year for crop production, harvest area, and land rent
@@ -147,6 +148,3 @@ Ref_veg_carbon_Mg_per_ha.csv    # refveg_carbon_fname: file name for reference v
 Water_footprint_m3.csv          # wf_fname: file name for water footprint output
 MOIRAI_ctry_GLU.csv             # iso_map_fname: maps the raaster fao country codes to iso
 MOIRAI_land_types.csv           # lt_map_fname: maps the land type category codes to descriptions
-
-# Enable carbon processing
-0		                            #Set to 1 to process carbon by land type in moirai. Setting to zero only produces land accounts.

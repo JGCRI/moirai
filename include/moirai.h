@@ -64,7 +64,7 @@
 
 
 #define CODENAME				"moirai"				// name of the compiled program
-#define VERSION         		"3.1"           			// current version
+#define VERSION         		"3.2"           			// current version
 #define MAXCHAR					1000						// maximum string length
 #define MAXRECSIZE				10000						// maximum record (csv line) length in characters
 
@@ -166,7 +166,6 @@
 #define ERROR_MEM				5							// error associated with failed memory allocation
 #define ERROR_IND				6							// error associated with failed index finding
 #define ERROR_COPY				7							// error associated with failed copy of output file
-// #define ERROR_CARBON			8							// error associated with carbon enabler
 
 
 // variables for number of records based on input files
@@ -665,9 +664,6 @@ typedef struct {
 } args_struct;
 
 // function declarations
-// read carbon_enabled from input file
-int run_carbon(args_struct in_args);
-
 
 // read raster file functions
 

@@ -6,6 +6,7 @@
 
 # flags
 0							# diagnostics: 0 = no, 1 = yes
+1                    # carbon outputs: 0 = no, 1 = yes
 
 # data years for recalibration
 0							# out_year_prod_ha_lr: output year for crop production, harvest area, and land rent
@@ -18,14 +19,14 @@
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./outputs/basins235_managed_carbon/                			# outpath: path to output files
+./example_outputs/basins235/                			# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./outputs/basins235_managed_carbon/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
-./outputs/basins235_managed_carbon/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
+./example_outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
+./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          			# cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
@@ -147,6 +148,3 @@ Ref_veg_carbon_Mg_per_ha.csv    		# refveg_carbon_fname: file name for reference
 Water_footprint_m3.csv          		# wf_fname: file name for water footprint output
 MOIRAI_ctry_GLU.csv             		# iso_map_fname: maps the raaster fao country codes to iso
 MOIRAI_land_types.csv           		# lt_map_fname: maps the land type category codes to descriptions
-
-# Enable carbon processing
-0		                                #Set to 1 to process carbon by land type in moirai. Setting to zero only produces land accounts.				

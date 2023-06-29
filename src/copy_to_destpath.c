@@ -11,9 +11,7 @@
  
  NOTE: this call automatically overwrites any file of the same name
  
- there are currently 9, and there will be one more
- 
- to do: add the water footprint file
+ there are currently 10
  
  arguments:
  args_struct in_args: the input file argument

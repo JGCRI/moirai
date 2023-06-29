@@ -49,7 +49,9 @@
 int init_moirai(args_struct *in_args) {
     
 	// input argument structure
+   // flags
 	in_args->diagnostics = 0;
+   in_args->carbon_enabled = 0;
 	// data years for calibration
 	in_args->out_year_prod_ha_lr = 0;
 	in_args->in_year_sage_crops = 0;
@@ -190,8 +192,7 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->wf_fname, '\0', MAXCHAR);
     memset(in_args->iso_map_fname, '\0', MAXCHAR);
     memset(in_args->lt_map_fname, '\0', MAXCHAR);
-	// carbon enabled
-	in_args->carbon_enabled = 0;
+
 
 
 	// number of land cells

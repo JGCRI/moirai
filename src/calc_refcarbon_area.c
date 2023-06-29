@@ -89,7 +89,7 @@ int calc_refcarbon_area(args_struct in_args, rinfo_struct raster_info) {
 	int ncells_lulc = raster_info.lulc_input_ncells;	// number of lulc input cells
 	
 	// used to determine working grid cell indices
-	int temp_int;			// for setting the random order
+	//int temp_int;			// for setting the random order
 	int num_split = 0;		// number of working grid cells in one dimension of one lulc cell
 	int grid_y_ul;				// row for ul corner working grid cell in lulc cell
 	int grid_x_ul;				// col for ul corner working grid cell in lulc cell
