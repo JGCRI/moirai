@@ -1,7 +1,7 @@
 # Carbon data implementation and harmonization for  `moirai`  
 
 ## Description:
-This folder contains a number of scripts which are used to generate 36 raster files (12 for soil carbon, 12 for above ground carbon, 12 for below ground carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land use and land cover classes from the ESA/IGBP land classes.    
+This folder contains a number of scripts which are used to generate 36 raster files (4 land types x 6 statistical states X 3 pools of carbon) that are used by `moirai`. The outputs are rasters where the carbon corresponding to individual land classes are harmonized to moirai's land use and land cover classes from the ESA/IGBP land classes.    
 
 ## Input carbon rasters (and the shell scripts used to generate them)
 396 raster (.bil) files containing carbon by state and ESA/IGBP land class at a 5 arcmin resolution. These are generated using the bash scripts in the folder `bash_scripts`. To run the bash scripts, the user would need following,
@@ -33,7 +33,10 @@ These are the files in the folder `input_files`
 * (8) `refveg_carbon_thematic.bil`: Land cover classes from moirai in the reference carbon year (currently set to 2010). This file is also copied from the base outputs of moirai.
 * (9)  `refveg_area_carbon_2000.bil`: Carbon area for the reference year (2000) set in `moirai.h`. Currently set to 2010. This file is copied from the base outputs of moirai. (Only used when using FAO HWSD data )
 * (10) `refveg_carbon_thematic_2000.bil`: Land cover classes from moirai in the reference year  (2000). This file is also copied from the base outputs of moirai.(Only used when using FAO HWSD data )
-* (11) Land use classes from moirai in the reference year  (2000 & 2010). These are .bil files corresponding to land use types (cropland, pasture & urbanland). 
+* (11) `crop_area_carbon.bil`: Carbon area for crop carbon for a reference year
+* (12) `pasture_area_carbon.bil`: Carbon area for pasture carbon for a reference year
+* (13) `urban_area_carbon.bil`: Carbon area for carbon in urban lands for a reference year
+* (14) Land use classes from moirai in the reference year  (2000 & 2010). These are .bil files corresponding to land use types (cropland, pasture & urbanland). 
 
 ## Main harmonization script
 `moirai_carbon_harmonization_Land_cover.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each unmanaged land type. Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). 
@@ -50,9 +53,9 @@ The table below explains the availability of data from different sources and the
 
 
 ## Outputs
-18 raster files (.envi) are saved to the outputs folder. These are directly accessed by the LDS. The naming convention of the files is as follows,
+36 raster files (.envi) are saved to the outputs folder. These are directly accessed by the LDS. The naming convention of the files is as follows,
 
-`<carbon_type>`_carbon_`<state>`.envi
+`<land use type>_<carbon pool>`_carbon_`<state>`.envi
 
 ## Common questions related to inputs and outputs
 
@@ -66,7 +69,7 @@ There are 18 separate files generated for the FAO dataset.
 
 ### Do the carbon outputs represent managed land or unmanaged land or both ?
 
-Currently the carbon outputs only represent carbon densities for unmanaged/undisturbed land. We are working on extending our approach to managed land types (Cropland, Pastures, Urbanland). Eventually, our outputs will include both carbon densities for managed and unmanaged land. 
+Carbon densities are produced for unmanaged land types and 3 types of management, namely cropland, pasture and urban land.
 
 ## Description of harmonization process
 
@@ -105,17 +108,6 @@ As a part of the final harmonization we also use a nearest neighbor interpolatio
 With the above, We now have results for soil and vegetation carbon that are harmonized with respect to the moirai land classes. The map below shows the global soil carbon in MgC/ha by 5arcmin grid cells differentiated by moirai LC type. 
 
 ![Figure 2: Moirai soil carbon by land type for 5 arcmin grid cells using the q3 state](examples/Carbon_values_by_moirai_land_typesoilq3.png)
-
-Similarly for the different states, the table below shows the total global soil and vegetation carbon in petagrams,
-
-| State            | Soil (0-30 cms) | Soil (30-100 cms) | Above ground vegetation | Below ground vegetation | Total |
-| ---------------- | --------------- | ----------------- | ----------------------- | ----------------------- | ----- |
-| Weighted Average | 840             | 773               | 215                     | 79                      | 1907  |
-| Median           | 842             | 859               | 211                     | 76                      | 1988  |
-| Minimum          | 700             | 842               | 2                       | 1                       | 1545  |
-| Maximum          | 3202            | 6698              | 691                     | 436                     | 11027 |
-| Q1               | 665             | 473               | 136                     | 49                      | 1323  |
-| Q3               | 1124            | 1448              | 297                     | 117                     | 2986  |
 
 ## Citations for raw data
 We also include citations for the data from the FAO Harmonized World Soil Database. However, we have not yet performed the harmonization process for the same.
