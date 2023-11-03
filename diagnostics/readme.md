@@ -1,4 +1,6 @@
-# Diagnostics and exploration functions for  `moirai`  
+0...3.
+
+000# Diagnostics and exploration functions for  `moirai`  
 
 # Description:
 This folder contains a number of diagnostics scripts and functions that can be used to verify, analyze and explore the outputs of the `moirai` LDS. It is recommended to set the R working directory to this diagnostics folder as the default paths assume that this is the case. It is also recommended to change the diagnostic output directory names in the scripts/functions to uniquely identify the Moirai outputs being diagnosed. There are 4 types of diagnostics and exploration outputs that can be currently generated from moirai:
@@ -108,56 +110,70 @@ Figure 4: Geomteric area vs terrain area at the basin level
 
 ## Introduction
 
-Moirai produces results on soil carbon (for a depth of 0-30 cm) and vegetation carbon (above and below ground biomass) by country iso, basin, and land type (HYDE and SAGE).
+Moirai outputs 6 carbon states for each of soil carbon (depth of 0-30 cm), above ground vegetation carbon, and below ground vegetation carbon. These states are determined by country iso, water basin, and land type (managed and unmanaged). These carbon diagnostics do not split basins by country (i.e., country delineations are ignored).
 
-Carbon density values are presented for 6 states: weighted_average, median, minimum, maximum, quartile 1 and quartile 3. The user can select one of three sources for the soil carbon data (soilgrids mean, soildgrids 95th percentile, or the Harmonized World Soil Database from the FAO), and this selection should match the input data used to generate the Moirai outputs (unless a comparison across data sources is desired).    
+Carbon density output values are diagnosed for 6 states: weighted_average, median, minimum, maximum, quartile 1 and quartile 3. The user can select one of two sources for the soil carbon data (soilgrids or the Harmonized World Soil Database from the FAO); this selection is determined by the specified Moirai input arguments and the diagnostic function arguments. Note that the vegetation carbon is also dependent on the soil carbon source as the land type mapping is different for soilgrids than for FAO/HWSD.
 
-The carbon outputs are stored in the file `Ref_veg_carbon_Mg_per_ha.csv` in the outputs folder. The user can compare Moirai outputs with input data distributions by GLU/basin with the following functions in `Carbon_diagnostic_functions.R`:
+The Moirai carbon outputs are stored in the file `Ref_veg_carbon_Mg_per_ha.csv` in the outputs folder. This file contains distinct carbon data for both the managed and unmanaged land types. The land types are listed in path_to_lt_mapping file associated with the Moirai outputs (e.g., `../example_outputs/basins235/MOIRAI_land_types.csv`). The managed carbon data are reported for the HYDE Cropland, Pasture, and UrbanLand LT_HYDE types, and are determined based on the HYDE/Moirai land type distribution, and so there are not corresponding ESA carbon distributions to compare with. This is because ESA cropland and urban land do not contain values in the carbon datasets, and pasture is not an ESA category. The unmanaged carbon data are reported for the LT_SAGE land types and are determined based on the ESA-Moirai land cover mapping, so there is an option to plot corresponding ESA carbon distributions as well. Note that Moirai input distributions are based on the harmonized input carbon data, and the ESA-based distributions are based on the pre-harmonized, primary ESA land type corresponding with the specified Moirai land type (see `../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv`). Both of these distributions comprise the six state values for each relevant 5 arcmin pixel. The user can make diagnostic plots of Moirai input carbon distributions and output values by GLU/basin and land type with the following functions in `Carbon_diagnostic_functions.R`:
 
-(1) `create_carbon_plots_soil()` to explore soil carbon outputs
+Unmanaged land types with optional comparison to ESA land type distribution:
 
-(2) `create_carbon_plots_veg_carbon_above_ground()` to explore above ground vegetation carbon outputs
+(1) `compare_carbon_distribution_ESA()`
 
-(3) `create_carbon_plots_veg_carbon_below_ground()` to explore below ground vegetation carbon outputs
+Managed land types (Cropland, Pasture, UrbanLand):
+
+(2) `compare_carbon_distribution_HYDE()`
 
 ## Description of outputs
 
-These functions generate histogram plots showing the distribution of carbon data (the histogram is constructed using the input data) along with points that describe the final values of carbon for each state for the selected GLU/basin. This comparison of inputs and outputs allows the user to verify that the values for each state are reasonable for the basin. This may also be useful to users interested in comparing carbon numbers with numbers from other datasets or the literature. These functions take a few minutes each to run.
+These functions generate histogram plots showing the distribution of harmonized Moirai input carbon state data (and optionally the distribution of pre-harmonized, primary ESA land type carbon state data for unmanaged types) along with points that show the Moirai output carbon values for each state for the selected GLU/basin and land type. This diagnostic allows the user to verify that the values for each state are reasonable for the basin, based on the input data distribution. This may also be useful to users interested in comparing carbon numbers with numbers from other datasets or the literature. These functions take a few minutes each to run.
 
-Figures 5 ,6 and 7 below present plots for soil and vegetation carbon for the Missouri basin from the latest outputs of moirai.
+Figures 5 ,6 and 7 below present example plots for soil and vegetation carbon for tropical evergreen forest/woodland in the Amazon basin from recent Moirai outputs.
 
-![Figure 5: Distribution of soil carbon for the Missouri Basin](examples/Distribution_soil_c_Missouri_River_Basin.png)
-Figure 5: Distribution of soil carbon for the Missouri Basin
+![Figure 5: Distribution of soil carbon for the Missouri Basin](examples/Amazon_AG_tropical_evergreen_forest_2010.png)
+Figure 5: Distribution of above ground vegetation carbon for tropical evergreen forest/woodland in the Amazon basin
 
-![Figure 6: Distribution of above ground biomass (vegetation carbon) for the Missouri Basin](examples/Distribution_veg_c_AG_Missouri_River_Basin.png)
-Figure 6: Distribution of above ground biomass (vegetation carbon) for the Missouri Basin
+![Figure 6: Distribution of above ground biomass (vegetation carbon) for the Missouri Basin](examples/Amazon_BG_tropical_evergreen_forest_2010.png)
+Figure 6: Distribution of below ground vegetation carbon for tropical evergreen forest/woodland in the Amazon basin
 
-![Figure 7: Distribution of below ground biomass (vegetation carbon) for the Missouri Basin](examples/Distribution_veg_c_BG_Missouri_River_Basin.png)
-Figure 7: Distribution of below ground biomass (vegetation carbon) for the Missouri Basin
+![Figure 7: Distribution of below ground biomass (vegetation carbon) for the Missouri Basin](examples/Amazon_soil_tropical_evergreen_forest_2010.png)
+Figure 7: Distribution of soil carbon for tropical evergreen forest/woodland in the Amazon basin
 
 
-Note : Where basin boundaries are distributed across two or more countries, the function will aggregate the values from the countries to represent the entire basin for each state of carbon.
+Note : Where basin boundaries are distributed across two or more countries, the functions aggregate the values from the countries to represent the entire basin for each state of carbon.
+
+## Saving diagnostic carbon plots and data
+The functions are designed for exploratory analysis and generate one plot for a specific GLU/basins and land type at one time. As such, the functions show an on-screen plot and return a ggplot object, but do not automatically save the plot or the data. The user is responsible for saving the plot using ggsave() or a device function (e.g, pdf()). If the user wants to save the data behind the plot they will have to first set all of the arguments and run the code within the function interactively, and then use write.csv() to write out the desired data objects (harmonized_data_filtered, Carbon_data_csv, and optionally t).
 
 ## User specified arguments
 
-The user can change/specify the arguments to these functions, although some of the default values will be sufficient for most applications. The working directory is assumed to be `…/moirai/diagnostics`. Here is the list of input arguments and their default values:
-* fig_dir  = `carbon_plots/`; destination folder for outputs from this function
-* plot_lim = `1000`; y-axis limit for plots
-* path_to_carbon_data = `../outputs/example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv`; Moirai carbon output file with path
-* path_to_carbon_rasters = `../indata/`; folder containing source carbon rasters
-* path_to_mapping = `./glu_mapping_basin235.csv`; GLU mapping file including path; this is an output of the spatial diagnostics and the default file was generated based on `…/moirai/example_outputs/basins235/`; if diagnosing 18 AEZs use `./glu_mapping_aez18.csv`. If you have created a new GLU file you will have to run the spatial diagnostics to generate this file.
-* path_to_mapping_name = `../indata/Global235_CLM_5arcmin.csv`; GLU name file including path; for 18 AEZ moirai outputs this file is `../indata/AEZ_orig_lds.csv`. If you have created a new GLU file with new column names you will have to add a new clause to the if statements in this script that identify which GLU set is being used.
-* path_to_iso_mapping = `../indata/FAO_iso_VMAP0_ctry.csv`; country mapping file including path
-* path_to_land_data = `../outputs/example_outputs/basins235/Land_type_area_ha.csv`; Moirai land are outputs including path
-* glu_name = `Missouri_River_Basin`; the GLU to plot
-* carbon_year = `2010`; This should be changed as it represents the year of the input carbon data
-* print_raster_progress_log = `FALSE`; Flag to print a log file
+The user can change/specify the arguments to these functions, although some of the default values will be sufficient for most applications. The carbon_type, moirai_LC, and harmonized_carbon_raster_file_names arguments must match each other. The working directory is assumed to be `…/moirai/diagnostics/`. Here is the list of input arguments and their default values:
 
-For `create_carbon_plots_soil()` there is an argument to select which source data set is to be used:
-* carbon_input_src_name = "soil_grids_95pct"; the options are "soil_grids_mean," "soil_grids_95pct," and "FAO_HWS."
+Both functions, arguments that user should specify
+* carbon_type = `above ground biomass`; can also be `below ground biomass` or `soil`.
+* moirai_LC = `TropicalEvergreenForest/Woodland` or `Cropland`; available values are listed in the `../example_outputs/basins235/MOIRAI_land_types.csv` file. LT_SAGE values are for `compare_carbon_distribution_ESA()` and LT_HYDE values are for `compare_carbon_distribution_HYDE()`. "Unknown" and "Unmanaged" values will not produce results.
+* basin_for_testing = `Amazon`; available values are listed in the `Basin_name` column of `../ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv`.
+* year_of_reference = `2010`; available years are listed in the `year` column of `../example_outputs/basins235/Land_type_area_ha.csv`. Use the default value of `2010` for comparing unmanaged land outputs against ESA data because this is the nominal year that the ESA land type area represents.
+* harmonized_carbon_raster_file_names = `c("AG_carbon_q1.envi", "AG_carbon_q3.envi", "AG_carbon_median.envi", "AG_carbon_min.envi", "AG_carbon_max.envi", "AG_carbon_weighted_average.envi")` for `compare_carbon_distribution_ESA()` and `c("AG_carbon_crop_q1.envi", "AG_carbon_crop_q3.envi", "AG_carbon_crop_median.envi", "AG_carbon_crop_min.envi", "AG_carbon_crop_max.envi", "AG_carbon_crop_weighted_average.envi")` for `compare_carbon_distribution_HYDE()`; these values are the corresponding carbon input files in `../indata/`.
+* path_to_carbon_outputs = `../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv`; this should be the corresponding output file from your Moirai run.
+* path_to_land_outputs = `../example_outputs/basins235/Land_type_area_ha.csv`; this should be the corresponding output file from your Moirai run.
+* path_to_lt_mapping = `../example_outputs/basins235/MOIRAI_land_types.csv`; this should be the corresponding output file from your Moirai run.
 
-For `create_carbon_plots_veg_carbon_above_ground()` and `create_carbon_plots_veg_carbon_below_ground()` there is argument to list the carbon raster file names. The input is a vector of 6 files names (one for each carbon state) for either above ground carbon or below ground carbon.
-* carbon_raster_file_names
+Both functions, arguments that do not need to be specified
+* path_to_basin_mapping = `../ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv`; water basin identities.
+* path_to_glu_data = `../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif`; thematic file of the water basin pixel locations.
+* path_to_moirai_ref_veg_thematic = `../ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil`; thematic file of the Moirai land types for carbon locations.
+* path_to_sage_mapping = `../indata/SAGE_PVLT.csv`; list of unmanaged land type codes.
+* path_to_harmonized_rasters = `../indata/`; location of input carbon data.
+
+The `compare_carbon_distribution_ESA()` function only , argument that user should specify
+* produce_ESA_distribution = `FALSE`; set this to "TRUE" to show the ESA land type carbon distribuiton
+
+The `compare_carbon_distribution_ESA()` function only , arguments that do not need to be specified
+* path_to_ESA_rasters = `../ancillary/carbon_harmonization/Carbon_rasters`
+* path_to_moirai_ESA = `../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv`
+
+
 
 # Functions to validate/test land area outputs (`Compare_LDS_area_outputs.R`)
 

@@ -29,75 +29,55 @@ library(rgdal)
 library(reldist)
 library(ggsci)
 library(scales)
+library(tidyr)
 
-# this is just a standalone helper function
-
-get_raster_data_basin <- function(x,path_to_carbon_rasters="../indata/",
-                                  print_raster_progress_log=TRUE,
-                                  path_to_mapping = "./glu_mapping_basin235.csv",
-                                  path_to_mapping_name = "../indata/Global235_CLM_5arcmin.csv",
-                                  glu_name = "Missouri_River_Basin")
-{
-  
-  carbon_data_raw<-NULL
-  carbon_raster_name <- x
-  mapping_data_basin <- read.csv(path_to_mapping)
-  mapping_data_basin <- rename(mapping_data_basin,basin_id=glu_id)
-  mapping_names_basin <- read.csv(path_to_mapping_name)
-  
-  carbon_data_raw <- raster(paste0(path_to_carbon_rasters,carbon_raster_name))
-  carbon_data_raw <- as.data.table(rasterToPoints(carbon_data_raw))
-  
-  # need to distinguish between basin and aez input
-	if(names(mapping_names_basin)[1] == "AEZ_ID") {
-		carbon_data_raw %>% rename(value=gsub(".bil","",carbon_raster_name,)) %>%
-    		filter(value>0) %>% 
-    		inner_join(mapping_data_basin, by=c("x","y")) %>% 
-    		inner_join(mapping_names_basin %>% rename(basin_id= AEZ_ID,basin_nm= AEZ_NAME),by=c("basin_id")) %>% 
-    		filter(basin_nm==glu_name)->carbon_data_clean 
-	} else if (names(mapping_names_basin)[1] == "GCAM_ID_1") {
-		carbon_data_raw %>% rename(value=gsub(".bil","",carbon_raster_name,)) %>%
-    		filter(value>0) %>% 
-    		inner_join(mapping_data_basin, by=c("x","y")) %>% 
-    		inner_join(mapping_names_basin %>% rename(basin_id= GCAM_ID_1,basin_nm= Basin_na_1),by=c("basin_id")) %>% 
-    		filter(basin_nm==glu_name)->carbon_data_clean
-	} else {
-		stop(paste("Unrecognized set of GLU names in file:", gcam_glu_data_file))
-	}
-  
-  if(print_raster_progress_log==TRUE){
-    print(paste0("Done processing ", carbon_raster_name))
-  }
-  
-  return(carbon_data_clean)
-}
+# the working directory must be .../moirai/diagnostics/, which is where this script resides
+setwd("./")
 
 
+
+###### compare_carbon_distribution_ESA
+# this plots non-managed land type carbon values
+# the valid values here are in the LT_SAGE columen in the path_to_lt_mapping file
+#    the non-managed values exclude Cropland, Pasture, and Urban
+
+# use these arguments to specify your moirai output data:
+#    path_to_carbon_outputs
+#    path_to_land_outputs
+#    path_to_lt_mapping
+# use these arguments to specify the output basin, land type, and year:
+#    basin_for_testing
+#    moirai_LC
+#    year_of_reference - specify 2010 for the most direct comparison with ESA data
+# Make sure that these two arguments match:
+#    carbon_type
+#    moirai_LC
+#    harmonized_carbon_raster_file_names argument
+# set this argument to true to add the distribution of the ESA data:
+#    produce_ESA_distribution
 
 compare_carbon_distribution_ESA<-function(
   
   carbon_type = "above ground biomass",
-  path_to_glu_data = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
-  path_to_carbon_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-  path_to_land_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Land_type_area_ha.csv",
-  path_to_lt_mapping = "C:/Projects/moirai/moirai/example_outputs/basins235/MOIRAI_land_types.csv",
-  path_to_basin_mapping = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
-  path_to_carbon_rasters = "C:/Projects/moirai/moirai/indata/",
-  path_to_ESA_rasters = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/Carbon_rasters",
-  path_to_moirai_ESA = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv",
+  path_to_glu_data = "../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
+  path_to_carbon_outputs = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
+  path_to_land_outputs = "../example_outputs/basins235/Land_type_area_ha.csv",
+  path_to_lt_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+  path_to_basin_mapping = "../ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
+  path_to_ESA_rasters = "../ancillary/carbon_harmonization/Carbon_rasters",
+  path_to_moirai_ESA = "../ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv",
   basin_for_testing = "Amazon",
-  year_of_reference = 2016,
+  year_of_reference = 2010,
   moirai_LC = "TropicalEvergreenForest/Woodland",
-  path_to_moirai_ref_veg_thematic = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
-  path_to_sage_mapping = "C:/Projects/moirai/moirai/indata/SAGE_PVLT.csv",
+  path_to_moirai_ref_veg_thematic = "../ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
+  path_to_sage_mapping = "../indata/SAGE_PVLT.csv",
   harmonized_carbon_raster_file_names = c("AG_carbon_q1.envi",
                                           "AG_carbon_q3.envi",
                                           "AG_carbon_median.envi",
                                           "AG_carbon_min.envi",
                                           "AG_carbon_max.envi",
                                           "AG_carbon_weighted_average.envi"),
-  path_to_harmonized_rasters = "C:/Projects/moirai/moirai/indata/", 
-  plot_lim = 25000,
+  path_to_harmonized_rasters = "../indata/", 
   produce_ESA_distribution=FALSE
 ){
   #Step 1: Get the basin name
@@ -106,7 +86,7 @@ compare_carbon_distribution_ESA<-function(
   
   basin_id <- unique(basin_id$GCAM_basin_ID)
   
-  managed_types <- c("Cropland","Urban","Pasture")
+  managed_types <- c("Cropland","UrbanLand","Pasture")
   #Step 1 : Get the carbon csv data
   LT_Mapping <- read.csv(path_to_lt_mapping, skip=4,stringsAsFactors = FALSE) %>%
     mutate(LT_SAGE = if_else(LT_HYDE %in% managed_types,LT_HYDE,LT_SAGE)) %>%
@@ -136,22 +116,24 @@ compare_carbon_distribution_ESA<-function(
     gather("state","value", "weighted_average":"q3_value")
   
   #Step 2: Compile the ESA 5 arcmin data
-  carbon_type_plot <- carbon_type
   
   if(carbon_type == "above ground biomass"){
-    carbon_type <- "AG"}
+    carbon_type_tag <- "AG"}
   
   if(carbon_type == "below ground biomass"){
-    carbon_type <- "BG"}
+    carbon_type_tag <- "BG"}
   
   if(carbon_type == "soil"){
-    
+  	carbon_type_tag = "soil"
+    # this is a scaling value for the ESA data
     scaler = 10
     
   }else{
-    
+    # this is a scaling value for the harmonized vegetation data
     scaler = 0.1
   }
+  
+  if(produce_ESA_distribution){
   
   ESA_map <- read.csv(path_to_moirai_ESA, stringsAsFactors = FALSE) %>% 
     filter(sage_hyde32_name %in% c(moirai_LC))  
@@ -166,7 +148,7 @@ compare_carbon_distribution_ESA<-function(
   
   get_carbon_data<- function(name){
     print(name)
-    path <- paste0(path_to_ESA_rasters,"/",carbon_type,"/",name)  
+    path <- paste0(path_to_ESA_rasters,"/",carbon_type_tag,"/",name)  
     tmp <- as.data.frame(rasterToPoints(raster(path)))
     names(tmp)[3] <- "value"
     
@@ -179,7 +161,7 @@ compare_carbon_distribution_ESA<-function(
   
   
   
-  list.files(path= paste0(path_to_ESA_rasters,"/",carbon_type),pattern=paste0(ESA_vegetation_type,"_",carbon_type,'.*.bil'), recursive=TRUE)->l
+  list.files(path= paste0(path_to_ESA_rasters,"/",carbon_type_tag),pattern=paste0(ESA_vegetation_type,"_",carbon_type_tag,'.*.bil'), recursive=TRUE)->l
   
   
   data_list <- lapply(l, get_carbon_data)
@@ -187,6 +169,8 @@ compare_carbon_distribution_ESA<-function(
   data_list_bind <- rbindlist(data_list) %>% mutate(value=value*scaler)
   
   data_list_bind %>% inner_join(GLU_Data) ->t
+  
+  } # end if produce_ESA_distribution
   
   #Step 3: Get the harmonized carbon layer for moirai
   
@@ -224,73 +208,94 @@ compare_carbon_distribution_ESA<-function(
   
   cv <- round(sd(harmonized_data_filtered$value)/mean(harmonized_data_filtered$value),2)
   
+  # cannot use geom_text() when data is specified in ggplot(data=###) call
+  nbins=100
   if(produce_ESA_distribution){
-  g <- ggplot(data=t)+
-    geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), size = 1.2,linetype="dashed")+
-    geom_text(aes(x=max(Carbon_data_csv$value),y=plot_lim),label=paste0("CV = ",cv))+
-    geom_histogram(data= t, aes(x=t$value,fill="Distribution from ESA"),bins =100,alpha=0.1,color="black")+
-    geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Distribution from moirai"),bins =100,alpha=0.4,color="black")+
-    ggtitle(paste0(moirai_LC," ",carbon_type_plot," carbon in Mgc/ha"))+
-    xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))+
-    labs(subtitle = paste0("Basin name - ",basin_for_testing),
+  	# get the y limit
+  	ymax = max(hist(t$value, breaks=seq(min(t$value), max(t$value), by=(max(t$value)-min(t$value))/nbins), plot=FALSE)$counts)
+
+    g <- ggplot()+
+      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
+      geom_histogram(data= t, aes(x=t$value,fill="Primary ESA distribution"),bins =100,alpha=0.1,color="black")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),bins =nbins,alpha=0.4,color="black")+
+      ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
+      xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
+      labs(subtitle = paste0("Basin name - ",basin_for_testing),
          caption = "All distributions are at a 5 arcmin resolution")+
-    ylab("count of cells")+
-    geom_point(data=Carbon_data_csv, aes(x=value,y=0, color=state),size=2)+
-    scale_color_npg()
+      ylab("count of cells")+
+      geom_point(data=Carbon_data_csv, aes(x=value,y=0, color=state),size=2)+
+      scale_color_npg()+
+      annotate(geom="text", x=max(Carbon_data_csv$value)*0.8, y=ymax, label=paste0("CV of input = ",cv))
   }else{
-    g <- ggplot(data=harmonized_data_filtered)+
+  	# get the y limit
+  	ymax = max(hist(harmonized_data_filtered$value, breaks=seq(min(harmonized_data_filtered$value), max(harmonized_data_filtered$value),
+  	       by=(max(harmonized_data_filtered$value)-min(harmonized_data_filtered$value))/nbins), plot=FALSE)$counts)
+  	
+    g <- ggplot()+
       geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), size = 1.2,linetype="dashed")+
-      geom_text(aes(x=max(Carbon_data_csv$value)*1.2,y=6000),label=paste0("CV = ",cv))+
-      geom_histogram(data= t, aes(x=t$value,fill="Distribution from ESA"),bins =100,alpha=0.1,color="white",fill="transparent")+
-      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Distribution from moirai"),alpha=0.5,bins =100,color="black")+
-      ggtitle(paste0(moirai_LC," ",carbon_type_plot," carbon in Mgc/ha"))+
-      xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))+
+      #geom_histogram(data= t, aes(x=t$value,fill="Distribution from ESA"),bins =100,alpha=0.1,color="white",fill="transparent")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),alpha=0.5,bins =nbins,color="black")+
+      ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
+      xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
       labs(subtitle = paste0("Basin name - ",basin_for_testing),
            caption = "All distributions are at a 5 arcmin resolution")+
       ylab("count of cells")+
       geom_point(data=Carbon_data_csv, aes(x=value,y=0, color=state),size=2)+
       scale_color_npg()+
-      scale_fill_manual(values=c("light blue"))
+      scale_fill_manual(values=c("light blue"))+
+      annotate(geom="text", x=max(Carbon_data_csv$value)*0.8, y=ymax, label=paste0("CV of input = ",cv))
     
     
   }
   
-  
-  
-  
-  print("Completed current LT")
+  print(paste("Completed", moirai_LC))
+  print(g)
   return(g)
   
 }
 
 
+###### compare_carbon_distribution_HYDE
+# this plots managed land type (Cropland, UrbanLand, Pasture) carbon values
+# the valid values here are in the LT_SAGE columen in the path_to_lt_mapping file
+#    the managed values include Cropland, Pasture, and UrbanLand
+# ESA-based distributions are not available as the managed land is determined by moirai/hyde data rather than ESA classes
+#    the carbon data are generally not available for crop and urban land based on ESA data
+
+# use these arguments to specify your moirai output data:
+#    path_to_carbon_outputs
+#    path_to_land_outputs
+#    path_to_lt_mapping
+# use these arguments to specify the output basin, land type, and year:
+#    basin_for_testing
+#    moirai_LC
+#    year_of_reference
+# Make sure that these three arguments match:
+#    carbon_type
+#    moirai_LC
+#    harmonized_carbon_raster_file_names argument
 
 
 compare_carbon_distribution_HYDE<-function(
   
   carbon_type = "above ground biomass",
-  path_to_glu_data = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
-  path_to_carbon_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
-  path_to_land_outputs = "C:/Projects/moirai/moirai/example_outputs/basins235/Land_type_area_ha.csv",
-  path_to_lt_mapping = "C:/Projects/moirai/moirai/example_outputs/basins235/MOIRAI_land_types.csv",
-  path_to_basin_mapping = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
-  path_to_carbon_rasters = "C:/Projects/moirai/moirai/indata/",
-  path_to_ESA_rasters = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/Carbon_rasters",
-  path_to_moirai_ESA = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/ESA_moirai_classes.csv",
+  path_to_glu_data = "../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
+  path_to_carbon_outputs = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
+  path_to_land_outputs = "../example_outputs/basins235/Land_type_area_ha.csv",
+  path_to_lt_mapping = "../example_outputs/basins235/MOIRAI_land_types.csv",
+  path_to_basin_mapping = "../ancillary/carbon_harmonization/input_files/basin_to_country_mapping.csv",
   basin_for_testing = "Amazon",
-  year_of_reference = 2016,
+  year_of_reference = 2010,
   moirai_LC = "Cropland",
-  path_to_moirai_ref_veg_thematic = "C:/Projects/moirai/moirai/ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
-  path_to_sage_mapping = "C:/Projects/moirai/moirai/indata/SAGE_PVLT.csv",
+  path_to_moirai_ref_veg_thematic = "../ancillary/carbon_harmonization/input_files/refveg_carbon_thematic.bil",
+  path_to_sage_mapping = "../indata/SAGE_PVLT.csv",
   harmonized_carbon_raster_file_names = c("AG_carbon_crop_q1.envi",
                                           "AG_carbon_crop_q3.envi",
                                           "AG_carbon_crop_median.envi",
                                           "AG_carbon_crop_min.envi",
                                           "AG_carbon_crop_max.envi",
-                                          "AG_carbon_crop_average.envi"),
-  path_to_harmonized_rasters = "C:/Projects/moirai/moirai/indata/", 
-  plot_lim = 25000,
-  produce_ESA_distribution=FALSE
+                                          "AG_carbon_crop_weighted_average.envi"),
+  path_to_harmonized_rasters = "../indata/"
 ){
   #Step 1: Get the basin name
   basin_id <- read.csv(path_to_basin_mapping, skip = 7, stringsAsFactors = FALSE) %>% 
@@ -298,7 +303,7 @@ compare_carbon_distribution_HYDE<-function(
   
   basin_id <- unique(basin_id$GCAM_basin_ID)
   
-  managed_types <- c("Cropland","Urban","Pasture")
+  managed_types <- c("Cropland","UrbanLand","Pasture")
   
   #Step 1 : Get the carbon csv data
   LT_Mapping <- read.csv(path_to_lt_mapping, skip=4,stringsAsFactors = FALSE) %>%
@@ -330,42 +335,24 @@ compare_carbon_distribution_HYDE<-function(
     dplyr::select(-value) %>% 
     gather("state","value", "weighted_average":"q3_value")
   
-  #Step 2: Compile the ESA 5 arcmin data
-  carbon_type_plot <- carbon_type
+  #Step 2: set some tags
   
   if(carbon_type == "above ground biomass"){
-    carbon_type <- "AG"}
+    carbon_type_tag <- "AG"}
   
-  if(carbon_type == " below ground biomass"){
+  if(carbon_type_tag == " below ground biomass"){
     carbon_type <- "BG"}
   
   if(carbon_type == "soil"){
-    
-    scaler = 10
-    
+    carbon_type_tag = "soil"    
   }else{
-    
+    # scaling factor for the vegetation harmonized data
     scaler = 0.1
-  }
-  
-  
-  
-  get_carbon_data<- function(name){
-    path <- paste0(path_to_ESA_rasters,"/",carbon_type,"/",name)  
-    tmp <- as.data.frame(rasterToPoints(raster(path)))
-    names(tmp)[3] <- "value"
-    
-    return(tmp)
   }
   
   
   GLU_Data <- as.data.frame(rasterToPoints(raster(path_to_glu_data))) %>% 
     filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin == basin_id)
-  
-  
-  
-  
-  
   
   
   #Step 3: Get the harmonized carbon layer for moirai
@@ -381,10 +368,7 @@ compare_carbon_distribution_HYDE<-function(
   data_list_harmonized <- lapply(harmonized_carbon_raster_file_names, get_carbon_data_harmonized)
   data_harmonized <- rbindlist(data_list_harmonized)
   
-  
-  
-  
-  
+
   
   data_harmonized %>% 
     inner_join(GLU_Data, by = c("x","y")) %>% 
@@ -399,27 +383,29 @@ compare_carbon_distribution_HYDE<-function(
   
   cv <- round(sd(harmonized_data_filtered$value)/mean(harmonized_data_filtered$value),2)
   
-   
+   # cannot use geom_text() when data is specified in ggplot(data=###) call
+
+    # get the y limit
+    nbins=100
+  	ymax = max(hist(harmonized_data_filtered$value, breaks=seq(min(harmonized_data_filtered$value), max(harmonized_data_filtered$value),
+  	       by=(max(harmonized_data_filtered$value)-min(harmonized_data_filtered$value))/nbins), plot=FALSE)$counts)
+
     g <- ggplot(data=harmonized_data_filtered)+
-      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), size = 1.2,linetype="dashed")+
-      geom_text(aes(x=max(Carbon_data_csv$value)*1.2,y=6000),label=paste0("CV = ",cv))+
-      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Distribution from moirai"),alpha=0.5,bins =100,color="black")+
-      ggtitle(paste0(moirai_LC," ",carbon_type_plot," carbon in Mgc/ha"))+
-      xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6))+
+      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),alpha=0.5,bins =nbins,color="black")+
+      ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
+      xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
       labs(subtitle = paste0("Basin name - ",basin_for_testing),
            caption = "All distributions are at a 5 arcmin resolution")+
       ylab("count of cells")+
       geom_point(data=Carbon_data_csv, aes(x=value,y=0, color=state),size=2)+
       scale_color_npg()+
-      scale_fill_manual(values=c("light blue"))
+      scale_fill_manual(values=c("light blue"))+
+      annotate(geom="text", x=max(Carbon_data_csv$value)*0.8, y=ymax, label=paste0("CV of input = ",cv))
     
-    
-  
-  
-  
-  
-  
-  print("Completed current LT")
+
+  print(paste("Completed", moirai_LC))
+  print(g)
   return(g)
   
 }

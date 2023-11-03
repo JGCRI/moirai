@@ -33,14 +33,11 @@ diagnostics/.Rhistory
 *.nc4
 
 # exclude some other stuff
-ancillary/old/
+old/
 diagnostics/basins235_example_outputs_spatial_output_files/
 example_outputs/basins235/*
 example_outputs/basins235/aglu-data/
 *.stackdump
 
-ancillary/carbon_harmonization/completeness_AG_q3.csv
-ancillary/carbon_harmonization/completeness_interpolated_AG_q3.csv
-ancillary/carbon_harmonization/Global_carbon_AGq3.csv
+ancillary/carbon_harmonization/outputs/
 diagnostics/data_for_plot.csv
-ancillary/carbon_harmonization/basin_AGq3.csv

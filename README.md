@@ -4,9 +4,24 @@ Alan Di Vittorio, Lawrence Berkeley National Laboratory
 
 Kanishka Narayan, Global Change Research Institute, Pacific Northwest National laboratory
 
+Evan Margiotta, Global Change Research Institute, Pacific Northwest National laboratory
+
 ## Version: 3
 
 ## Version History
+* **Version 3.2:** ?Jan? 2024; DOI: TBD
+	* Adds distinct, spatially-explicit carbon data for managed land types (cropland, urban land, pasture)
+		* This further improves carbon density estimates
+		* The previously added carbon data applied only to the unmanaged land types
+	* Updated carbon diagnostics
+* **Version 3.1.1:** May 2022; DOI: http://doi.org/10.5281/zenodo.6632745
+	* Harmonizes carbon data for Moirai by matching land cover types between source data and Moirai
+		* This improves carbon density estimates
+	* New capacity to include deeper soil carbon (30-100cm) in addition to topsoil carbon (0-30cm)
+	  * The default is topsoil carbon only (0-30cm)
+  * Adds more detailed diagnostics for basin and global level carbon outputs
+	* Updates some data references in the documentation
+	* Note that this version maintains the same spatial configuration and data sources as version 3.1.0
 * **Version 3.1.0:** April 2021; DOI: http://doi.org/10.5281/zenodo.4973631
 	* Adds comprehensive suitable and protected area land distinctions to the land area and carbon outputs
 		* There are now 8 distinct categories (including unknown) based on new input data
@@ -143,7 +158,7 @@ The Moirai LDS also generates these files (some of which were previously stored 
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
 * **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for all land and vegetation types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for all land and vegetation types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). The managed land types (cropland, urban land, pasture) now have distinct carbon values, rather than the values of the previously converted, unmanaged land type. As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution, unless the FAO HWSD soil data are used, which is circa 2000.
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m<sup>3</sup>), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
@@ -238,8 +253,8 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **SAGE physical cropland area, circa 2000**: Physical cropland area circa 2000, as fraction of cell area (`Cropland2000_5min.nc`)
 	* These data are used to normalize the SAGE individual crop harvested area values to each grid cell
 	* Please cite these data when using Moirai: Ramankutty, N., Evan, A. T., Monfreda, C. & Foley, J. A. 2008. Farming the planet: 1. Geographic distribution of global agricultural lands in the year 2000. Global Biogeochem. Cycles, 22, GB1003.
-* **Soil carbon density (0-30 cm) rasters (24)** (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
-* **Vegetation carbon density rasters (48)**(Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
+* **Soil carbon density (0-30 cm) rasters (24)** For unmanaged land the user can select files with either soilGrids (ESA harmonization) or FAO HWSD (IGBP harmonization) source data; make sure that the soil and vegetion carbon files have matching sources. The managed land files (cropland, urban land, pasture) have only the soilGrids (ESA harmonization) source. (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
+* **Vegetation carbon density rasters (48)** For unmanaged land the user can select files with either soilGrids (ESA harmonization) or FAO HWSD (IGBP harmonization) source data; make sure that the soil and vegetion carbon files have matching sources. The managed land files (cropland, urban land, pasture) have only the soilGrids (ESA harmonization) source. (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
 
 ### CSV input data (filename without path)
 * **Original GTAP LU2.1 land rent data** (`GTAP_value_milUSD.csv`): Please cite these data when using Moirai: Lee, H.-L., Hhertel, T. W., Rose, S., Avetisyan, M. An integrated global land use data base for CGE analysis of climate policy options. Chapter 4, pp. 72-88, in Hertel, T. W., S. Rose and R. Tol  (eds.) (2009). Economic Analysis of Land Use in Global Climate Change Policy. Abingdon: Routledge.

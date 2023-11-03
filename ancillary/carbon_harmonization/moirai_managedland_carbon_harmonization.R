@@ -22,8 +22,8 @@
 # Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
 
 #Purpose : This script harmonizes the 1026 rasters stored in the zip file Carbon_rasters.zip to the moirai refrence
-#vegetation classes (currently in 2010). This script generates 18 final rasters that are used within the moirai code.  
-#This script performs the harmonization for data for soil carbon from the soil grids (0-100 cms) and vegetation carbon
+#vegetation classes (currently in 2010). This script generates 18 final rasters for each  managed category that are used within the moirai code.  
+#This script performs the harmonization for data for soil carbon from the soil grids (0-30 cms) and vegetation carbon
 #from Spawn et al. for above and below ground vegetation.
 
 #Load libraries
@@ -52,8 +52,8 @@ scheme_basic <- theme_bw() +
         legend.box.background = element_rect(colour = "black"))+
   theme(legend.key.width=unit(4,"cm"))
 
-#Set the working directory
-path_to_working_directory <- "C:/Moirai/ancillary/carbon_harmonization"
+#Set the working directory to moirai/ancillary/carbon_harmonization
+path_to_working_directory <- "./"
 setwd(path_to_working_directory)
 
 #Create some directories
