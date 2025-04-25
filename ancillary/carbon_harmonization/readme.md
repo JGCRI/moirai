@@ -49,9 +49,9 @@ These are the files in the folder `input_files`
 
 The working directory for running these R scripts needs to be the folder that they reside in. These scripts create and outputs folder and an optional diagnostics folder.
 
-`moirai_carbon_harmonization_Land_cover.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each unmanaged land type (18 files). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour).
+`moirai_carbon_harmonization.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each unmanaged land type (18 files). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour).
 
-`moirai_managedland_carbon_harmonization_LandUse.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each managed land type (crop, pasture, urban) (54 files). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour).
+`moirai_managedland_carbon_harmonization.R` which performs the harmonization for three  types of carbon (soil, above ground biomass, below ground biomass) for 6 states (weighted_average, min, max, q1, q3, median) for each managed land type (crop, pasture, urban) (54 files). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour).
 
 `moirai_carbon_harmonization_FAO.R` which performs the harmonization for soil carbon  for 6 states (weighted_average, min, max, q1, q3, median) (6 files). This script is also needed to produce the vegetation carbon files that correspond with the FAO land types associated with the soil data (12 files). Each type of carbon requires around 20 mins to run through (bringing the total runtime of the script to 1 hour). This script is specifically used only when using the FAO HWSD soil carbon data.
 
