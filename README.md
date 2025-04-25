@@ -4,17 +4,22 @@ Alan Di Vittorio, Lawrence Berkeley National Laboratory
 
 Kanishka Narayan, Global Change Research Institute, Pacific Northwest National Laboratory
 
-Evan Margiotta, Global Change Research Institute, Pacific Northwest National Laboratory
+Evan Margiotta, Global Change Research Institute, Pacific Northwest National laboratory
 
-## Current Version: 3.1.1
+## Version: 3
 
 ## Version History
-* **Version 3.1.1:** May 2022; DOI: 10.5281/zenodo.6632745
+* **Version 3.2:** ?Jan? 2024; DOI: TBD
+	* Adds distinct, spatially-explicit carbon data for managed land types (cropland, urban land, pasture)
+		* This further improves carbon density estimates
+		* The previously added carbon data applied only to the unmanaged land types
+	* Updated carbon diagnostics
+* **Version 3.1.1:** May 2022; DOI: http://doi.org/10.5281/zenodo.6632745
 	* Harmonizes carbon data for Moirai by matching land cover types between source data and Moirai
 		* This improves carbon density estimates
 	* New capacity to include deeper soil carbon (30-100cm) in addition to topsoil carbon (0-30cm)
-		* The default is topsoil carbon only (0-30cm)
-	* Adds more detailed diagnostics for basin and global level carbon outputs
+	  * The default is topsoil carbon only (0-30cm)
+  * Adds more detailed diagnostics for basin and global level carbon outputs
 	* Updates some data references in the documentation
 	* Note that this version maintains the same spatial configuration and data sources as version 3.1.0
 * **Version 3.1.0:** April 2021; DOI: http://doi.org/10.5281/zenodo.4973631
@@ -118,7 +123,7 @@ There are two example input files that can be run without modification (see belo
 Only the NetCDF library has to be downloaded and installed by the user, as the five data sets below are now included in the repository through the LFS system. Associated licenses and ownership are included in `…/moirai/docs/third_party_contributions_v31.pdf.docx`.
 
 ### C NetCDF library
-The user must have the C NetCDF library installed (available at [http://www.unidata.ucar.edu/software/netcdf/](http://www.unidata.ucar.edu/software/netcdf/). The header and library search paths for compiling Moirai LDS must be set accordingly (see above). The version used and tested for Moirai LDS is NetCDF version 4.1.1. An archived version of this library is now available here: [Required Libraries](https://stash.pnnl.gov/projects/JGCRI/repos/moirai/browse/required_libs).
+The user must have the C NetCDF library installed (available at [http://www.unidata.ucar.edu/software/netcdf/](http://www.unidata.ucar.edu/software/netcdf/). The header and library search paths for compiling Moirai LDS must be set accordingly (see above). The version used and tested for Moirai LDS is NetCDF version 4.1.1. An archived version of this library is now available here: [Required Libraries](https://stash.pnnl.gov/projects/JGCRI/repos/moirai/browse/required_libs).  When installing on a Windows machine, it may help to make sure there are no spaces in the path of the install directory.  Additionally for Windows, if an error message such as "Warning! PATH too long installer unable to modify PATH!" occurs during NetCDF install, adding the path manually to the user's environmental variables may fix this.  Alternatively, Windows Subsystem for Linux may be utilized for installation following the Linux guidance.
 
 ## All input data are included with this distribution
 The following data are included in the distribution via the Git LFS system, but instructions for downloading are included below if necessary, and they reside in their own folders as specified by the Moirai input file.
@@ -153,7 +158,7 @@ The Moirai LDS also generates these files (some of which were previously stored 
 * **MIRCA_irrHA_ha.csv** = irrigated harvested area, country X GLU X 26 crop classes (hectares)
 * **MIRCA_rfdHA_ha.csv** = rainfed harvested area, country X GLU X 26 crop classes (hectares)
 * **Land_type_area_ha.csv** = land type area, country X GLU X SAGE vegetation type X HYDE land use type X Suitability and protection category X  year (hectares)
-* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for reference vegetation land types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution.
+* **Ref_veg_carbon_Mg_per_ha.csv** = soil and veg C density for all land and vegetation types, country X GLU X land type X soil (0-30 cm) / above ground vegetation C / below ground vegetation C (Megagrams per hectare) for 6 states (weighted average, median, minimum, maximum, quartile 1 and quartile 3). The managed land types (cropland, urban land, pasture) now have distinct carbon values, rather than the values of the previously converted, unmanaged land type. As the corresponding input data are circa 2010, these output data are based on the 2010 land type area distribution, unless the FAO HWSD soil data are used, which is circa 2000.
 * **Water_footprint_m3.csv** = average annual water volume consumed (1996-2005), country X GLU X 18 crop X water type (m<sup>3</sup>), blue = surface and groundwater irrigation, green = rain, gray = needed to dilute pollutant runoff, total = the sum, but is slightly different than summing the individual type outputs due to rounding
 * These names and the destination directory are set in the Moirai LDS input file.
 
@@ -182,14 +187,14 @@ The Moirai LDS also generates the following associated raster files along with t
 * **urban_area_####.bil** = Valid cropland area in km<sup>2</sup> for the land use/cover output raster year specified in the input file.
 
 ## Inputs
-This section focuses on the inputs listed in the Moirai LDS input file. Of the many inputs to the Moirai LDS, those listed in the Moirai LDS input file are the most important as they include the primary source data in addition to the GLU definition that determines how to aggregate the source data. The extent and resolution of the default raster input data determine the working resolution of the Moirai LDS, which is defined in the Moirai LDS header file (`…/moirai/include/moirai.h`; global extent, 5 arcmin resolution). When substituting input data the user must ensure that the new data are read in and resampled to the working grid. An alternative grid can also be defined in the Moirai LDS header file. Each input has its own read function that can be rewritten to accommodate input dataset substitution. Input raster data sources are listed in Table 1 ([…/moirai/docs/moirai_v31_table_1.pdf](https://github.com/JGCRI/moirai/blob/master/docs/moirai_v31_table1.pdf)) and input text data sources in Table 2 ([…/moirai/docs/moirai_v31_table_2.pdf](https://github.com/JGCRI/moirai/blob/master/docs/moirai_v31_table2.pdf)).
+This section focuses on the inputs listed in the Moirai LDS input file. Of the many inputs to the Moirai LDS, those listed in the Moirai LDS input file are the most important as they include the primary source data in addition to the GLU definition that determines how to aggregate the source data. The extent and resolution of the default raster input data determine the working resolution of the Moirai LDS, which is defined in the Moirai LDS header file (`…/moirai/include/moirai.h`; global extent, 5 arcmin resolution). When substituting input data the user must ensure that the new data are read in and resampled to the working grid. An alternative grid can also be defined in the Moirai LDS header file. Each input has its own read function that can be rewritten to accommodate input dataset substitution. Input raster data sources are listed in Table 1 ([…/moirai/docs/moirai_v31_table_1.pdf](https://github.com/JGCRI/moirai/tree/master/docs/moirai_v31_table1.pdf)) and input text data sources in Table 2 ([…/moirai/docs/moirai_v31_table_2.pdf](https://github.com/JGCRI/moirai/tree/master/docs/moirai_v31_table2.pdf)).
 
 ### Preparing substitute Geographic Land Unit (GLU) data
 The easiest and most common input data substitution will be for the GLU data that determine the final boundaries for data aggregation. This substitution does not require code modification as long as the data are prepared in the same format as the original data. The GLU data are integers that thematically assign each pixel to a single GLU, with ocean assigned the no-data value of -9999. There are separate land area input data that determine which pixels are land pixels, but the substitute GLU data can also include other water bodies with no-data values. The raster file (see "GLU thematic map" below) is a single-band binary file with 4-byte signed integer values, no header, and 5 arcmin resolution. It uses the WGS84 geographic datum with no projection, and the first value in the file is the pixel with upper left corner at -180 degrees longitude and 90 degrees latitude. The values are stored in order of ascending longitude in each descending latitude row, with longitude varying faster. The mapping of the thematic values to names is defined in the GLU text file (see "List of output GLU names" below). This is a comma-separated-value file with two columns and one header line. The first column contains the GLU integer, the second column contains the GLU name, and the header text is not used.
 
 ### Moirai LDS input file
 (e.g., `…/moirai/input_files/moirai_input_basins235.txt`)
-The Moirai LDS input file specifies the input and output paths, the file names of the primary input and output files, and whether additional diagnostic files are output. The output year for production, harvested area, and land rent outputs, is specified, as well as the input year of the required crop data to determine whether or not recalibration is necessary. Similarly, the output USD value year for land rent is specified along with the input USD value year of the FAO price data in order to perform the correct price calibration. The input file code variables are filled based on the order of the uncommented lines in the input file, rather than by keyword (# is the comment character), and there are 76 input values read from the input file. Thus, the following input descriptions follow the order in the input file.
+The Moirai LDS input file specifies the input and output paths, the file names of the primary input and output files, and whether additional diagnostic files are output. The output year for production, harvested area, and land rent outputs, is specified, as well as the input year of the required crop data to determine whether or not recalibration is necessary. Similarly, the output USD value year for land rent is specified along with the input USD value year of the FAO price data in order to perform the correct price calibration. The input file code variables are filled based on the order of the uncommented lines in the input file, rather than by keyword (# is the comment character), and there are 131 input values read from the input file. Thus, the following input descriptions follow the order in the input file.
 
 ### Flags
 * diagnostics: 0 = no, 1 = output diagnostics files
@@ -248,8 +253,8 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **SAGE physical cropland area, circa 2000**: Physical cropland area circa 2000, as fraction of cell area (`Cropland2000_5min.nc`)
 	* These data are used to normalize the SAGE individual crop harvested area values to each grid cell
 	* Please cite these data when using Moirai: Ramankutty, N., Evan, A. T., Monfreda, C. & Foley, J. A. 2008. Farming the planet: 1. Geographic distribution of global agricultural lands in the year 2000. Global Biogeochem. Cycles, 22, GB1003.
-* **Soil carbon density (0-30 cm) rasters (6)** (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
-* **Vegetation carbon density rasters (12)**(Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
+* **Soil carbon density (0-30 cm) rasters (24)** For unmanaged land the user can select files with either soilGrids (ESA harmonization) or FAO HWSD (IGBP harmonization) source data; make sure that the soil and vegetion carbon files have matching sources. The managed land files (cropland, urban land, pasture) have only the soilGrids (ESA harmonization) source. (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)
+* **Vegetation carbon density rasters (48)** For unmanaged land the user can select files with either soilGrids (ESA harmonization) or FAO HWSD (IGBP harmonization) source data; make sure that the soil and vegetion carbon files have matching sources. The managed land files (cropland, urban land, pasture) have only the soilGrids (ESA harmonization) source. (Please see `…/moirai/  ancillary/carbon_harmonization/readme.md` for details on the same)  
 
 ### CSV input data (filename without path)
 * **Original GTAP LU2.1 land rent data** (`GTAP_value_milUSD.csv`): Please cite these data when using Moirai: Lee, H.-L., Hhertel, T. W., Rose, S., Avetisyan, M. An integrated global land use data base for CGE analysis of climate policy options. Chapter 4, pp. 72-88, in Hertel, T. W., S. Rose and R. Tol  (eds.) (2009). Economic Analysis of Land Use in Global Climate Change Policy. Abingdon: Routledge.
@@ -283,10 +288,13 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * The crop irrigated harvested area output file (`MIRCA_irrHA_ha.csv`)
 * The crop rainfed harvested area output file (`MIRCA_rfdHA_ha.csv`)
 * The historical land type area output file (`Land_type_area_ha.csv`)
-* The reference vegetation type carbon density output file (`Ref_veg_carbon_Mg_per_ha.csv`)
+* The carbon density output file (`Ref_veg_carbon_Mg_per_ha.csv`)
 * The crop water volume consumption output file (`Water_footprint_m3.csv`)
 * The country X GLU mapping output file (`MOIRAI_ctry_GLU.csv`)
 * The land type mapping output file (`MOIRAI_land_types.csv`)
+
+### Carbon Flag
+* carbon_enabled: Set to 1 to process carbon by land type in moirai. Setting to 0 only produces land accounts.
 
 ## Diagnostics
 A detailed description of all the diagnostics features is available in:  `…/moirai/diagnostics/readme.md`

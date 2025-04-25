@@ -49,7 +49,9 @@
 int init_moirai(args_struct *in_args) {
     
 	// input argument structure
+   // flags
 	in_args->diagnostics = 0;
+   in_args->carbon_enabled = 0;
 	// data years for calibration
 	in_args->out_year_prod_ha_lr = 0;
 	in_args->in_year_sage_crops = 0;
@@ -105,6 +107,61 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->veg_BG_max_fname, '\0', MAXCHAR);
 	memset(in_args->veg_BG_q1_fname, '\0', MAXCHAR);
 	memset(in_args->veg_BG_q3_fname, '\0', MAXCHAR);
+	//em 2022-08-03 Add new managed land carbon states here
+	memset(in_args->soil_carbon_pasture_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_pasture_min_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_pasture_median_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_pasture_max_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_pasture_q1_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_pasture_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_pasture_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_pasture_q3_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_min_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_median_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_max_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_q1_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_crop_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_crop_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_crop_q3_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_min_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_median_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_max_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_q1_fname, '\0', MAXCHAR);
+	memset(in_args->soil_carbon_urban_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_carbon_urban_q3_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_wavg_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_median_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_min_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_max_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_q1_fname, '\0', MAXCHAR);
+	memset(in_args->veg_BG_urban_q3_fname, '\0', MAXCHAR);
 	// input csv file names (without path)
 	memset(in_args->rent_orig_fname, '\0', MAXCHAR);
 	memset(in_args->country87_gtap_fname, '\0', MAXCHAR);
@@ -135,7 +192,9 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->wf_fname, '\0', MAXCHAR);
     memset(in_args->iso_map_fname, '\0', MAXCHAR);
     memset(in_args->lt_map_fname, '\0', MAXCHAR);
-	
+
+
+
 	// number of land cells
 	num_land_cells_aez_new = 0;			// the actual number of land cell indices in land_cells_aez_new[]
 	num_land_cells_sage = 0;			// the actual number of land cell indices in land_cells_sage[]

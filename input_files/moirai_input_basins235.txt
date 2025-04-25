@@ -5,16 +5,17 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-1			# diagnostics: 0 = no, 1 = yes
+0							# diagnostics: 0 = no, 1 = yes
+1                    # carbon outputs: 0 = no, 1 = yes
 
 # data years for recalibration
-0			# out_year_prod_ha_lr: output year for crop production, harvest area, and land rent
-2000		# in_year_sage_crops: input year of the 175 crop harvest area and yield data
-2001		# out_year_usd: the output US dollar value year for land rent
-2001		# in_year_lr_usd: the US dollar value year for the input land rent data
+0							# out_year_prod_ha_lr: recalibration output year for crop production, harvest area, and land rent
+2000							# in_year_sage_crops: input year of the 175 crop harvest area and yield data
+2001							# out_year_usd: the output US dollar value year for land rent
+2001							# in_year_lr_usd: the US dollar value year for the input land rent data
 
 # year to write output land use/cover rasters (outputs only if year is processed)
-2000		# set this to invalid year (e.g., 0) for no output
+2000							# lulc_out_year set this to invalid year (e.g., 0) for no output 
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
@@ -28,68 +29,122 @@
 ./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
-hyde_cell_plus.bil          # cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
-sage_land_frac.bil			# land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
-hyde_land_plus.bil          # land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
-Global235_CLM_5arcmin.bil   # aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ)
-AEZ_orig_lds.gri			# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
-potveg_plus.bil				# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
-fao_ctry_rast.bil			# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
-L1_processed.bil            # L1_fname: suitability pixels (fraction)
-L2_processed.bil            # L2_fname: suitability pixels (fraction)
-L3_processed.bil            # L3_fname: suitability pixels (fraction)
-L4_processed.bil            # L4_fname: suitability pixels (fraction)
-All_IUCN_processed.bil      # ALL_IUCN_fname: all protected pixels (fraction)
-1a_1b_2_processed.bil       # IUCN_1a_1b_2_fname: high level protected pixels (fraction)
-Nfert_0083d.img             # nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
-Cropland2000_5min.nc      	# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
-soil_carbon_weighted_average.envi     # soil_carbon_wavg_fname: weighted average carbon state
-soil_carbon_min.envi                 #soil_carbon_min_fname: minimum carbon state
-soil_carbon_median.envi              #soil_carbon_median_fname: median carbon state
-soil_carbon_max.envi                 #soil_carbon_max_fname: maximum carbon state
-soil_carbon_q1.envi                  #soil_carbon_q1_fname: q1 carbon state
-soil_carbon_q3.envi                  #soil_carbon_q3_fname: q3 carbon state    
-AG_carbon_weighted_average.envi                 # veg_carbon_wavg_fname: weighted average vegetation carbon state
-AG_carbon_min.envi                 #veg_carbon_min_fname: minimum vegetation carbon state
-AG_carbon_median.envi              #veg_carbon_median_fname: median vegetation carbon state
-AG_carbon_max.envi                 #veg_carbon_max_fname: maximum vegetation carbon state
-AG_carbon_q1.envi                  #veg_carbon_q1_fname: q1 vegetation carbon state
-AG_carbon_q3.envi                  #veg_carbon_q3_fname: q3 vegetation carbon state
-BG_carbon_weighted_average.envi        #veg_BG_wavg_fname: weighted average below ground biomass
-BG_carbon_median.envi           #veg_BG_median_fname: weighted average below ground biomass
-BG_carbon_min.envi              #veg_BG_min_fname: minimum below ground biomass      
-BG_carbon_max.envi              #veg_BG_max_fname: max below ground biomass
-BG_carbon_q1.envi                      #veg_BG_q1_fname: q1 below ground biomass
-BG_carbon_q3.envi               #veg_BG_q3_fname: q3 below ground biomass
+hyde_cell_plus.bil          			# cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)
+sage_land_frac.bil				# land_area_sage_fname: SAGE land fraction of each grid cell  (fraction)
+hyde_land_plus.bil          			# land_area_hyde_fname: HYDE land area of each grid cell  (km^2)
+Global235_CLM_5arcmin.bil   			# aez_new_fname: new climate AEZs for calculating GCAM inputs (thematic; 1-NUM_NEW_AEZ)
+AEZ_orig_lds.gri				# aez_orig_fname: original climate AEZs for reference (thematic; 1-NUM_ORIG_AEZ)
+potveg_plus.bil					# potveg_fname: SAGE potential vegetation circa 2000 if no land use had occurred (thematic)
+fao_ctry_rast.bil				# country_fao_fname: FAO country codes based on VMAP0 with some additions (thematic)
+L1_processed.bil            			# L1_fname: suitability pixels (fraction)
+L2_processed.bil            			# L2_fname: suitability pixels (fraction)
+L3_processed.bil            			# L3_fname: suitability pixels (fraction)
+L4_processed.bil            			# L4_fname: suitability pixels (fraction)
+All_IUCN_processed.bil      			# ALL_IUCN_fname: all protected pixels (fraction)
+1a_1b_2_processed.bil       			# IUCN_1a_1b_2_fname: high level protected pixels (fraction)
+Nfert_0083d.img             			# nfert_rast_fname: nitrogen application rate (kg/ha) (deprecated)
+Cropland2000_5min.nc      			# cropland_sage_fname: sage physical cropland fraction of sage land area (fraction)
+soil_carbon_weighted_average.envi     		# soil_carbon_wavg_fname: weighted average carbon state
+soil_carbon_min.envi                		# soil_carbon_min_fname: minimum carbon state
+soil_carbon_median.envi              		# soil_carbon_median_fname: median carbon state
+soil_carbon_max.envi                 		# soil_carbon_max_fname: maximum carbon state
+soil_carbon_q1.envi                  		# soil_carbon_q1_fname: q1 carbon state
+soil_carbon_q3.envi                  		# soil_carbon_q3_fname: q3 carbon state    
+AG_carbon_weighted_average.envi         	# veg_carbon_wavg_fname: weighted average vegetation carbon state
+AG_carbon_min.envi                 		# veg_carbon_min_fname: minimum vegetation carbon state
+AG_carbon_median.envi              		# veg_carbon_median_fname: median vegetation carbon state
+AG_carbon_max.envi                 		# veg_carbon_max_fname: maximum vegetation carbon state
+AG_carbon_q1.envi                  		# veg_carbon_q1_fname: q1 vegetation carbon state
+AG_carbon_q3.envi                  		# veg_carbon_q3_fname: q3 vegetation carbon state
+BG_carbon_weighted_average.envi         	# veg_BG_wavg_fname: weighted average below ground biomass
+BG_carbon_median.envi           		# veg_BG_median_fname: weighted average below ground biomass
+BG_carbon_min.envi              		# veg_BG_min_fname: minimum below ground biomass      
+BG_carbon_max.envi              		# veg_BG_max_fname: max below ground biomass
+BG_carbon_q1.envi                       	# veg_BG_q1_fname: q1 below ground biomass
+BG_carbon_q3.envi               		# veg_BG_q3_fname: q3 below ground biomass
+soil_carbon_pasture_weighted_average.envi    	# soil_carbon_pasture_wavg_fname: weighted average carbon state
+soil_carbon_pasture_min.envi                 	# soil_carbon_pasture_min_fname: minimum carbon state
+soil_carbon_pasture_median.envi              	# soil_carbon_pasture_median_fname: median carbon state
+soil_carbon_pasture_max.envi                 	# soil_carbon_pasture_max_fname: maximum carbon state
+soil_carbon_pasture_q1.envi                  	# soil_carbon_pasture_q1_fname: q1 carbon state
+soil_carbon_pasture_q3.envi                  	# soil_carbon_pasture_q3_fname: q3 carbon state    
+AG_carbon_pasture_weighted_average.envi         # veg_carbon_pasture_wavg_fname: weighted average vegetation carbon state
+AG_carbon_pasture_min.envi                	# veg_carbon_pasture_min_fname: minimum vegetation carbon state
+AG_carbon_pasture_median.envi              	# veg_carbon_pasture_median_fname: median vegetation carbon state
+AG_carbon_pasture_max.envi                 	# veg_carbon_pasture_max_fname: maximum vegetation carbon state
+AG_carbon_pasture_q1.envi                  	# veg_carbon_pasture_q1_fname: q1 vegetation carbon state
+AG_carbon_pasture_q3.envi                  	# veg_carbon_pasture_q3_fname: q3 vegetation carbon state
+BG_carbon_pasture_weighted_average.envi         # veg_BG_pasture_wavg_fname: weighted average below ground biomass
+BG_carbon_pasture_median.envi           	# veg_BG_pasture_median_fname: weighted average below ground biomass
+BG_carbon_pasture_min.envi              	# veg_BG_pasture_min_fname: minimum below ground biomass      
+BG_carbon_pasture_max.envi              	# veg_BG_pasture_max_fname: max below ground biomass
+BG_carbon_pasture_q1.envi                       # veg_BG_pasture_q1_fname: q1 below ground biomass
+BG_carbon_pasture_q3.envi               	# veg_BG_pasture_q3_fname: q3 below ground biomass
+soil_carbon_crop_weighted_average.envi     	# soil_carbon_crop_wavg_fname: weighted average carbon state
+soil_carbon_crop_min.envi                 	# soil_carbon_crop_min_fname: minimum carbon state
+soil_carbon_crop_median.envi              	# soil_carbon_crop_median_fname: median carbon state
+soil_carbon_crop_max.envi                 	# soil_carbon_crop_max_fname: maximum carbon state
+soil_carbon_crop_q1.envi                  	# soil_carbon_crop_q1_fname: q1 carbon state
+soil_carbon_crop_q3.envi                  	# soil_carbon_crop_q3_fname: q3 carbon state    
+AG_carbon_crop_weighted_average.envi            # veg_carbon_crop_wavg_fname: weighted average vegetation carbon state
+AG_carbon_crop_min.envi                 	# veg_carbon_crop_min_fname: minimum vegetation carbon state
+AG_carbon_crop_median.envi              	# veg_carbon_crop_median_fname: median vegetation carbon state
+AG_carbon_crop_max.envi                 	# veg_carbon_crop_max_fname: maximum vegetation carbon state
+AG_carbon_crop_q1.envi                  	# veg_carbon_crop_q1_fname: q1 vegetation carbon state
+AG_carbon_crop_q3.envi                  	# veg_carbon_crop_q3_fname: q3 vegetation carbon state
+BG_carbon_crop_weighted_average.envi        	# veg_BG_crop_wavg_fname: weighted average below ground biomass
+BG_carbon_crop_median.envi           		# veg_BG_crop_median_fname: weighted average below ground biomass
+BG_carbon_crop_min.envi              		# veg_BG_crop_min_fname: minimum below ground biomass      
+BG_carbon_crop_max.envi              		# veg_BG_crop_max_fname: max below ground biomass
+BG_carbon_crop_q1.envi                      	# veg_BG_crop_q1_fname: q1 below ground biomass
+BG_carbon_crop_q3.envi               		# veg_BG_crop_q3_fname: q3 below ground biomass
+soil_carbon_urban_weighted_average.envi    	# soil_carbon_urban_wavg_fname: weighted average carbon state
+soil_carbon_urban_min.envi                	# soil_carbon_urban_min_fname: minimum carbon state
+soil_carbon_urban_median.envi             	# soil_carbon_urban_median_fname: median carbon state
+soil_carbon_urban_max.envi                	# soil_carbon_urban_max_fname: maximum carbon state
+soil_carbon_urban_q1.envi                 	# soil_carbon_urban_q1_fname: q1 carbon state
+soil_carbon_urban_q3.envi                  	# soil_carbon_urban_q3_fname: q3 carbon state    
+AG_carbon_urban_weighted_average.envi           # veg_carbon_urban_wavg_fname: weighted average vegetation carbon state
+AG_carbon_urban_min.envi                	# veg_carbon_urban_min_fname: minimum vegetation carbon state
+AG_carbon_urban_median.envi             	# veg_carbon_urban_median_fname: median vegetation carbon state
+AG_carbon_urban_max.envi                	# veg_carbon_urban_max_fname: maximum vegetation carbon state
+AG_carbon_urban_q1.envi                 	# veg_carbon_urban_q1_fname: q1 vegetation carbon state
+AG_carbon_urban_q3.envi                  	# veg_carbon_urban_q3_fname: q3 vegetation carbon state
+BG_carbon_urban_weighted_average.envi       	# veg_BG_urban_wavg_fname: weighted average below ground biomass
+BG_carbon_urban_median.envi           		# veg_BG_urban_median_fname: weighted average below ground biomass
+BG_carbon_urban_min.envi              		# veg_BG_urban_min_fname: minimum below ground biomass      
+BG_carbon_urban_max.envi              		# veg_BG_urban_max_fname: max below ground biomass
+BG_carbon_urban_q1.envi                      	# veg_BG_urban_q1_fname: q1 below ground biomass
+BG_carbon_urban_q3.envi              		# veg_BG_urban_q3_fname: q3 below ground biomass
 
 # input csv file names (without path)
-GTAP_value_milUSD.csv		# rent_orig_fname: original GTAP LU2.1 land rent data
-GTAP_GCAM_ctry87.csv		# country87_gtap_fname: GTAP 87 country list, in GCAM order (alphabetical by iso)
-FAO_ctry_GCAM_ctry87.csv	# country87map_fao_fname: FAO country to 87 country mapping list
-FAO_iso_VMAP0_ctry.csv		# country_all_fname: FAO/VMAP0 and iso
-Global235_CLM_5arcmin.csv   # aez_new_info_fname: the new aez list of integer codes and names
-iso_GCAM_regID_32reg.csv	# countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
-GCAM_region_names_32reg.csv	# regionlist_gcam_fname: GCAM region list
-GTAP_use.csv				# use_gtap_fname: GTAP product use categories
-SAGE_PVLT.csv				# lt_sage_fname: SAGE land cover types for potential vegetation
-hyde32_lu.csv				# lu_hyde_fname: HYDE land use types
-isam_2_sage_hyde_mapping.csv	# lulc_fname: LULC types and mapping to sage and hyde
-SAGE_gtap_fao_crop2use.csv	# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
-FAO_production_1993_2016.csv	# production_fao_fname: FAO production data
-FAO_yield_1993_2016.csv			# yield_fao_fname: FAO yield data
-FAO_harvarea_1993_2016.csv		# harvestarea_fao_fname: FAO harvest area data
-FAO_producerprice_1993_2016.csv	# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
-cpi_all_1970_2017_bls_june2018_annual.csv		# convert_usd_fname: consumer price index table to convert from one US dollar year to another
+GTAP_value_milUSD.csv				# rent_orig_fname: original GTAP LU2.1 land rent data
+GTAP_GCAM_ctry87.csv				# country87_gtap_fname: GTAP 87 country list, in GCAM order (alphabetical by iso)
+FAO_ctry_GCAM_ctry87.csv			# country87map_fao_fname: FAO country to 87 country mapping list
+FAO_iso_VMAP0_ctry.csv				# country_all_fname: FAO/VMAP0 and iso
+Global235_CLM_5arcmin.csv   			# aez_new_info_fname: the new aez list of integer codes and names
+iso_GCAM_regID_32reg.csv			# countrymap_iso_gcam_region_fname: iso countries to gcam region mapping list
+GCAM_region_names_32reg.csv			# regionlist_gcam_fname: GCAM region list
+GTAP_use.csv					# use_gtap_fname: GTAP product use categories
+SAGE_PVLT.csv					# lt_sage_fname: SAGE land cover types for potential vegetation
+hyde32_lu.csv					# lu_hyde_fname: HYDE land use types
+isam_2_sage_hyde_mapping.csv			# lulc_fname: LULC types and mapping to sage and hyde
+SAGE_gtap_fao_crop2use.csv			# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
+FAO_production_1993_2016.csv			# production_fao_fname: FAO production data
+FAO_yield_1993_2016.csv				# yield_fao_fname: FAO yield data
+FAO_harvarea_1993_2016.csv			# harvestarea_fao_fname: FAO harvest area data
+FAO_producerprice_1993_2016.csv			# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
+cpi_all_1970_2017_bls_june2018_annual.csv	# convert_usd_fname: consumer price index table to convert from one US dollar year to another
 
 # output file names (without path)
-moirai_log_basins235.txt        # lds_logname: log file name for runtime output
-MOIRAI_ag_HA_ha.csv             # harvestarea_fname: file name for harvested area output
-MOIRAI_ag_prod_t.csv            # production_fname:	file name for production output
-MOIRAI_value_milUSD.csv         # rent_fname: file name for rent output
-MIRCA_irrHA_ha.csv              # mirca_irr_fname: file name for mirca irrigated harvested area output
-MIRCA_rfdHA_ha.csv              # mirca_rfd_fname: file name for mirca rainfed harvested area output
-Land_type_area_ha.csv           # land_type_area_fname: file name for land type area output
-Ref_veg_carbon_Mg_per_ha.csv    # refveg_carbon_fname: file name for reference veg carbon and soil carbon
-Water_footprint_m3.csv          # wf_fname: file name for water footprint output
-MOIRAI_ctry_GLU.csv             # iso_map_fname: maps the raaster fao country codes to iso
-MOIRAI_land_types.csv           # lt_map_fname: maps the land type category codes to descriptions
+moirai_log_basins235.txt        		# lds_logname: log file name for runtime output
+MOIRAI_ag_HA_ha.csv             		# harvestarea_fname: file name for harvested area output
+MOIRAI_ag_prod_t.csv           			# production_fname: file name for production output
+MOIRAI_value_milUSD.csv         		# rent_fname: file name for rent output
+MIRCA_irrHA_ha.csv              		# mirca_irr_fname: file name for mirca irrigated harvested area output
+MIRCA_rfdHA_ha.csv             			# mirca_rfd_fname: file name for mirca rainfed harvested area output
+Land_type_area_ha.csv           		# land_type_area_fname: file name for land type area output
+Ref_veg_carbon_Mg_per_ha.csv    		# refveg_carbon_fname: file name for reference veg carbon and soil carbon
+Water_footprint_m3.csv          		# wf_fname: file name for water footprint output
+MOIRAI_ctry_GLU.csv             		# iso_map_fname: maps the raaster fao country codes to iso
+MOIRAI_land_types.csv           		# lt_map_fname: maps the land type category codes to descriptions
