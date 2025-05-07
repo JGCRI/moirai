@@ -6,10 +6,12 @@ Kanishka Narayan, Global Change Research Institute, Pacific Northwest National L
 
 Evan Margiotta, Global Change Research Institute, Pacific Northwest National laboratory
 
-## Version: 3
+## Latest Version:
+
+* All post-version2 conceptual DOI: http://doi.org/10.5281/zenodo.2584034; this points to the latest release
 
 ## Version History
-* **Version 3.2:** ?Jan? 2024; DOI: TBD
+* **Version 3.2:** May 2025; DOI: TBD
 	* Adds distinct, spatially-explicit carbon data for managed land types (cropland, urban land, pasture)
 		* This further improves carbon density estimates
 		* The previously added carbon data applied only to the unmanaged land types
@@ -41,7 +43,7 @@ Evan Margiotta, Global Change Research Institute, Pacific Northwest National lab
 * **Version 3.0.1:** 18 August 2019; http://doi.org/10.5281/zenodo.3370875
 	* This fixes a makefile compilation bug and removes the absolute path in `moirai.h` for the NetCDF library header file
 * **Version 3.0.0:** 5 March 2019; http://doi.org/10.5281/zenodo.2584035
-* All post-v2 version conceptual DOI: http://doi.org/10.5281/zenodo.2584034; this currently points to the latest release
+
 * **Version 2.0.0:** 4 December 2017; no DOI
 
 ## NOTICE:
