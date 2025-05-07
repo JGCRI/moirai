@@ -11,7 +11,7 @@ Evan Margiotta, Global Change Research Institute, Pacific Northwest National lab
 * All post-version2 conceptual DOI: http://doi.org/10.5281/zenodo.2584034; this points to the latest release
 
 ## Version History
-* **Version 3.2:** May 2025; DOI: TBD
+* **Version 3.2:** May 2025; DOI: http://doi.org/10.5281/zenodo.4688447
 	* Adds distinct, spatially-explicit carbon data for managed land types (cropland, urban land, pasture)
 		* This further improves carbon density estimates
 		* The previously added carbon data applied only to the unmanaged land types
