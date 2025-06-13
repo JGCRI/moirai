@@ -1,0 +1,8 @@
+ 
+#Use this code to change the unit type and add nodata code
+
+gdalwarp fao_ctry_rast.tif fao_ctry_rast_final.tif -dstnodata -9999 -ot Int16
+
+#Use this to get the final raster binary for moirai
+
+gdal_translate -of ENVI fao_ctry_rast_final.tif fao_ctry_rast.bil

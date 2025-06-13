@@ -5,7 +5,7 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-0							# diagnostics: 0 = no, 1 = yes
+1							# diagnostics: 0 = no, 1 = yes
 1                    # carbon outputs: 0 = no, 1 = yes
 
 # data years for recalibration
@@ -19,14 +19,14 @@
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
-./example_outputs/basins235/                			# outpath: path to output files
+./test_newbounds/basins235/                			# outpath: path to output files
 ./indata/HarvestedAreaYield175Crops_NetCDF/		        # sagepath: path to sage crop files
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
-./example_outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
-./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
+./test_newbounds/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
+./test_newbounds/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
 
 # input raster file names (without path)
 hyde_cell_plus.bil          			# cell_area_fname: HYDE total area of each grid cell (km^2) (spherical earth)

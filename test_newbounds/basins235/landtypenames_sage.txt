@@ -1,0 +1,15 @@
+TropicalEvergreenForest/Woodland
+TropicalDeciduousForest/Woodland
+TemperateBroadleafEvergreenForest/Woodland
+TemperateNeedleleafEvergreenForest/Woodland
+TemperateDeciduousForest/Woodland
+BorealEvergreenForest/Woodland
+BorealDeciduousForest/Woodland
+Evergreen/DeciduousMixedForest/Woodland
+Savanna
+Grassland/Steppe
+DenseShrubland
+OpenShrubland
+Tundra
+Desert
+PolarDesert/Rock/Ice

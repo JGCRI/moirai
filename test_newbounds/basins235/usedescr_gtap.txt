@@ -1,0 +1,13 @@
+"sugarcane,sugarbeet"
+"cattle,sheep,goats,horses,ruminants,etc."
+"forestry,logging,etc."
+cerealsgrainn.e.c.
+"swine,poultry,otheranimals/products"
+cropsn.e.c.
+oilseeds
+paddyrice
+plant-basedfibres
+rawmilk
+"vegetables,fruit,nuts"
+wheat
+rawanimalfibres

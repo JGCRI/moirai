@@ -1,0 +1,245 @@
+#!/bin/bash
+# clean_gcam_water_basins_grass.bsh
+# june 2025
+
+# GRASS GIS shell script
+
+# this takes about 30 minutes to run
+
+# to run this, copy the commands into the GRASS shell
+# make sure that the shell is in the .../moirai/ancillary/update_country_raster_water directory
+
+# executing this script from the command line does not work unless there is a way to force it into a GRASS shell
+# the problem is that it runs in a new regular shell
+
+# Use Moirai v3 output countryXbasin maps to adjust the input water basin boundaries
+# In the gcam_aezs mapset
+# this is to eliminate random small features along country boundaries that are created by mismatch between country and water basin boundaries
+#    some of these random features get combined with others of the countryXbasin combination,
+#    either creating a ‘false’ land unit or being added to a legitimate one
+# note that not all of these mismatches are data-driven, meaning that some country boundaries do not always follow watershed boundaries exactly
+
+# identification of mismatched boundaries will be based on the number of pixels in each unique spatial feature
+#    any feature with. <=6  pixels will have its water basin adjusted to the neighboring basin in the same country, on a pixel-by-pixel basis
+#    this will be implemented by finding the mode of the basin numbers in a 7x7 nieghborhood around the pixel,
+#       not including the center pixel (the one to be changed),
+#       and only including pixels in the same country as the center pixel
+
+# there may be some <=6 pixel features that are changed erroneously, but these are few compared to the corrections
+# there may be some >6 pixel featurs that should be changed, but these are few compared to the corrections
+
+# the number of features at the countryXbasin level has been nearly cut in half, from 2238 to 1389!!!!
+# the number of counttryXbasin land units is now 679; the v3 moirai output has 702
+# the number of regionXbasin land units has been reduced; need to run through moirai and GCAM to check
+
+#### outputs
+# fao_ctry_rast_nowater.bil : the country raster file, now four byte integer so that R can output the final
+#    used by update_ctry_rast.R to separate include and separate inland water associated with countries
+#       this R script produces the final country raster input to Moirai
+# Global235_CLM_5arcmin.bil : the final water basin raster file for input to Moirai
+
+# steps:
+#
+# update the namibia pixels in the v3 vmap0_fao_countries_wbnds_rast raster
+#
+# create vector data from the updated vmap0_fao_countries_wbnds_rast data and intersect it with the v3 water_basins_235_moirai_vect data
+#
+# create a raster file of the cat id values in these new vector data
+#    the cat id values are unique for each spatial feature, thus providing a way to determine if a feature may be due to mismatch
+#
+# use r.stats write the pixel counts of each spatial feature to a csv file
+#
+# create a copy of water_basins_235_moirai, which is the input basin (glu) raster for moirai
+#    this copy will be the new adjusted raster for use by moirai: water_basins_235_moirai_june2025
+#
+# use a weights text file that excludes the current (center) pixel
+# use a window larger than the pixel threshold
+#
+# loop over the features with  <=6  pixels
+#
+#    exclude some small features for adjustment that are known to be correct
+#
+#    create a use mask of the region corresponding only to the country of the feature
+#
+#    create a selection map by setting non-feature pixels to null (*)
+#       this means that only the non-null pixels will be processed
+#
+#    use r.neighbors to update the selected feature pixels in the temp map
+#       use the 'mode' function and a 7x7 neighborhood
+#       desired value is the most frequent neighboring basin within the same country
+#       so if the surrounding basin values in the same country are the same, then it is likely ok and it doesn't change
+#
+#    rmove the mask and use r.patch to apply the new values to the new  water basin raster
+
+
+
+
+echo "start at:"
+date
+
+##### cd to .../moirai/ancillary/update_country_raster_water directory !!!!!!!!!!!!!
+
+# set the pixel threshold
+# spatial features with # pixels <= pix_thresh will be adjusted
+pix_thresh=6
+
+# set the neighborhood #x#for finding new basin id
+# this should be larger than the pixel threshold
+neighborhood=7
+
+# name of text weights file that excludes the current (center) pixel
+# use a larger window than the pixel threshold
+wname=./exclude_center_7x7.txt
+
+# if a large window causes other problems, may need to iterate this whole process
+
+# output country raster name
+country_oname=./fao_ctry_rast_nowater.bil
+
+# output water basin raster name
+basin_oname=./Global235_CLM_5arcmin.bil
+
+# name of diagnostic csv file of vmap0Xbasin land unit pixel counts
+vboname=./vmap0_basin_2025_rast_lu_p${pix_thresh}_n${neighborhood}.csv
+
+# name of diagnostic csv file of vmap0Xbasin feature pixel counts
+vbftoname=./vmap0_basin_2025_rast_features_p${pix_thresh}_n${neighborhood}.csv
+
+# name of diagnostic csv file of gcam regionXbasin land unit pixel counts
+rboname=./region_basin_2025_rast_lu_p${pix_thresh}_n${neighborhood}.csv
+
+# name of diagnostic csv file of gcam regionXbasin land unit pixel counts
+rbftoname=./region_basin_2025_rast_features_p${pix_thresh}_n${neighborhood}.csv
+
+
+# name of output csv file of previous vmap0 country X basin features
+ftoname=./vmap0_basin_rast_v3_features.csv
+
+
+# first change the south-africa namibia-coast pixels to namibia
+# the &&& operator allows NULL values to result in true or false evaluations, instead of returning NULL
+#    this allows full propagation of the data; otherwise data that do not overlap between both maps gets removed
+r.mapcalc expression="vmap0_fao_countries_wbnds_june2025_rast = if(vmap0_fao_countries_wbnds_rast==202 &&& water_basins_235_moirai==196,147,vmap0_fao_countries_wbnds_rast)" --overwrite
+
+# now create an area vector map from the namibia updated vmap0 raster data
+r.to.vect input=vmap0_fao_countries_wbnds_june2025_rast output=vmap0_fao_countries_wbnds_june2025_vect type=area column=ctry --overwrite
+
+# intersect the new vmap0 countries with the prevous water basin data to get unique ids for each spatial feature
+# v.overlay did the cleaning
+v.overlay ainput=vmap0_fao_countries_wbnds_june2025_vect binput=water_basins_235_moirai_vect operator=and output=vmap0_basin_vect --overwrite
+
+# create a raster file of the unique spatial feature ids
+v.to.rast input=vmap0_basin_vect output=vmap0_basin_rast_features use=cat type=area --overwrite
+
+# write the pixel counts
+# sorted in ascending order of pixel counts
+r.stats -c -n input=vmap0_basin_rast_features output=${ftoname} separator=comma sort=asc --overwrite
+
+# get the spatial feature cell counts from the file
+# there is no header line
+# read the values into variables
+numfeat=0
+while IFS="," read -r v1 v2 remainder
+do
+   numfeat=$(($numfeat+1))
+   cat[$numfeat]=$v1
+   count[$numfeat]=$v2
+done < $ftoname
+
+# create a copy of the basin data to be adjusted; this is the output map
+g.copy raster=water_basins_235_moirai,water_basins_235_moirai_june2025 --overwrite
+
+num_adj=0
+# loop over the spatial features of interest
+for ((i=1 ; i <= numfeat ; i++))
+do
+
+   select_ctry_out=$(v.db.select -c map=vmap0_basin_vect columns=a_ctry where="cat == $cat[$i]")
+   select_basin_out=$(v.db.select -c map=vmap0_basin_vect columns=b_basin where="cat == $cat[$i]")
+
+   ##### cat 212 in the previous data needs to remain unchanged - spain south med coast!
+   ##### in any case, should keep a few swiss cats the same: 940, 943, 926, 927, 928
+   # 6 is probably the max to adjust
+   # some 7-pixel features will be wrong, but can't go through them individually
+   # there may still be some individual features <7 that are off, but when aggregated to country level the remaining <7 should be fine
+ 
+   # adjust basin only if the land unit is <= pix_thresh pixels
+   # also exclude some specifc units that are essentially correct but small
+   if [ $count[$i] -le $pix_thresh ]; then
+
+      # exclude some correct features from adjustment - there may be more, but these are known
+      if [[ $cat[$i] -eq 212 || $cat[$i] -eq 926 || $cat[$i] -eq 927 || $cat[$i] -eq 928 || $cat[$i] -eq 940 || $cat[$i] -eq 943 ]]; then
+         echo "not adjusting orig cat=" $cat[$i] "because it is correct"
+      else
+
+         num_adj=$(($num_adj+1))
+
+         echo "adj feature # =" $num_adj "; cat =" $cat[$i] "; ctry =" $select_ctry_out "; basin =" $select_basin_out
+
+         # make a mask to include only values in this country
+         r.mask vector=vmap0_basin_vect where="a_ctry == $select_ctry_out" --overwrite
+
+         # create the selection map by setting non-feature pixels to NULL
+         # true sets the selection map to the feature cat value
+         # false sets the selection map to zero, so this needs to be changed to NULL
+         # NULL sets the seleciton map to NULL
+         r.mapcalc expression="feature_temp = if(vmap0_basin_rast_features==$cat[$i],vmap0_basin_rast_features)" --overwrite
+         r.null map=feature_temp setnull=0
+   
+         # update the output water basin map
+         # use the mode of the surrounding 7x7 neighborhood pixels within this country only (not including the current center pixel)
+         # the mask includes only the country pixels for determining the mode
+         # the selection input restricts processing to the pixels in this feature
+         # the weight file excludes the current center pixel from the mode
+         r.neighbors input=water_basins_235_moirai_june2025 output=adj_feature selection=feature_temp size=$neighborhood method=mode weighting_function=file weight=$wname --overwrite
+
+         # remove the country mask
+         r.mask -r
+
+         # update the output map
+         r.patch input=adj_feature,water_basins_235_moirai_june2025 output=water_basins_235_moirai_june2025 --overwrite
+
+         # end else adjust this feature
+      fi
+
+      # end if feature size <= pix_thresh
+   fi
+
+done
+
+echo "Number of adjusted features =" $num_adj
+
+# write the new water basin .bil file
+r.out.bin -i -b input=water_basins_235_moirai_june2025 output=$basin_oname null=-9999 bytes=4 order=little
+
+# write the new country raster .bil file(no water)
+r.out.bin -i -b input=vmap0_fao_countries_wbnds_june2025_rast output=$country_oname null=-9999 bytes=4 order=little
+
+# remove the temp maps
+g.remove -f type=raster name=feature_temp
+g.remove -f type=raster name=adj_feature
+
+# create a diagnostic map of countryXbasin and check unit stats
+r.mapcalc expression="vmap0_basin_2025_rast = vmap0_fao_countries_wbnds_june2025_rast * 10000 + water_basins_235_moirai_june2025" --overwrite
+# get pixel counts of country land units
+r.stats -c -n input=vmap0_basin_2025_rast output=${vboname} separator=comma sort=asc --overwrite
+# convert to vector, then back to raster, and get pixel counts of each spatial feature
+r.to.vect input=vmap0_basin_2025_rast output=vmap0_basin_2025_vect type=area column=ctry_basin --overwrite
+v.to.rast input=vmap0_basin_2025_vect output=vmap0_basin_2025_rast_features use=cat type=area --overwrite
+r.stats -c -n input=vmap0_basin_2025_rast_features output=${vbftoname} separator=comma sort=asc --overwrite
+
+# this gives an idea of the number of gcam land units, but note that the region mask is moiria v3 output data
+# create a diagnostic map of gcam regionXbasin and check unit stats (using v3 region data)
+r.mapcalc expression="region_basin_2025_rast = region32_gcam_moirai_out * 10000 + water_basins_235_moirai_june2025" --overwrite
+# get pixel counts of region land units
+r.stats -c -n input=region_basin_2025_rast output=${rboname} separator=comma sort=asc --overwrite
+
+### this isn't helpful because the moirai output region map does not align with this moirai input country map due to water vs land boundaries
+# convert to vector, then back to raster, and get pixel counts of each spatial feature
+#r.to.vect input=region_basin_diag_rast output=region_basin_diag_vect type=area column=region_basin --overwrite
+#v.to.rast input=region_basin_diag_vect output=region_basin_diag_rast_features use=cat type=area --overwrite
+#r.stats -c -n input=region_basin_diag_rast_features output=${rbftoname} separator=comma sort=asc --overwrite
+
+
+echo "finish at:"
+date
