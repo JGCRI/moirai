@@ -213,7 +213,7 @@ echo "Number of adjusted features =" $num_adj
 r.out.bin -i -b input=water_basins_235_moirai_june2025 output=$basin_oname null=-9999 bytes=4 order=little
 
 # write the new country raster .bil file(no water)
-r.out.bin -i -b input=vmap0_fao_countries_wbnds_june2025_rast output=$country_oname null=-9999 bytes=4 order=little
+r.out.bin -i -b input=vmap0_fao_countries_wbnds_june2025_rast output=$country_oname null=-9999 bytes=2 order=little
 
 # remove the temp maps
 g.remove -f type=raster name=feature_temp
