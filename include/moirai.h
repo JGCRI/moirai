@@ -105,8 +105,8 @@
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
 #define HYDE_START_YEAR         1700            // the first hyde year
-#define NUM_HYDE_YEARS          52            	// number of available hyde years
-#define NUM_HYDE_POST2000_YEARS 21            	// number of hyde years >= 2001; these are each year
+#define NUM_HYDE_YEARS          56            	// number of available hyde years
+#define NUM_HYDE_POST2000_YEARS 25            	// number of hyde years >= 2001; these are each year
 #define CROP_LT_CODE            10              // used to generate land type category
 #define PASTURE_LT_CODE         20              // used to generate land type category
 #define URBAN_LT_CODE           30              // used to generate land type category
