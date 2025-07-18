@@ -1,5 +1,5 @@
 
-Program moirai started at Thu Jul 17 20:47:30 2025
+Program moirai started at Fri Jul 18 08:11:31 2025
 
 
 For more detailed information regarding alignment of various input data set the diagnostics flag to 1 in the input file
@@ -1626,308 +1626,308 @@ Currently processing Year: 48
 Year 2017: proc_land_type_area()
 
 Global lulc area check for year 2017: proc_land_type_area()
-Unknown: out =	263667.192508
-TropicalEvergreenForest/Woodland: out =	12418603.770065;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2255842.966667;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	563799.024834;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2885609.903426;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2961218.990111;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6105018.270754;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2778617.917000;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94479.982939;	in =	0.000000
-Savanna: out =	6414231.188095;	in =	6255346.549946
-Grassland/Steppe: out =	14257005.846807;	in =	15375798.322451
-DenseShrubland: out =	2982397.288635;	in =	3191713.108969
-OpenShrubland: out =	8253139.570636;	in =	9582699.600226
-Tundra: out =	6332609.542003;	in =	6627922.837306
-Desert: out =	11705156.649710;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2965676.283130;	in =	18164742.285517
-uopp_: out =	749748.597579;	in =	547281.749748
-cropland: out =	15839346.492163;	in =	15056207.443174
-grazing: out =	32258388.498783;	in =	31740418.785556
-pasture: out =	7376052.206823;	in =	7409783.574099
-rangeland: out =	21762600.137255;	in =	22055734.624010
-ir_norice: out =	2132304.853192;	in =	1829672.886237
-rf_norice: out =	12509573.005127;	in =	0.000000
-ir_rice: out =	750649.025888;	in =	660195.001736
-rf_rice: out =	446819.607944;	in =	0.000000
-tot_irri: out =	2882953.879080;	in =	0.000000
-tot_rainfed: out =	12956392.613077;	in =	0.000000
-tot_rice: out =	1197468.633831;	in =	1065204.961210
-Global land area: out =	132084557.975846;	in =	147369063.225412
+Unknown: out =	264610.702592
+TropicalEvergreenForest/Woodland: out =	12453319.914272;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2275725.241718;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	567969.738194;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2896921.256148;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2984548.271017;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6107481.022796;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2780005.404283;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	94730.996460;	in =	0.000000
+Savanna: out =	6474853.249716;	in =	6255346.549946
+Grassland/Steppe: out =	14421273.341112;	in =	15375798.322451
+DenseShrubland: out =	3007596.769993;	in =	3191713.108969
+OpenShrubland: out =	8320502.933533;	in =	9582699.600226
+Tundra: out =	6348741.741522;	in =	6627922.837306
+Desert: out =	11730057.792913;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2967320.918311;	in =	18164742.285517
+uopp_: out =	743253.819411;	in =	547281.749748
+cropland: out =	15682601.651697;	in =	15056207.443174
+grazing: out =	31963043.210158;	in =	31740418.785556
+pasture: out =	7288941.017089;	in =	7409783.574099
+rangeland: out =	21587895.803851;	in =	22055734.624010
+ir_norice: out =	2111192.970461;	in =	1829672.886237
+rf_norice: out =	12385796.174473;	in =	0.000000
+ir_rice: out =	743216.855395;	in =	660195.001736
+rf_rice: out =	442395.651366;	in =	0.000000
+tot_irri: out =	2854409.825848;	in =	0.000000
+tot_rainfed: out =	12828191.825840;	in =	0.000000
+tot_rice: out =	1185612.506757;	in =	1065204.961210
+Global land area: out =	132084557.975845;	in =	147369063.225412
 
 Currently processing Year: 49
 Year 2018: proc_land_type_area()
 
 Global lulc area check for year 2018: proc_land_type_area()
-Unknown: out =	264175.350075
-TropicalEvergreenForest/Woodland: out =	12394871.063254;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2254743.264378;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	571771.018926;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2884933.126029;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2967497.682278;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6101975.232713;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777917.190097;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94842.446224;	in =	0.000000
-Savanna: out =	6404705.517541;	in =	6255346.549946
-Grassland/Steppe: out =	14335430.908129;	in =	15375798.322451
-DenseShrubland: out =	3006187.999500;	in =	3191713.108969
-OpenShrubland: out =	8256654.535094;	in =	9582699.600226
-Tundra: out =	6335214.846728;	in =	6627922.837306
-Desert: out =	11666374.913245;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2965336.998414;	in =	18164742.285517
-uopp_: out =	764918.006416;	in =	547281.749748
-cropland: out =	15899845.469340;	in =	15056207.443174
-grazing: out =	32137162.407467;	in =	31740418.785556
-pasture: out =	7340140.980546;	in =	7409783.574099
-rangeland: out =	21703171.941763;	in =	22055734.624010
-ir_norice: out =	2148632.623905;	in =	1829672.886237
-rf_norice: out =	12544396.138540;	in =	0.000000
-ir_rice: out =	747078.584663;	in =	660195.001736
-rf_rice: out =	459738.122228;	in =	0.000000
-tot_irri: out =	2895711.208573;	in =	0.000000
-tot_rainfed: out =	13004134.260774;	in =	0.000000
-tot_rice: out =	1206816.706888;	in =	1065204.961210
-Global land area: out =	132084557.975845;	in =	147369063.225412
+Unknown: out =	265164.826762
+TropicalEvergreenForest/Woodland: out =	12429622.707775;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2274746.643748;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	575504.310707;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2896075.989264;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2990317.457730;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6104701.853871;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2779283.616316;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95092.495749;	in =	0.000000
+Savanna: out =	6464614.628354;	in =	6255346.549946
+Grassland/Steppe: out =	14499092.653217;	in =	15375798.322451
+DenseShrubland: out =	3031974.568226;	in =	3191713.108969
+OpenShrubland: out =	8324598.343507;	in =	9582699.600226
+Tundra: out =	6351751.416244;	in =	6627922.837306
+Desert: out =	11691449.824998;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2966758.987799;	in =	18164742.285517
+uopp_: out =	758265.987111;	in =	547281.749748
+cropland: out =	15742517.122703;	in =	15056207.443174
+grazing: out =	31843024.541768;	in =	31740418.785556
+pasture: out =	7254205.016848;	in =	7409783.574099
+rangeland: out =	21527013.124370;	in =	22055734.624010
+ir_norice: out =	2127359.033748;	in =	1829672.886237
+rf_norice: out =	12420290.064337;	in =	0.000000
+ir_rice: out =	739681.764726;	in =	660195.001736
+rf_rice: out =	455186.259908;	in =	0.000000
+tot_irri: out =	2867040.798474;	in =	0.000000
+tot_rainfed: out =	12875476.324239;	in =	0.000000
+tot_rice: out =	1194868.024639;	in =	1065204.961210
+Global land area: out =	132084557.975846;	in =	147369063.225412
 
 Currently processing Year: 50
 Year 2019: proc_land_type_area()
 
 Global lulc area check for year 2019: proc_land_type_area()
-Unknown: out =	263714.146647
-TropicalEvergreenForest/Woodland: out =	12372406.156661;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2252453.490311;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	571888.320475;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2885838.526917;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2964047.714192;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6101267.952296;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777008.747527;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94640.541949;	in =	0.000000
-Savanna: out =	6382196.136697;	in =	6255346.549946
-Grassland/Steppe: out =	14305975.576478;	in =	15375798.322451
-DenseShrubland: out =	3002348.592213;	in =	3191713.108969
-OpenShrubland: out =	8239826.455752;	in =	9582699.600226
-Tundra: out =	6334731.088792;	in =	6627922.837306
-Desert: out =	11659776.843242;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2965738.291638;	in =	18164742.285517
-uopp_: out =	780067.786216;	in =	547281.749748
-cropland: out =	15894191.402184;	in =	15056207.443174
-grazing: out =	32236440.205658;	in =	31740418.785556
-pasture: out =	7380715.821624;	in =	7409783.574099
-rangeland: out =	21734049.583457;	in =	22055734.624010
-ir_norice: out =	2196163.849352;	in =	1829672.886237
-rf_norice: out =	12506320.756505;	in =	0.000000
-ir_rice: out =	743552.299197;	in =	660195.001736
-rf_rice: out =	448154.497107;	in =	0.000000
-tot_irri: out =	2939716.148558;	in =	0.000000
-tot_rainfed: out =	12954475.253614;	in =	0.000000
-tot_rice: out =	1191706.796303;	in =	1065204.961210
-Global land area: out =	132084557.975846;	in =	147369063.225412
+Unknown: out =	264684.855925
+TropicalEvergreenForest/Woodland: out =	12406999.661164;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2272691.646407;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	575928.094603;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2897259.140325;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2986949.194014;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6103642.421936;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778249.752057;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	94893.310770;	in =	0.000000
+Savanna: out =	6443025.984552;	in =	6255346.549946
+Grassland/Steppe: out =	14468293.141348;	in =	15375798.322451
+DenseShrubland: out =	3027347.456467;	in =	3191713.108969
+OpenShrubland: out =	8305900.351176;	in =	9582699.600226
+Tundra: out =	6351026.871792;	in =	6627922.837306
+Desert: out =	11684775.700541;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2967150.110338;	in =	18164742.285517
+uopp_: out =	773311.688514;	in =	547281.749748
+cropland: out =	15736911.727344;	in =	15056207.443174
+grazing: out =	31945516.866574;	in =	31740418.785556
+pasture: out =	7293965.463529;	in =	7409783.574099
+rangeland: out =	21563112.764129;	in =	22055734.624010
+ir_norice: out =	2174419.653432;	in =	1829672.886237
+rf_norice: out =	12382584.357214;	in =	0.000000
+ir_rice: out =	736190.392772;	in =	660195.001736
+rf_rice: out =	443717.323942;	in =	0.000000
+tot_irri: out =	2910610.046209;	in =	0.000000
+tot_rainfed: out =	12826301.681160;	in =	0.000000
+tot_rice: out =	1179907.716716;	in =	1065204.961210
+Global land area: out =	132084557.975847;	in =	147369063.225412
 
 Currently processing Year: 51
 Year 2020: proc_land_type_area()
 
 Global lulc area check for year 2020: proc_land_type_area()
-Unknown: out =	263898.063816
-TropicalEvergreenForest/Woodland: out =	12349505.963665;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2251085.345440;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	572291.177405;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2886328.464677;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2969575.354844;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6102233.999617;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777485.949718;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94910.684440;	in =	0.000000
-Savanna: out =	6371312.730342;	in =	6255346.549946
-Grassland/Steppe: out =	14330703.734263;	in =	15375798.322451
-DenseShrubland: out =	2998181.024889;	in =	3191713.108969
-OpenShrubland: out =	8236099.974241;	in =	9582699.600226
-Tundra: out =	6333739.435247;	in =	6627922.837306
-Desert: out =	11656780.775099;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2966036.960489;	in =	18164742.285517
-uopp_: out =	796035.576045;	in =	547281.749748
-cropland: out =	15957313.047019;	in =	15056207.443174
-grazing: out =	32171039.714590;	in =	31740418.785556
-pasture: out =	7405950.386900;	in =	7409783.574099
-rangeland: out =	21669351.395897;	in =	22055734.624010
-ir_norice: out =	2209694.989657;	in =	1829672.886237
-rf_norice: out =	12526104.729632;	in =	0.000000
-ir_rice: out =	767652.575703;	in =	660195.001736
-rf_rice: out =	453860.752023;	in =	0.000000
-tot_irri: out =	2977347.565360;	in =	0.000000
-tot_rainfed: out =	12979965.481639;	in =	0.000000
-tot_rice: out =	1221513.327730;	in =	1065204.961210
-Global land area: out =	132084557.975846;	in =	147369063.225412
+Unknown: out =	264859.424290
+TropicalEvergreenForest/Woodland: out =	12383572.267570;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2271149.226075;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	576025.227983;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2897512.853786;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2992626.768633;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6104789.217117;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778813.622926;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95161.005740;	in =	0.000000
+Savanna: out =	6432384.869085;	in =	6255346.549946
+Grassland/Steppe: out =	14491774.606893;	in =	15375798.322451
+DenseShrubland: out =	3023962.850859;	in =	3191713.108969
+OpenShrubland: out =	8302621.546764;	in =	9582699.600226
+Tundra: out =	6350322.662752;	in =	6627922.837306
+Desert: out =	11681472.375776;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2967518.334728;	in =	18164742.285517
+uopp_: out =	789066.516069;	in =	547281.749748
+cropland: out =	15799414.294852;	in =	15056207.443174
+grazing: out =	31881510.303946;	in =	31740418.785556
+pasture: out =	7320034.483532;	in =	7409783.574099
+rangeland: out =	21497570.487624;	in =	22055734.624010
+ir_norice: out =	2187816.822811;	in =	1829672.886237
+rf_norice: out =	12402178.338266;	in =	0.000000
+ir_rice: out =	760052.052325;	in =	660195.001736
+rf_rice: out =	449367.081454;	in =	0.000000
+tot_irri: out =	2947868.875142;	in =	0.000000
+tot_rainfed: out =	12851545.419729;	in =	0.000000
+tot_rice: out =	1209419.133778;	in =	1065204.961210
+Global land area: out =	132084557.975845;	in =	147369063.225412
 
 Currently processing Year: 52
 Year 2021: proc_land_type_area()
 
 Global lulc area check for year 2021: proc_land_type_area()
-Unknown: out =	263565.367952
-TropicalEvergreenForest/Woodland: out =	12325645.777441;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2247453.109462;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	570791.354330;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2886849.149099;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2968922.573686;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6102505.814463;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777361.994332;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94951.072405;	in =	0.000000
-Savanna: out =	6343819.076287;	in =	6255346.549946
-Grassland/Steppe: out =	14266064.093215;	in =	15375798.322451
-DenseShrubland: out =	2987475.908472;	in =	3191713.108969
-OpenShrubland: out =	8233465.719684;	in =	9582699.600226
-Tundra: out =	6333090.279263;	in =	6627922.837306
-Desert: out =	11656733.152204;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2966569.368806;	in =	18164742.285517
-uopp_: out =	809931.242280;	in =	547281.749748
-cropland: out =	16012790.564399;	in =	15056207.443174
-grazing: out =	32236572.358065;	in =	31740418.785556
-pasture: out =	7403489.622946;	in =	7409783.574099
-rangeland: out =	21715980.541669;	in =	22055734.624010
-ir_norice: out =	2212512.980423;	in =	1829672.886237
-rf_norice: out =	12566691.364232;	in =	0.000000
-ir_rice: out =	768470.448222;	in =	660195.001736
-rf_rice: out =	465115.771556;	in =	0.000000
-tot_irri: out =	2980983.428632;	in =	0.000000
-tot_rainfed: out =	13031807.135790;	in =	0.000000
-tot_rice: out =	1233586.219780;	in =	1065204.961210
-Global land area: out =	132084557.975845;	in =	147369063.225412
+Unknown: out =	264506.730358
+TropicalEvergreenForest/Woodland: out =	12360460.296647;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2267929.224146;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	574809.194664;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2897947.488264;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2992203.819348;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6105100.943933;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778281.198301;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95199.925140;	in =	0.000000
+Savanna: out =	6405186.786140;	in =	6255346.549946
+Grassland/Steppe: out =	14428601.606301;	in =	15375798.322451
+DenseShrubland: out =	3013038.001358;	in =	3191713.108969
+OpenShrubland: out =	8299383.167906;	in =	9582699.600226
+Tundra: out =	6349634.341394;	in =	6627922.837306
+Desert: out =	11681726.688283;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2967954.706640;	in =	18164742.285517
+uopp_: out =	802821.431025;	in =	547281.749748
+cropland: out =	15854349.365046;	in =	15056207.443174
+grazing: out =	31945423.060951;	in =	31740418.785556
+pasture: out =	7315630.819949;	in =	7409783.574099
+rangeland: out =	21544753.837083;	in =	22055734.624010
+ir_norice: out =	2190606.913395;	in =	1829672.886237
+rf_norice: out =	12442369.959403;	in =	0.000000
+ir_rice: out =	760861.827365;	in =	660195.001736
+rf_rice: out =	460510.664905;	in =	0.000000
+tot_irri: out =	2951468.740776;	in =	0.000000
+tot_rainfed: out =	12902880.624298;	in =	0.000000
+tot_rice: out =	1221372.492272;	in =	1065204.961210
+Global land area: out =	132084557.975844;	in =	147369063.225412
 
 Currently processing Year: 53
 Year 2022: proc_land_type_area()
 
 Global lulc area check for year 2022: proc_land_type_area()
-Unknown: out =	263470.424254
-TropicalEvergreenForest/Woodland: out =	12308709.345796;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2245652.049425;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	571019.089191;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2888102.452285;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2971433.259666;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6102534.065205;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777279.914423;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94868.389077;	in =	0.000000
-Savanna: out =	6330376.145666;	in =	6255346.549946
-Grassland/Steppe: out =	14262159.042529;	in =	15375798.322451
-DenseShrubland: out =	2979365.461847;	in =	3191713.108969
-OpenShrubland: out =	8237897.605309;	in =	9582699.600226
-Tundra: out =	6334169.910228;	in =	6627922.837306
-Desert: out =	11656904.599257;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2966625.756761;	in =	18164742.285517
-uopp_: out =	824041.603476;	in =	547281.749748
-cropland: out =	16028784.192470;	in =	15056207.443174
-grazing: out =	32241164.668980;	in =	31740418.785556
-pasture: out =	7415370.241382;	in =	7409783.574099
-rangeland: out =	21706291.706016;	in =	22055734.624010
-ir_norice: out =	2221515.549947;	in =	1829672.886237
-rf_norice: out =	12566589.420642;	in =	0.000000
-ir_rice: out =	762915.226252;	in =	660195.001736
-rf_rice: out =	477763.995638;	in =	0.000000
-tot_irri: out =	2984430.776198;	in =	0.000000
-tot_rainfed: out =	13044353.416289;	in =	0.000000
-tot_rice: out =	1240679.221889;	in =	1065204.961210
-Global land area: out =	132084557.975844;	in =	147369063.225412
+Unknown: out =	264434.917556
+TropicalEvergreenForest/Woodland: out =	12343608.893409;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2265603.384005;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	574813.319826;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2899142.407982;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2994797.329833;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6105261.641843;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778101.198328;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95117.703022;	in =	0.000000
+Savanna: out =	6392615.049447;	in =	6255346.549946
+Grassland/Steppe: out =	14425718.783865;	in =	15375798.322451
+DenseShrubland: out =	3004974.973338;	in =	3191713.108969
+OpenShrubland: out =	8303305.367570;	in =	9582699.600226
+Tundra: out =	6350544.936381;	in =	6627922.837306
+Desert: out =	11681807.340562;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2968038.036938;	in =	18164742.285517
+uopp_: out =	816783.882379;	in =	547281.749748
+cropland: out =	15870198.501020;	in =	15056207.443174
+grazing: out =	31949690.308540;	in =	31740418.785556
+pasture: out =	7328785.616825;	in =	7409783.574099
+rangeland: out =	21534303.080904;	in =	22055734.624010
+ir_norice: out =	2199520.349300;	in =	1829672.886237
+rf_norice: out =	12442282.885321;	in =	0.000000
+ir_rice: out =	755361.607672;	in =	660195.001736
+rf_rice: out =	473033.658742;	in =	0.000000
+tot_irri: out =	2954881.956970;	in =	0.000000
+tot_rainfed: out =	12915316.544062;	in =	0.000000
+tot_rice: out =	1228395.266414;	in =	1065204.961210
+Global land area: out =	132084557.975845;	in =	147369063.225412
 
 Currently processing Year: 54
 Year 2023: proc_land_type_area()
 
 Global lulc area check for year 2023: proc_land_type_area()
-Unknown: out =	263471.785121
-TropicalEvergreenForest/Woodland: out =	12279253.455139;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2242707.719506;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	570694.313876;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2888099.353614;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2971426.347983;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6103405.506503;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777288.482477;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	94979.943184;	in =	0.000000
-Savanna: out =	6303275.522308;	in =	6255346.549946
-Grassland/Steppe: out =	14247637.656367;	in =	15375798.322451
-DenseShrubland: out =	2975082.677190;	in =	3191713.108969
-OpenShrubland: out =	8238078.183654;	in =	9582699.600226
-Tundra: out =	6333492.309806;	in =	6627922.837306
-Desert: out =	11656749.326380;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2967028.903865;	in =	18164742.285517
-uopp_: out =	838213.675903;	in =	547281.749748
-cropland: out =	16069795.186312;	in =	15056207.443174
-grazing: out =	32263877.626657;	in =	31740418.785556
-pasture: out =	7432013.384586;	in =	7409783.574099
-rangeland: out =	21706720.412395;	in =	22055734.624010
-ir_norice: out =	2241972.424505;	in =	1829672.886237
-rf_norice: out =	12575749.216203;	in =	0.000000
-ir_rice: out =	777464.586880;	in =	660195.001736
-rf_rice: out =	474608.958712;	in =	0.000000
-tot_irri: out =	3019437.011380;	in =	0.000000
-tot_rainfed: out =	13050358.174927;	in =	0.000000
-tot_rice: out =	1252073.545592;	in =	1065204.961210
-Global land area: out =	132084557.975844;	in =	147369063.225412
+Unknown: out =	264472.194379
+TropicalEvergreenForest/Woodland: out =	12314552.637916;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2262859.848338;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	574779.036632;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2899002.612141;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2994859.986229;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6106070.143914;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778632.294072;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95231.822160;	in =	0.000000
+Savanna: out =	6365944.253110;	in =	6255346.549946
+Grassland/Steppe: out =	14410820.256492;	in =	15375798.322451
+DenseShrubland: out =	3000301.754681;	in =	3191713.108969
+OpenShrubland: out =	8303266.008261;	in =	9582699.600226
+Tundra: out =	6349843.279452;	in =	6627922.837306
+Desert: out =	11681765.616678;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2968437.262495;	in =	18164742.285517
+uopp_: out =	830803.154507;	in =	547281.749748
+cropland: out =	15910829.379004;	in =	15056207.443174
+grazing: out =	31972086.435383;	in =	31740418.785556
+pasture: out =	7344503.096829;	in =	7409783.574099
+rangeland: out =	21535274.399552;	in =	22055734.624010
+ir_norice: out =	2219774.687129;	in =	1829672.886237
+rf_norice: out =	12451377.915913;	in =	0.000000
+ir_rice: out =	769766.915551;	in =	660195.001736
+rf_rice: out =	469909.860430;	in =	0.000000
+tot_irri: out =	2989541.602681;	in =	0.000000
+tot_rainfed: out =	12921287.776340;	in =	0.000000
+tot_rice: out =	1239676.775978;	in =	1065204.961210
+Global land area: out =	132084557.975845;	in =	147369063.225412
 
 Currently processing Year: 55
 Year 2024: proc_land_type_area()
 
 Global lulc area check for year 2024: proc_land_type_area()
-Unknown: out =	263422.948135
-TropicalEvergreenForest/Woodland: out =	12259354.756894;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2241170.455815;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	570289.766055;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2888720.293838;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2975775.932504;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6103939.566589;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777648.111385;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	95183.823561;	in =	0.000000
-Savanna: out =	6288677.506853;	in =	6255346.549946
-Grassland/Steppe: out =	14236906.438851;	in =	15375798.322451
-DenseShrubland: out =	2968531.865341;	in =	3191713.108969
-OpenShrubland: out =	8238508.783998;	in =	9582699.600226
-Tundra: out =	6333476.389081;	in =	6627922.837306
-Desert: out =	11656819.334574;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2967241.904102;	in =	18164742.285517
-uopp_: out =	852755.125246;	in =	547281.749748
-cropland: out =	16113550.721845;	in =	15056207.443174
-grazing: out =	32252584.251178;	in =	31740418.785556
-pasture: out =	7431633.025944;	in =	7409783.574099
-rangeland: out =	21694928.685634;	in =	22055734.624010
-ir_norice: out =	2254353.037953;	in =	1829672.886237
-rf_norice: out =	12598962.625781;	in =	0.000000
-ir_rice: out =	783134.179091;	in =	660195.001736
-rf_rice: out =	477100.879052;	in =	0.000000
-tot_irri: out =	3037487.217040;	in =	0.000000
-tot_rainfed: out =	13076063.504828;	in =	0.000000
-tot_rice: out =	1260235.058144;	in =	1065204.961210
-Global land area: out =	132084557.975845;	in =	147369063.225412
+Unknown: out =	264396.481013
+TropicalEvergreenForest/Woodland: out =	12295473.022555;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2261522.206461;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	574230.362662;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2899708.073502;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	2999184.820403;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6106662.939080;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2779069.410129;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95432.663769;	in =	0.000000
+Savanna: out =	6349693.374694;	in =	6255346.549946
+Grassland/Steppe: out =	14399530.299464;	in =	15375798.322451
+DenseShrubland: out =	2994359.771782;	in =	3191713.108969
+OpenShrubland: out =	8304147.544366;	in =	9582699.600226
+Tundra: out =	6349746.852876;	in =	6627922.837306
+Desert: out =	11681821.019352;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2968625.280765;	in =	18164742.285517
+uopp_: out =	845192.247780;	in =	547281.749748
+cropland: out =	15954144.087330;	in =	15056207.443174
+grazing: out =	31961617.517860;	in =	31740418.785556
+pasture: out =	7344640.110655;	in =	7409783.574099
+rangeland: out =	21522863.258062;	in =	22055734.624010
+ir_norice: out =	2232032.719127;	in =	1829672.886237
+rf_norice: out =	12474353.887393;	in =	0.000000
+ir_rice: out =	775380.372693;	in =	660195.001736
+rf_rice: out =	472377.108140;	in =	0.000000
+tot_irri: out =	3007413.091833;	in =	0.000000
+tot_rainfed: out =	12946730.995527;	in =	0.000000
+tot_rice: out =	1247757.480830;	in =	1065204.961210
+Global land area: out =	132084557.975844;	in =	147369063.225412
 
 Currently processing Year: 56
 Year 2025: proc_land_type_area()
 
 Global lulc area check for year 2025: proc_land_type_area()
-Unknown: out =	263505.626671
-TropicalEvergreenForest/Woodland: out =	12237469.629005;	in =	12239708.858718
-TropicalDeciduousForest/Woodland: out =	2238929.736117;	in =	2085218.321283
-TemperateBroadleafEvergreenForest/Woodland: out =	570021.420735;	in =	568673.719446
-TemperateNeedleleafEvergreenForest/Woodland: out =	2889497.032152;	in =	2925970.888788
-TemperateDeciduousForest/Woodland: out =	2976948.104101;	in =	2847395.819151
-BorealEvergreenForest/Woodland: out =	6104491.997060;	in =	6017402.980694
-BorealDeciduousForest/Woodland: out =	2777473.850954;	in =	2287936.312319
-Evergreen/DeciduousMixedForest/Woodland: out =	95420.921373;	in =	0.000000
-Savanna: out =	6270802.347418;	in =	6255346.549946
-Grassland/Steppe: out =	14222379.223070;	in =	15375798.322451
-DenseShrubland: out =	2962067.079273;	in =	3191713.108969
-OpenShrubland: out =	8239072.331956;	in =	9582699.600226
-Tundra: out =	6332973.410018;	in =	6627922.837306
-Desert: out =	11656735.173186;	in =	11854625.642121
-PolarDesert/Rock/Ice: out =	2967513.544045;	in =	18164742.285517
-uopp_: out =	867239.186369;	in =	547281.749748
-cropland: out =	16154854.995612;	in =	15056207.443174
-grazing: out =	32257162.366729;	in =	31740418.785556
-pasture: out =	7438799.090245;	in =	7409783.574099
-rangeland: out =	21687831.430579;	in =	22055734.624010
-ir_norice: out =	2269339.384955;	in =	1829672.886237
-rf_norice: out =	12616659.738260;	in =	0.000000
-ir_rice: out =	787266.427900;	in =	660195.001736
-rf_rice: out =	481589.444465;	in =	0.000000
-tot_irri: out =	3056605.812868;	in =	0.000000
-tot_rainfed: out =	13098249.182718;	in =	0.000000
-tot_rice: out =	1268855.872366;	in =	1065204.961210
-Global land area: out =	132084557.975845;	in =	147369063.225412
-Wrote file ./example_outputs/basins235/Land_type_area_ha.csv: proc_land_type_area(); records written=3019075
+Unknown: out =	264492.018094
+TropicalEvergreenForest/Woodland: out =	12273090.919000;	in =	12239708.858718
+TropicalDeciduousForest/Woodland: out =	2259372.965461;	in =	2085218.321283
+TemperateBroadleafEvergreenForest/Woodland: out =	573715.611706;	in =	568673.719446
+TemperateNeedleleafEvergreenForest/Woodland: out =	2900335.495234;	in =	2925970.888788
+TemperateDeciduousForest/Woodland: out =	3000169.311173;	in =	2847395.819151
+BorealEvergreenForest/Woodland: out =	6107164.919306;	in =	6017402.980694
+BorealDeciduousForest/Woodland: out =	2778966.818518;	in =	2287936.312319
+Evergreen/DeciduousMixedForest/Woodland: out =	95667.401905;	in =	0.000000
+Savanna: out =	6332774.120494;	in =	6255346.549946
+Grassland/Steppe: out =	14384467.095932;	in =	15375798.322451
+DenseShrubland: out =	2988314.264683;	in =	3191713.108969
+OpenShrubland: out =	8305219.484139;	in =	9582699.600226
+Tundra: out =	6349338.086524;	in =	6627922.837306
+Desert: out =	11681543.089787;	in =	11854625.642121
+PolarDesert/Rock/Ice: out =	2968971.546627;	in =	18164742.285517
+uopp_: out =	859519.022356;	in =	547281.749748
+cropland: out =	15995010.835861;	in =	15056207.443174
+grazing: out =	31966424.969045;	in =	31740418.785556
+pasture: out =	7352613.943186;	in =	7409783.574099
+rangeland: out =	21516008.292038;	in =	22055734.624010
+ir_norice: out =	2246870.694670;	in =	1829672.886237
+rf_norice: out =	12491847.200581;	in =	0.000000
+ir_rice: out =	779471.708522;	in =	660195.001736
+rf_rice: out =	476821.232087;	in =	0.000000
+tot_irri: out =	3026342.403187;	in =	0.000000
+tot_rainfed: out =	12968668.432668;	in =	0.000000
+tot_rice: out =	1256292.940604;	in =	1065204.961210
+Global land area: out =	132084557.975844;	in =	147369063.225412
+Wrote file ./example_outputs/basins235/Land_type_area_ha.csv: proc_land_type_area(); records written=3018890
 Wrote file ./example_outputs/basins235/Water_footprint_m3.csv: proc_water_footprint(); records written=19261
 Warning: extra fao country 2 or sage crop 1717 in file ./indata/FAO_yield_1993_2021.csv: read_yield_fao(); record=37
 Warning: extra fao country 2 or sage crop 1804 in file ./indata/FAO_yield_1993_2021.csv: read_yield_fao(); record=38
@@ -13509,5 +13509,5 @@ Warning: No forest area but orig rent for reglr_ind 78, aez_ind 6:  calc_rent_fr
 Warning: No forest area but orig rent for reglr_ind 82, aez_ind 6:  calc_rent_frs_use_aez()
 Wrote file ./example_outputs/basins235/MOIRAI_value_milUSD.csv: write_rent_use_aez(); records written=4703
 
-Successful completion of program moirai at Thu Jul 17 21:19:29 2025
+Successful completion of program moirai at Fri Jul 18 08:41:52 2025
 
