@@ -88,7 +88,7 @@
 // these four files all need to be in the same format with the same years, in order and contiguous
 #define FAO_START_YEAR_COL					8		// the column of the start year in the fao input data
 #define FAO_START_YEAR						1993	// first year in fao yield, HA, prod, and prodprice files
-#define FAO_END_YEAR						2016	// last year in fao yield, HA, prod, and prodprice files
+#define FAO_END_YEAR						2021	// last year in fao yield, HA, prod, and prodprice files
 #define NUM_FAO_YRS							(FAO_END_YEAR - FAO_START_YEAR + 1)	// number of years in the files
 
 // averaging periods and years for production, harvest area, yield, and land rent data
@@ -105,8 +105,8 @@
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
 #define HYDE_START_YEAR         1700            // the first hyde year
-#define NUM_HYDE_YEARS          47            	// number of available hyde years
-#define NUM_HYDE_POST2000_YEARS 16            	// number of hyde years >= 2001; these are each year
+#define NUM_HYDE_YEARS          56            	// number of available hyde years
+#define NUM_HYDE_POST2000_YEARS 25            	// number of hyde years >= 2001; these are each year
 #define CROP_LT_CODE            10              // used to generate land type category
 #define PASTURE_LT_CODE         20              // used to generate land type category
 #define URBAN_LT_CODE           30              // used to generate land type category
