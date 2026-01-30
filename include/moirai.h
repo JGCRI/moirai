@@ -98,6 +98,7 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
+#define NUM_MAPSPAM_CROPS		46				// number of crops in the mapSPAM2020 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define NUM_CARBON_TYPES        4              //Types of carbon
@@ -523,6 +524,7 @@ typedef struct {
 	char hydepath[MAXCHAR];				// path to the directory containing the HYDE files
 	char lulcpath[MAXCHAR];				// path to the directory containing the LULC files
 	char mircapath[MAXCHAR];			// path to the directory containing the MIRCA ascii grid files
+	char mapspampath[MAXCHAR];			// path to the directory containing the mapSPAM ascii grid files
     char wfpath[MAXCHAR];               // path to the directory containing the water footprint esri grid files
     char ldsdestpath[MAXCHAR];              // destination path for the gcam data system input files
     char mapdestpath[MAXCHAR];              // destination path for the gcam data system mapping files
@@ -652,6 +654,8 @@ typedef struct {
 	char rent_fname[MAXCHAR];				// file name for land rent output
     char mirca_irr_fname[MAXCHAR];			// file name for mirca irrigated crop area output
     char mirca_rfd_fname[MAXCHAR];			// file name for mirca rainfed crop area output
+    char mapspam_irr_fname[MAXCHAR];		// file name for mapSPAM irrigated crop area output
+    char mapspam_rfd_fname[MAXCHAR];		// file name for mapSPAM rainfed crop area output
     char land_type_area_fname[MAXCHAR];     // file name for land type area output
     char refveg_carbon_fname[MAXCHAR];      // file name for reference veg carbon output
     char wf_fname[MAXCHAR];                 // file name for water footprint output
@@ -682,6 +686,7 @@ int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
+int read_mapspam(char *fname, float *mapspam_grid);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
@@ -718,6 +723,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
+int proc_mapspam(args_struct in_args, rinfo_struct raster_info);
 int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);

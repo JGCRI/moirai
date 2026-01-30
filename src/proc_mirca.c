@@ -151,6 +151,9 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
         strcat(fname, irr_base);
         sprintf(tmp_str, "%i%s", (crop_index+1), mirca_tag);
         strcat(fname, tmp_str);
+        
+        printf("The state of fname is : %s\n",fname);
+        
         if((err = read_mirca(fname, irr_grid)) != OK)
         {
             fprintf(fplog, "Failed to read file %s for input: proc_mirca()\n",fname);
@@ -162,6 +165,9 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
         strcat(fname, rfd_base);
         sprintf(tmp_str, "%i%s", (crop_index+1), mirca_tag);
         strcat(fname, tmp_str);
+        
+        printf("The state of fname is : %s\n",fname);
+        
         if((err = read_mirca(fname, rfd_grid)) != OK)
         {
             fprintf(fplog, "Failed to read file %s for input: proc_mirca()\n",fname);
@@ -233,6 +239,9 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.mirca_irr_fname);
     fpout = fopen(fname,"w"); //float
+    
+    printf("The state of fname is : %s\n",fname);
+    
     if(fpout == NULL)
     {
         fprintf(fplog,"Failed to open file  %s for write:  proc_mirca()\n", fname);
@@ -250,6 +259,9 @@ int proc_mirca(args_struct in_args, rinfo_struct raster_info) {
     strcpy(fname2, in_args.outpath);
     strcat(fname2, in_args.mirca_rfd_fname);
     fpout2 = fopen(fname2,"w"); //float
+    
+    printf("The state of fname2 is : %s\n",fname2);
+    
     if(fpout2 == NULL)
     {
         fprintf(fplog,"Failed to open file  %s for write:  proc_mirca()\n", fname2);
