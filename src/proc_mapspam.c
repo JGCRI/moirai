@@ -130,12 +130,12 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
             return ERROR_MEM;
         }
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            irr_out[i][j] = calloc(NUM_mapspam_CROPS, sizeof(float));
+            irr_out[i][j] = calloc(NUM_MAPSPAM_CROPS, sizeof(float));
             if(irr_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for irr_out[%i][%i]: proc_mapspam()\n", i, j);
                 return ERROR_MEM;
             }
-            rfd_out[i][j] = calloc(NUM_mapspam_CROPS, sizeof(float));
+            rfd_out[i][j] = calloc(NUM_MAPSPAM_CROPS, sizeof(float));
             if(rfd_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for rfd_out[%i][%i]: proc_mapspam()\n", i, j);
                 return ERROR_MEM;
@@ -144,7 +144,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     } // end for i loop over fao country
     
     // loop over the mapspam crops
-    for (crop_index = 0; crop_index < NUM_mapspam_CROPS; crop_index++) {
+    for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
         
         // read the irrigated crop file
         strcpy(fname, in_args.mapspampath);
@@ -278,7 +278,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     // write the records (rounded to nearest integer)
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-            for (crop_index = 0; crop_index < NUM_mapspam_CROPS; crop_index++) {
+            for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
                 // irrigated
                 outval = (float) floor((double) 0.5 + irr_out[ctry_ind][aez_ind][crop_index]);
                 // output only positive values
