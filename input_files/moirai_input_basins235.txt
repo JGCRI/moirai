@@ -24,6 +24,7 @@
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
+./indata/mapSPAM/										# mapspampath: path to mapSPAM files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
 ./example_outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
 ./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files
@@ -143,6 +144,8 @@ MOIRAI_ag_prod_t.csv           			# production_fname: file name for production o
 MOIRAI_value_milUSD.csv         		# rent_fname: file name for rent output
 MIRCA_irrHA_ha.csv              		# mirca_irr_fname: file name for mirca irrigated harvested area output
 MIRCA_rfdHA_ha.csv             			# mirca_rfd_fname: file name for mirca rainfed harvested area output
+mapSPAM_irrHA_ha.csv					# mapspam_irr_fname: file name for mapSPAM irrigated harvested area output
+mapSPAM_rfdHA_ha.csv					# mapspam_rfd_fname: file name for mapSPAM rainfed harvested area output
 Land_type_area_ha.csv           		# land_type_area_fname: file name for land type area output
 Ref_veg_carbon_Mg_per_ha.csv    		# refveg_carbon_fname: file name for reference veg carbon and soil carbon
 Water_footprint_m3.csv          		# wf_fname: file name for water footprint output
