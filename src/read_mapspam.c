@@ -51,7 +51,7 @@
 
 #include "moirai.h"
 
-int read_mapspam(char *fname, char *hname, float *mapspam_grid) {
+int read_mapspam(char *fname, float *mapspam_grid) {
     
     // use this function to input data to the working grid
     
@@ -61,8 +61,8 @@ int read_mapspam(char *fname, char *hname, float *mapspam_grid) {
     // read in double values
     
     int i;
-    int nrows = 2160;			// num input lats = 2160
-    int ncols = 4320;			// num input lons = 4320
+    int nrows = 2160;		// num input lats = 2160
+    int ncols = 4320;		// num input lons = 4320
     int ncells = 0;         // number of input grid cells = nrows*ncols
     int nodata = 0;			// nodata value = -9
     double res = 0;         // resolution = 5.0 / 60.0 = 0.083333333333333
@@ -72,8 +72,7 @@ int read_mapspam(char *fname, char *hname, float *mapspam_grid) {
     //double ymax = 90.0;		// latitude max grid boundary
     
     FILE *fpin;						// file pointer
-    FILE *hpin;						// file pointer to header
-    float value;						// each value read in
+    float value;					// each value read in
     
     if((fpin = fopen(fname, "r")) == NULL)
     {
@@ -81,26 +80,13 @@ int read_mapspam(char *fname, char *hname, float *mapspam_grid) {
         return ERROR_FILE;
     }
     
-    if((hpin = fopen(hname, "r")) == NULL)
-    {
-        fprintf(fplog,"Failed to open file %s:  read_mapspam()\r\n", hname);
-        return ERROR_FILE;
-    }
-    
-//     // read the header lines
-//     if(fscanf(fpin,"%*s%i%*s%i%*s%lf%*s%lf%*s%lf%*s%i%*[^\r\n]\r\n", &ncols, &nrows, &xmin, &ymin, &res, &nodata) == EOF)
-//     {
-//         fprintf(fplog, "Failed to read file %s header:  read_mapspam()\n", fname);
-//         return ERROR_FILE;
-//     }
-    
     // check the res
     if (ncols != NUM_LON || nrows != NUM_LAT) {
         printf("File %s dims do not match expected values:  read_mapspam()\n", fname);
         return ERROR_FILE;
     }
     
-    //fprintf(fplog,"Start reading mapspam at %s :  read_mapspam()\n", get_systime());
+    fprintf(fplog,"Start reading mapspam at %s :  read_mapspam()\n", get_systime());
     
     // read the data
     ncells = nrows * ncols;
@@ -110,7 +96,7 @@ int read_mapspam(char *fname, char *hname, float *mapspam_grid) {
             mapspam_grid[i] = value;
         } else {
             if (i == ncells) {
-                //fprintf(fplog,"Finished reading mapspam at %s:  read_mapspam()\n", get_systime());
+                fprintf(fplog,"Finished reading mapspam at %s:  read_mapspam()\n", get_systime());
             } else {
                 fprintf(fplog, "Failed to read mapspam at %s:  read_mapspam()\n", get_systime());
                 return ERROR_FILE;
