@@ -85,15 +85,19 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     char fname[MAXCHAR];        // current file name to read, or write irrigation
     char fname2[MAXCHAR];       // file name to write rainfed
+    char hname[MAXCHAR];		// file name for header file
     char tmp_str[MAXCHAR];		// stores a temporary string
+    char hdr_str[MAXCHAR];		// stores a temporary string
     
     FILE *fpout;                // out file pointer for irrigation
     FILE *fpout2;               // out file pointer for rainfed
 
     // mapspam file names
     const char mapspam_base[] = "spam2020_V2r0_global_H_";   // mapspam file base; 5 arcmin
-    const char irr_tag[] = "_I.envi";   // mapspam irrigated file end; 5 arcmin
-    const char rfd_tag[] = "_R.envi";   // mapspam rainfed file end; 5 arcmin    
+    const char irr_tag[] = "_I";   // mapspam irrigated file end; 5 arcmin
+    const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
+    const char envi_tag[] = ".envi"; // mapspam envi file tag
+    const char hdr_tag[] = ".hdr";  // mapspam header tag 
     // allocate arrays
     
     irr_grid = calloc(NUM_CELLS, sizeof(float));
@@ -149,12 +153,15 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         // read the irrigated crop file
         strcpy(fname, in_args.mapspampath);
         strcat(fname, mapspam_base);
-        sprintf(tmp_str, "%s%s", (crop_names[crop_index]), irr_tag);
+        sprintf(tmp_str, "%s%s%s", (crop_names[crop_index]), irr_tag, envi_tag);
+        sprintf(hdr_str, "%s%s%s", (crop_names[crop_index]), irr_tag, hdr_tag);
+        sprintf(hname, "%s%s", fname, hdr_str);
         strcat(fname, tmp_str);
         
         printf("The state of fname is : %s\n",fname);
+        printf("The state of hname is : %s\n",hname);
         
-        if((err = read_mapspam(fname, irr_grid)) != OK)
+        if((err = read_mapspam(fname, hname, irr_grid)) != OK)
         {
             fprintf(fplog, "Failed to read file %s for input: proc_mapspam()\n",fname);
             return err;
@@ -163,12 +170,15 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         // read the rainfed crop file
         strcpy(fname, in_args.mapspampath);
         strcat(fname, mapspam_base);
-        sprintf(tmp_str, "%s%s", (crop_names[crop_index]), rfd_tag);
+        sprintf(tmp_str, "%s%s%s", (crop_names[crop_index]), rfd_tag, envi_tag);
+        sprintf(hdr_str, "%s%s%s", (crop_names[crop_index]), rfd_tag, hdr_tag);
+        sprintf(hname, "%s%s", fname, hdr_str);
         strcat(fname, tmp_str);
         
         printf("The state of fname is : %s\n",fname);
+        printf("The state of hname is : %s\n",hname);
         
-        if((err = read_mapspam(fname, rfd_grid)) != OK)
+        if((err = read_mapspam(fname, hname, rfd_grid)) != OK)
         {
             fprintf(fplog, "Failed to read file %s for input: proc_mapspam()\n",fname);
             return err;

@@ -24,7 +24,7 @@
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
-./indata/mapSPAM/										# mapspampath: path to mapSPAM files
+./indata/mapSPAM/spam2020V2r0_global_harvested_area/	# mapspampath: path to mapSPAM files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
 ./example_outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
 ./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files

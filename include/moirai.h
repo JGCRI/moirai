@@ -686,7 +686,7 @@ int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
-int read_mapspam(char *fname, float *mapspam_grid);
+int read_mapspam(char *fname, char *hname, float *mapspam_grid);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
