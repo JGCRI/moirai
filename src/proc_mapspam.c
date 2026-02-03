@@ -91,7 +91,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     FILE *fpout2;               // out file pointer for rainfed
 
     // mapspam file names
-    const char mapspam_base[] = "spam2020_V2r0_global_H";   // mapspam file base; 5 arcmin
+    const char mapspam_base[] = "spam2020_V2r0_global_H_";   // mapspam file base; 5 arcmin
     const char irr_tag[] = "_I.envi";   // mapspam irrigated file end; 5 arcmin
     const char rfd_tag[] = "_R.envi";   // mapspam rainfed file end; 5 arcmin    
     // allocate arrays
@@ -149,7 +149,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         // read the irrigated crop file
         strcpy(fname, in_args.mapspampath);
         strcat(fname, mapspam_base);
-        sprintf(tmp_str, "%i%s", (crop_names[crop_index]), irr_tag);
+        sprintf(tmp_str, "%s%s", (crop_names[crop_index]), irr_tag);
         strcat(fname, tmp_str);
         
         printf("The state of fname is : %s\n",fname);
@@ -163,7 +163,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         // read the rainfed crop file
         strcpy(fname, in_args.mapspampath);
         strcat(fname, mapspam_base);
-        sprintf(tmp_str, "%i%s", (crop_names[crop_index]), rfd_tag);
+        sprintf(tmp_str, "%s%s", (crop_names[crop_index]), rfd_tag);
         strcat(fname, tmp_str);
         
         printf("The state of fname is : %s\n",fname);

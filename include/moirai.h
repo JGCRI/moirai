@@ -80,8 +80,8 @@
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
 //map 2023-01-19 update input arguments to include carbon boolean
-#define NUM_IN_ARGS						131					// number of input variables in the input file
-#define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
+#define NUM_IN_ARGS						134					// number of input variables in the input file
+#define NUM_ORIG_AEZ					18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
 // this applies to the yield, harvest area, production, and prod price input FAO data
