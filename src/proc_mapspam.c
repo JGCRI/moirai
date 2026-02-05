@@ -95,20 +95,18 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     const char irr_tag[] = "_I";   // mapspam irrigated file end; 5 arcmin
     const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
     const char envi_tag[] = ".envi"; // mapspam envi file tag
-    // allocate arrays
     
+    // allocate arrays
     irr_grid = calloc(NUM_CELLS, sizeof(float));
     if(irr_grid == NULL) {
         fprintf(fplog,"Failed to allocate memory for irr_grid: proc_mapspam()\n");
         return ERROR_MEM;
     }
-    
     rfd_grid = calloc(NUM_CELLS, sizeof(float));
     if(rfd_grid == NULL) {
         fprintf(fplog,"Failed to allocate memory for rfd_grid: proc_mapspam()\n");
         return ERROR_MEM;
     }
-    
     irr_out = calloc(NUM_FAO_CTRY, sizeof(float**));
     if(irr_out == NULL) {
         fprintf(fplog,"Failed to allocate memory for irr_out: proc_mapspam()\n");
@@ -119,7 +117,8 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         fprintf(fplog,"Failed to allocate memory for rfd_out: proc_mapspam()\n");
         return ERROR_MEM;
     }
-    for (i = 0; i < NUM_FAO_CTRY; i++) {
+    // allocate AEZ dimension
+        for (i = 0; i < NUM_FAO_CTRY; i++) {
         irr_out[i] = calloc(ctry_aez_num[i], sizeof(float*));
         if(irr_out[i] == NULL) {
             fprintf(fplog,"Failed to allocate memory for irr_out[%i]: proc_mapspam()\n", i);
@@ -130,6 +129,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
             fprintf(fplog,"Failed to allocate memory for rfd_out[%i]: proc_mapspam()\n", i);
             return ERROR_MEM;
         }
+    // allocate crop dimension
         for (j = 0; j < ctry_aez_num[i]; j++) {
             irr_out[i][j] = calloc(NUM_MAPSPAM_CROPS, sizeof(float));
             if(irr_out[i][j] == NULL) {
@@ -153,8 +153,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         sprintf(tmp_str, "%s%s%s", (crop_names[crop_index]), irr_tag, envi_tag);
         strcat(fname, tmp_str);
         
-        printf("The state of fname is : %s\n",fname);
-        
         if((err = read_mapspam(fname, irr_grid)) != OK)
         {
             fprintf(fplog, "Failed to read file %s for input: proc_mapspam()\n",fname);
@@ -166,8 +164,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         strcat(fname, mapspam_base);
         sprintf(tmp_str, "%s%s%s", (crop_names[crop_index]), rfd_tag, envi_tag);
         strcat(fname, tmp_str);
-        
-        printf("The state of fname is : %s\n",fname);
         
         if((err = read_mapspam(fname, rfd_grid)) != OK)
         {
@@ -241,8 +237,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     strcat(fname, in_args.mapspam_irr_fname);
     fpout = fopen(fname,"w"); //float
     
-    printf("The state of fname is : %s\n",fname);
-    
     if(fpout == NULL)
     {
         fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname);
@@ -252,7 +246,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     fprintf(fpout,"# File: %s\n", fname);
     fprintf(fpout,"# Author: %s\n", CODENAME);
     fprintf(fpout,"# Description: mapspam irrigated harvested area (ha) for sage land cells in country X glu\n");
-    fprintf(fpout,"# Original source: mapspam2000; country raster; new glu raster\n");
+    fprintf(fpout,"# Original source: mapspam2020; country raster; new glu raster\n");
     fprintf(fpout,"# ----------\n");
     fprintf(fpout,"iso,glu_code,mapspam_crop,value");
     
@@ -260,8 +254,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     strcpy(fname2, in_args.outpath);
     strcat(fname2, in_args.mapspam_rfd_fname);
     fpout2 = fopen(fname2,"w"); //float
-    
-    printf("The state of fname2 is : %s\n",fname2);
     
     if(fpout2 == NULL)
     {
@@ -272,16 +264,25 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     fprintf(fpout2,"# File: %s\n", fname2);
     fprintf(fpout2,"# Author: %s\n", CODENAME);
     fprintf(fpout2,"# Description: mapspam rainfed havested area (ha) for sage land cells in country X glu\n");
-    fprintf(fpout2,"# Original source: mapspam2000; country raster; new glu raster\n");
+    fprintf(fpout2,"# Original source: mapspam2020; country raster; new glu raster\n");
     fprintf(fpout2,"# ----------\n");
     fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
     
     // write the records (rounded to nearest integer)
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
+    
+    	fprintf(fplog,"Test that for loop is working: %i\n",ctry_ind); // check that for loop is working
+    	
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
             for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
                 // irrigated
                 outval = (float) floor((double) 0.5 + irr_out[ctry_ind][aez_ind][crop_index]);
+                
+                if (irr_out[ctry_ind][aez_ind][crop_index] != 0) {
+                fprintf(fplog,"The value of irr_out is: %f\n",irr_out[ctry_ind][aez_ind][crop_index]);
+                fprintf(fplog,"The value of outval is: %f\n",outval); // write an outval to check format
+                }
+                
                 // output only positive values
                 if (outval > 0) {
                     fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],

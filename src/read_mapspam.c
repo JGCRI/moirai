@@ -74,7 +74,7 @@ int read_mapspam(char *fname, float *mapspam_grid) {
     FILE *fpin;						// file pointer
     float value;					// each value read in
     
-    if((fpin = fopen(fname, "r")) == NULL)
+    if((fpin = fopen(fname, "r")) == NULL) // open file: fname in mode: r (read only)
     {
         fprintf(fplog,"Failed to open file %s:  read_mapspam()\r\n", fname);
         return ERROR_FILE;
@@ -91,9 +91,15 @@ int read_mapspam(char *fname, float *mapspam_grid) {
     // read the data
     ncells = nrows * ncols;
     for (i = 0; i < ncells; i++) {
-        if (fscanf(fpin, "%f", &value) != EOF) {
+    
+    	fprintf(fplog,"Test that the for loop is working at index: %i\n",i); // For loop test
+    	
+        if (fscanf(fpin, "%f", &value) != EOF) { // scan file: fpin for type: %f (float) and assign to the memory location pointed to by &value
             // no need to convert units
             mapspam_grid[i] = value;
+            
+            fprintf(fplog,"Something is happening here: %f\n",value); // check that we get here
+            
         } else {
             if (i == ncells) {
                 fprintf(fplog,"Finished reading mapspam at %s:  read_mapspam()\n", get_systime());
