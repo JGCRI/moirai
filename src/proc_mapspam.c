@@ -225,13 +225,12 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 
                 irr_out[ctry_ind][aez_ind][crop_index] = irr_out[ctry_ind][aez_ind][crop_index] + irr_grid[land_cells_sage[j]];
                 rfd_out[ctry_ind][aez_ind][crop_index] = rfd_out[ctry_ind][aez_ind][crop_index] + rfd_grid[land_cells_sage[j]];
-                
+        
             }	// end if valid aez cell
         }	// end for j loop over valid sage land cells
     }   // end for loop over the mapspam crops
     
     // write the output files
-    
     // irrigated
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.mapspam_irr_fname);

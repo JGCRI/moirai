@@ -71,6 +71,8 @@ int read_mapspam(char *fname, float *mapspam_grid) {
     double ymin = 0;		// latitude min grid boundary = yllcorner = -90
     //double ymax = 90.0;		// latitude max grid boundary
     
+    char out_name_Cat1[]= "SamplemapSPAMdata.bil";
+    
     FILE *fpin;						// file pointer
     float value;					// each value read in
     
@@ -91,15 +93,9 @@ int read_mapspam(char *fname, float *mapspam_grid) {
     // read the data
     ncells = nrows * ncols;
     for (i = 0; i < ncells; i++) {
-    
-    	fprintf(fplog,"Test that the for loop is working at index: %i\n",i); // For loop test
-    	
         if (fscanf(fpin, "%f", &value) != EOF) { // scan file: fpin for type: %f (float) and assign to the memory location pointed to by &value
             // no need to convert units
             mapspam_grid[i] = value;
-            
-            fprintf(fplog,"Something is happening here: %f\n",value); // check that we get here
-            
         } else {
             if (i == ncells) {
                 fprintf(fplog,"Finished reading mapspam at %s:  read_mapspam()\n", get_systime());
@@ -111,7 +107,7 @@ int read_mapspam(char *fname, float *mapspam_grid) {
         }	// end if read and set value else check for end of file or error
         
     }	// end for i loop to read the data
-    
+        
     fclose(fpin);
     
     return OK;}
