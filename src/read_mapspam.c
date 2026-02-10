@@ -11,8 +11,7 @@
  the 5 arcmin mapSPAM files
   starts at upper left corner (-180,90)
   units are hectares
-  6 header lines: ncols, nrows, xllcorner (pixel corner), yllcorner (pixel corner), cellsize, NODATA_value
-  file names are built from the input_mapspam_area.txt lines
+  No header
   the crop # has 1 digit for #<10, and 2 digits for #>=10
  
  also store hectares - no unit conversion
@@ -24,7 +23,7 @@
  return value:
  integer error code: OK = 0, otherwise a non-zero error code
  
- Created by Roan Chadsey on 28 Jan 2026
+ Created by Roan Chadsey on 10 Feb 2026
  
  Moirai Land Data System (Moirai) Copyright (c) 2019, The
  Regents of the University of California, through Lawrence Berkeley National
@@ -48,66 +47,46 @@
  Moirai is free software: you can use it under the terms of the modified BSD-3 license (see …/moirai/license.txt)
  
  **********/
-
-#include "moirai.h"
-
-int read_mapspam(char *fname, float *mapspam_grid) {
-    
-    // use this function to input data to the working grid
+ 
+ #include "moirai.h"
+ 
+ int read_mapspam(char *fname, float *mapspam_grid) { // Inputs are the same as the original for now. A pointer to the file we want to read and a pointer to the array we want to write to
+ 
+ 	// use this function to input data to the working grid
     
     // mapSPAM 2020 irrigated/raindfed data
     // envi ascii grid file
     // 5 arcmin resolution, extent = (-180,180, -90, 90), ?WGS84?
     // read in double values
     
-    int i;
-    int nrows = 2160;		// num input lats = 2160
-    int ncols = 4320;		// num input lons = 4320
-    int ncells = 0;         // number of input grid cells = nrows*ncols
-    int nodata = 0;			// nodata value = -9
-    double res = 0;         // resolution = 5.0 / 60.0 = 0.083333333333333
-    double xmin = 0;		// longitude min grid boundary = xllcorner = -180
-    //double xmax = 180.0;	// longitude max grid boundary
-    double ymin = 0;		// latitude min grid boundary = yllcorner = -90
-    //double ymax = 90.0;		// latitude max grid boundary
-    
-    char out_name_Cat1[]= "SamplemapSPAMdata.bil";
-    
+    // define variables
+    int nrows = 2160;				// num input lats
+    int ncols = 4320;				// num input lons
+    int ncells = nrows * ncols;		// number of input grid cells
+    int insize_IUCN = 4;			// 1 byte unsigned char for input // check that this is the correct format still
+    double res = 5.0 / 60.0;		// resolution
+    double xmin = -180.0;			// longitude min grid boundary
+    double xmax = 180.0;			// longitude max grid boundary
+    double ymin = -90.0;			// latitude min grid boundary
+    double ymax = 90.0;				// latitude max grid boundary
+
     FILE *fpin;						// file pointer
-    float value;					// each value read in
-    
-    if((fpin = fopen(fname, "r")) == NULL) // open file: fname in mode: r (read only)
+    int num_read;					// check number of values we read in to confirm dimensions are correct
+
+    // open fname to fpin pointer
+    if((fpin = fopen(fname, "rb")) == NULL)
     {
-        fprintf(fplog,"Failed to open file %s:  read_mapspam()\r\n", fname);
+        fprintf(fplog,"Failed to open file %s:  read_mapspam()\n", fname);
         return ERROR_FILE;
     }
-    
-    // check the res
-    if (ncols != NUM_LON || nrows != NUM_LAT) {
-        printf("File %s dims do not match expected values:  read_mapspam()\n", fname);
-        return ERROR_FILE;
-    }
-    
-    fprintf(fplog,"Start reading mapspam at %s :  read_mapspam()\n", get_systime());
-    
-    // read the data
-    ncells = nrows * ncols;
-    for (i = 0; i < ncells; i++) {
-        if (fscanf(fpin, "%f", &value) != EOF) { // scan file: fpin for type: %f (float) and assign to the memory location pointed to by &value
-            // no need to convert units
-            mapspam_grid[i] = value;
-        } else {
-            if (i == ncells) {
-                fprintf(fplog,"Finished reading mapspam at %s:  read_mapspam()\n", get_systime());
-            } else {
-                fprintf(fplog, "Failed to read mapspam at %s:  read_mapspam()\n", get_systime());
-                return ERROR_FILE;
-            }	// end if all data read in else error
-            
-        }	// end if read and set value else check for end of file or error
-        
-    }	// end for i loop to read the data
-        
+
+    // read the data and check for same size as the working grid
+    num_read = (int) fread(mapspam_grid, insize_IUCN, ncells, fpin);
     fclose(fpin);
-    
-    return OK;}
+    if(num_read != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_mapspam(); num_read=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+ }

@@ -269,19 +269,11 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     // write the records (rounded to nearest integer)
     for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
-    
-    	fprintf(fplog,"Test that for loop is working: %i\n",ctry_ind); // check that for loop is working
     	
         for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
             for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
                 // irrigated
                 outval = (float) floor((double) 0.5 + irr_out[ctry_ind][aez_ind][crop_index]);
-                
-                if (irr_out[ctry_ind][aez_ind][crop_index] != 0) {
-                fprintf(fplog,"The value of irr_out is: %f\n",irr_out[ctry_ind][aez_ind][crop_index]);
-                fprintf(fplog,"The value of outval is: %f\n",outval); // write an outval to check format
-                }
-                
                 // output only positive values
                 if (outval > 0) {
                     fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
