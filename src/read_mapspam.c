@@ -62,8 +62,8 @@
     // define variables
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
-    int ncells = nrows * ncols;		// number of input grid cells
-    int insize_IUCN = 4;			// 1 byte unsigned char for input // check that this is the correct format still
+    int ncells = nrows * ncols;		// number of input grid cells ~10,000,000 values
+    int insize_IUCN = 4;			// 1 byte unsigned char for input
     double res = 5.0 / 60.0;		// resolution
     double xmin = -180.0;			// longitude min grid boundary
     double xmax = 180.0;			// longitude max grid boundary
@@ -75,9 +75,18 @@
     
     //char fname[MAXCHAR];			// file name to open
 	FILE *fpout;					// file pointer
+	int num_in;
 	int num_out;					// store the number of elements written
-    char out_name_sample[] = "mapspam_grid.bil";
-    char fname2[MAXCHAR] = "./example_outputs/basins235/";
+	float *temp_array;				// temp array to store sample raster
+    char out_name_sample[] = "mapspam_grid.bil"; // binary file to write sample raster to
+    char fname2[] = "./example_outputs/basins235/"; // path to output so we don't have to add new args to read_mapspam
+	
+	// Allocate memory to temporary array so we can output sample raster
+	temp_array = calloc(ncells, sizeof(float));
+    if(temp_array == NULL) {
+        fprintf(fplog,"Failed to allocate memory for temp_array: read_mapspam()\n");
+        return ERROR_MEM;
+    }
 
     // open fname to fpin pointer
     if((fpin = fopen(fname, "rb")) == NULL)
@@ -87,7 +96,7 @@
     }
 
     // read the data and check for same size as the working grid
-    num_read = (int) fread(mapspam_grid, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(mapspam_grid, insize_IUCN, ncells, fpin); // read to temp array for now
     fclose(fpin);
     if(num_read != NUM_CELLS)
     {
@@ -96,7 +105,17 @@
         return ERROR_FILE;
     }
     
-    strcpy(fname2, out_name_sample);
+    // read the data and check for same size as the working grid
+    num_in = (int) fread(temp_array, insize_IUCN, ncells, fpin); // read to temp array for now
+    fclose(fpin);
+    if(num_in != NUM_CELLS)
+    {
+        fprintf(fplog, "Error reading file %s: read_mapspam(); num_in=%i != NUM_CELLS=%i\n",
+                fname, num_read, NUM_CELLS);
+        return ERROR_FILE;
+    }
+    
+    strcat(fname2, out_name_sample);
     
     // Write sample raster
 	if((fpout = fopen(fname2, "wb")) == NULL)
@@ -105,7 +124,7 @@
 		return ERROR_FILE;
 	}
 
-	num_out = (int) fwrite(mapspam_grid, sizeof(float), ncells, fpout);
+	num_out = (int) fwrite(temp_array, insize_IUCN, ncells, fpout);
 	
 	fclose(fpout);
 	
