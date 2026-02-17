@@ -23,7 +23,7 @@
  return value:
  integer error code: OK = 0, otherwise a non-zero error code
  
- Created by Roan Chadsey on 10 Feb 2026
+ Created by Roan Chadsey on 10 Feb 2026, add
  
  Moirai Land Data System (Moirai) Copyright (c) 2019, The
  Regents of the University of California, through Lawrence Berkeley National
@@ -72,12 +72,6 @@
 
     FILE *fpin;						// file pointer
     int num_read;					// check number of values we read in to confirm dimensions are correct
-    
-    //char fname[MAXCHAR];			// file name to open
-	FILE *fpout;					// file pointer
-	int num_out;					// store the number of elements written
-    char out_name_sample[] = "mapspam_grid.bil";
-    char fname2[MAXCHAR] = "./example_outputs/basins235/";
 
     // open fname to fpin pointer
     if((fpin = fopen(fname, "rb")) == NULL)
@@ -95,25 +89,4 @@
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
-    
-    strcpy(fname2, out_name_sample);
-    
-    // Write sample raster
-	if((fpout = fopen(fname2, "wb")) == NULL)
-	{
-		fprintf(fplog,"Failed to open file %s: read_mapspam()\n", fname2);
-		return ERROR_FILE;
-	}
-
-	num_out = (int) fwrite(mapspam_grid, sizeof(float), ncells, fpout);
-	
-	fclose(fpout);
-	
-	// Check that the length of mapspam_grid is correct
-	if(num_out != ncells)
-	{
-		fprintf(fplog, "Error writing file %s: read_mapspam(); records written=%i != ncells=%i\n",
-			fname2, num_out, ncells);
-		return ERROR_FILE;
-	}
  }
