@@ -96,6 +96,9 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
     const char envi_tag[] = ".envi"; // mapspam envi file tag
     
+    char irr_grid_mapSPAM[]= "irr_sample_mapspam.bil";
+    char rfd_grid_mapSPAM[]= "rfd_sample_mapspam.bil";
+    
     // allocate arrays
     irr_grid = calloc(NUM_CELLS, sizeof(float));
     if(irr_grid == NULL) {
@@ -170,14 +173,15 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
             fprintf(fplog, "Failed to read file %s for input: proc_mapspam()\n",fname);
             return err;
         }
+    
         
         // loop over the valid sage land cells
         //  and skip it if no valid glu value or country value
         for (j = 0; j < num_land_cells_sage; j++) {
-            aez_val = aez_bounds_new[land_cells_sage[j]];
-            ctry_code = country_fao[land_cells_sage[j]];
+            aez_val = aez_bounds_new[land_cells_sage[j]]; // get the basin value for this sage pixel
+            ctry_code = country_fao[land_cells_sage[j]]; // get country code for this sage pixel
             
-            if (aez_val != raster_info.aez_new_nodata) {
+            if (aez_val != raster_info.aez_new_nodata) { // check that this is a valid pixel
                 // get the fao country index
                 ctry_ind = NOMATCH;
                 for (i = 0; i < NUM_FAO_CTRY; i++) {
@@ -222,10 +226,17 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
                     fprintf(fplog, "Failed to match aez %i to country %i: proc_mapspam()\n",aez_val,ctry_code);
                     return ERROR_IND;
                 }
-
+    			
+				if (irr_grid[land_cells_sage[j]] < 0) {
+					irr_grid[land_cells_sage[j]] = 0; // replace NAN values
+				}
+				if (rfd_grid[land_cells_sage[j]] < 0) {
+					rfd_grid[land_cells_sage[j]] = 0; // replace NAN values
+				}
+    			
                 irr_out[ctry_ind][aez_ind][crop_index] = irr_out[ctry_ind][aez_ind][crop_index] + irr_grid[land_cells_sage[j]];
                 rfd_out[ctry_ind][aez_ind][crop_index] = rfd_out[ctry_ind][aez_ind][crop_index] + rfd_grid[land_cells_sage[j]];
-        
+		
             }	// end if valid aez cell
         }	// end for j loop over valid sage land cells
     }   // end for loop over the mapspam crops

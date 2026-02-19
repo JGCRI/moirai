@@ -63,7 +63,7 @@
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
     int ncells = nrows * ncols;		// number of input grid cells
-    int insize_IUCN = 4;			// 1 byte unsigned char for input // check that this is the correct format still
+    int insize_float = 4;			// 1 byte unsigned char for input // check that this is the correct format still
     double res = 5.0 / 60.0;		// resolution
     double xmin = -180.0;			// longitude min grid boundary
     double xmax = 180.0;			// longitude max grid boundary
@@ -72,6 +72,7 @@
 
     FILE *fpin;						// file pointer
     int num_read;					// check number of values we read in to confirm dimensions are correct
+	int i;							// index for replacing nan values
 
     // open fname to fpin pointer
     if((fpin = fopen(fname, "rb")) == NULL)
@@ -81,8 +82,9 @@
     }
 
     // read the data and check for same size as the working grid
-    num_read = (int) fread(mapspam_grid, insize_IUCN, ncells, fpin);
+    num_read = (int) fread(mapspam_grid, insize_float, ncells, fpin);
     fclose(fpin);
+    
     if(num_read != NUM_CELLS)
     {
         fprintf(fplog, "Error reading file %s: read_mapspam(); num_read=%i != NUM_CELLS=%i\n",
