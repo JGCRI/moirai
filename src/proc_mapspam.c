@@ -64,6 +64,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     int var_index;			// the index for looping over mapspam variables
     char var_names[4][3] = {"_H","_A","_P","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
     char csv_tags[4][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
+    char var_long_names[4][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
     int err = OK;				// store error code from the write functions
     
     int scg_code = 186;         // fao code for serbia and montenegro
@@ -262,7 +263,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		}   // end for loop over the mapspam crops
 	}	// end for loop over mapspam variables
     
-    
+    // Write values
 	for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) {
 	
 		strcpy(fname, in_args.outpath);
@@ -279,7 +280,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		// write header lines
 		fprintf(fpout,"# File: %s\n", fname);
 		fprintf(fpout,"# Author: %s\n", CODENAME);
-		fprintf(fpout,"# Description: mapspam irrigated harvested area (ha) for sage land cells in country X glu\n");
+		fprintf(fpout,"# Description: mapspam irrigated %s for sage land cells in country X glu\n", var_long_names[var_index]);
 		fprintf(fpout,"# Original source: mapspam2020; country raster; new glu raster\n");
 		fprintf(fpout,"# ----------\n");
 		fprintf(fpout,"iso,glu_code,mapspam_crop,value");
@@ -299,7 +300,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		// write header lines
 		fprintf(fpout2,"# File: %s\n", fname2);
 		fprintf(fpout2,"# Author: %s\n", CODENAME);
-		fprintf(fpout2,"# Description: mapspam rainfed havested area (ha) for sage land cells in country X glu\n");
+		fprintf(fpout2,"# Description: mapspam rainfed %s for sage land cells in country X glu\n", var_long_names[var_index]);
 		fprintf(fpout2,"# Original source: mapspam2020; country raster; new glu raster\n");
 		fprintf(fpout2,"# ----------\n");
 		fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
@@ -335,74 +336,76 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 	fprintf(fplog, "Wrote file %s: proc_mapspam(); records written=%i\n", fname2, nrecords_rfd);
     }
     
-    
-	// // write the output files
-// 	// irrigated
-// 	strcpy(fname, in_args.outpath);
-// 	strcat(fname, in_args.mapspam_irr_fname);
-// 	fpout = fopen(fname,"w"); //float
-// 	
-// 	if(fpout == NULL)
-// 	{
-// 		fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname);
-// 		return ERROR_FILE;
-// 	}
-// 	// write header lines
-// 	fprintf(fpout,"# File: %s\n", fname);
-// 	fprintf(fpout,"# Author: %s\n", CODENAME);
-// 	fprintf(fpout,"# Description: mapspam irrigated harvested area (ha) for sage land cells in country X glu\n");
-// 	fprintf(fpout,"# Original source: mapspam2020; country raster; new glu raster\n");
-// 	fprintf(fpout,"# ----------\n");
-// 	fprintf(fpout,"iso,glu_code,mapspam_crop,value");
-// 	
-// 	// rainfed
-// 	strcpy(fname2, in_args.outpath);
-// 	strcat(fname2, in_args.mapspam_rfd_fname);
-// 	fpout2 = fopen(fname2,"w"); //float
-// 	
-// 	if(fpout2 == NULL)
-// 	{
-// 		fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname2);
-// 		return ERROR_FILE;
-// 	}
-// 	// write header lines
-// 	fprintf(fpout2,"# File: %s\n", fname2);
-// 	fprintf(fpout2,"# Author: %s\n", CODENAME);
-// 	fprintf(fpout2,"# Description: mapspam rainfed havested area (ha) for sage land cells in country X glu\n");
-// 	fprintf(fpout2,"# Original source: mapspam2020; country raster; new glu raster\n");
-// 	fprintf(fpout2,"# ----------\n");
-// 	fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
-// 	
-// 	// write the records (rounded to nearest integer)
-// 	for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
-// 		
-// 		for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-// 			for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
-// 				// irrigated
-// 				outval = (float) floor((double) 0.5 + irr_out[ctry_ind][aez_ind][crop_index]);
-// 				// output only positive values
-// 				if (outval > 0) {
-// 					fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-// 							crop_index+1, outval);
-// 					nrecords_irr++;
-// 				} // end if value is positive
-// 				// rainfed
-// 				outval = (float) floor((double) 0.5 + rfd_out[ctry_ind][aez_ind][crop_index]);
-// 				// output only positive values
-// 				if (outval > 0) {
-// 					fprintf(fpout2,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
-// 							crop_index+1, outval);
-// 					nrecords_rfd++;
-// 				} // end if value is positive
-// 			} // end for crop loop
-// 		} // end for aez loop
-// 	} // end for country loop
-// 	
-// 	fclose(fpout);
-// 	fclose(fpout2);
-// 	
-// 	fprintf(fplog, "Wrote file %s: proc_mapspam(); records written=%i\n", fname, nrecords_irr);
-// 	fprintf(fplog, "Wrote file %s: proc_mapspam(); records written=%i\n", fname2, nrecords_rfd);
+    // Generate yield grid
+    var_index = 3; // Access yield var
+	strcpy(fname, in_args.outpath);
+	strcat(fname, in_args.mapspam_irr_fname);
+	sprintf(tmp_str, "%s%s", (var_names[var_index]), csv_tags[var_index]);
+	strcat(fname, tmp_str);
+	fpout = fopen(fname,"w"); //float
+	
+	if(fpout == NULL)
+	{
+		fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname);
+		return ERROR_FILE;
+	}
+	// write header lines
+	fprintf(fpout,"# File: %s\n", fname);
+	fprintf(fpout,"# Author: %s\n", CODENAME);
+	fprintf(fpout,"# Description: mapspam irrigated %s for sage land cells in country X glu\n", var_long_names[var_index]);
+	fprintf(fpout,"# Original source: mapspam2020; country raster; new glu raster\n");
+	fprintf(fpout,"# ----------\n");
+	fprintf(fpout,"iso,glu_code,mapspam_crop,value");
+	
+	// rainfed
+	strcpy(fname2, in_args.outpath);
+	strcat(fname2, in_args.mapspam_rfd_fname);
+	sprintf(tmp_str, "%s%s", (var_names[var_index]), csv_tags[var_index]);
+	strcat(fname2, tmp_str);
+	fpout2 = fopen(fname2,"w"); //float
+	
+	if(fpout2 == NULL)
+	{
+		fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname2);
+		return ERROR_FILE;
+	}
+	// write header lines
+	fprintf(fpout2,"# File: %s\n", fname2);
+	fprintf(fpout2,"# Author: %s\n", CODENAME);
+	fprintf(fpout2,"# Description: mapspam rainfed %s for sage land cells in country X glu\n", var_long_names[var_index]);
+	fprintf(fpout2,"# Original source: mapspam2020; country raster; new glu raster\n");
+	fprintf(fpout2,"# ----------\n");
+	fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
+	
+	// write the records (rounded to nearest integer)
+	for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
+		for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
+			for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
+				// irrigated
+				outval = (float) floor((double) 0.5 + (irr_out[ctry_ind][aez_ind][crop_index][2]/irr_out[ctry_ind][aez_ind][crop_index][0]));
+				// output only positive values
+				if (outval > 0 && !isinf(outval)) {
+					fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+							crop_index+1, outval);
+					nrecords_irr++;
+				} // end if value is positive
+				// rainfed
+				outval = (float) floor((double) 0.5 + (rfd_out[ctry_ind][aez_ind][crop_index][2]/rfd_out[ctry_ind][aez_ind][crop_index][0]));
+				// output only positive values
+				if (outval > 0 && !isinf(outval)) {
+					fprintf(fpout2,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
+							crop_index+1, outval);
+					nrecords_rfd++;
+				} // end if value is positive
+			} // end for crop loop
+		} // end for aez loop
+	} // end for country loop
+		
+	fclose(fpout);
+	fclose(fpout2);
+	
+	fprintf(fplog, "Wrote file %s: proc_mapspam(); records written=%i\n", fname, nrecords_irr);
+	fprintf(fplog, "Wrote file %s: proc_mapspam(); records written=%i\n", fname2, nrecords_rfd);
     
     free(irr_grid);
     free(rfd_grid);
