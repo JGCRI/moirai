@@ -99,6 +99,7 @@
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
 #define NUM_MAPSPAM_CROPS		46				// number of crops in the mapSPAM2020 data set
+#define NUM_MAPSPAM_VARS		4				// number of variables in the mapSPAM2020 data set
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define NUM_CARBON_TYPES        4              //Types of carbon
@@ -654,8 +655,8 @@ typedef struct {
 	char rent_fname[MAXCHAR];				// file name for land rent output
     char mirca_irr_fname[MAXCHAR];			// file name for mirca irrigated crop area output
     char mirca_rfd_fname[MAXCHAR];			// file name for mirca rainfed crop area output
-    char mapspam_irr_fname[MAXCHAR];		// file name for mapSPAM irrigated crop area output
-    char mapspam_rfd_fname[MAXCHAR];		// file name for mapSPAM rainfed crop area output
+    char mapspam_irr_fname[MAXCHAR];		// file name for mapSPAM irrigated output
+    char mapspam_rfd_fname[MAXCHAR];		// file name for mapSPAM rainfed output
     char land_type_area_fname[MAXCHAR];     // file name for land type area output
     char refveg_carbon_fname[MAXCHAR];      // file name for reference veg carbon output
     char wf_fname[MAXCHAR];                 // file name for water footprint output
