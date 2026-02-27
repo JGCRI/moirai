@@ -5,8 +5,8 @@
 # the working directory is the main project directory (which contains the examples directory)
 
 # flags
-0							# diagnostics: 0 = no, 1 = yes
-1                    # carbon outputs: 0 = no, 1 = yes
+1							# diagnostics: 0 = no, 1 = yes
+0                    # carbon outputs: 0 = no, 1 = yes
 
 # data years for recalibration
 0							# out_year_prod_ha_lr: recalibration output year for crop production, harvest area, and land rent
@@ -131,10 +131,10 @@ SAGE_PVLT.csv					# lt_sage_fname: SAGE land cover types for potential vegetatio
 hyde32_lu.csv					# lu_hyde_fname: HYDE land use types
 isam_2_sage_hyde_mapping.csv			# lulc_fname: LULC types and mapping to sage and hyde
 SAGE_gtap_fao_crop2use.csv			# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
-FAO_production_1993_2016.csv			# production_fao_fname: FAO production data
-FAO_yield_1993_2016.csv				# yield_fao_fname: FAO yield data
-FAO_harvarea_1993_2016.csv			# harvestarea_fao_fname: FAO harvest area data
-FAO_producerprice_1993_2016.csv			# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
+FAO_production_1993_2021.csv			# production_fao_fname: FAO production data
+FAO_yield_1993_2021.csv				# yield_fao_fname: FAO yield data
+FAO_harvarea_1993_2021.csv			# harvestarea_fao_fname: FAO harvest area data
+FAO_producerprice_1993_2021.csv			# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
 cpi_all_1970_2017_bls_june2018_annual.csv	# convert_usd_fname: consumer price index table to convert from one US dollar year to another
 
 # output file names (without path)
