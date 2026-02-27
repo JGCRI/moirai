@@ -60,11 +60,11 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     int i, j, k = 0;
     int crop_index;             // the index for looping over mapspam crops
-    char crop_names[46][5]	= {"WHEA","RICE","MAIZ","BARL","MILL","PMIL","SORG","OCER","POTA","SWPO","YAMS","CASS","ORTS","BEAN","CHIC","COWP","PIGE","LENT","OPUL","SOYB","GROU","CNUT","OILP","SUNF","RAPE","SESA","OOIL","SUGC","SUGB","COTT","OFIB","COFF","RCOF","COCO","TEAS","TOBA","BANA","PLNT","CITR","TROF","TEMF","TOMA","ONIO","VEGE","RUBB","REST"}; // the mapspam crop names
+    char crop_names[NUM_MAPSPAM_CROPS][5]	= {"WHEA","RICE","MAIZ","BARL","MILL","PMIL","SORG","OCER","POTA","SWPO","YAMS","CASS","ORTS","BEAN","CHIC","COWP","PIGE","LENT","OPUL","SOYB","GROU","CNUT","OILP","SUNF","RAPE","SESA","OOIL","SUGC","SUGB","COTT","OFIB","COFF","RCOF","COCO","TEAS","TOBA","BANA","PLNT","CITR","TROF","TEMF","TOMA","ONIO","VEGE","RUBB","REST"}; // the mapspam crop names
     int var_index;			// the index for looping over mapspam variables
-    char var_names[4][3] = {"_H","_A","_P","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
-    char csv_tags[4][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
-    char var_long_names[4][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
+    char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_A","_P","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
+    char csv_tags[NUM_MAPSPAM_VARS][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
+    char var_long_names[NUM_MAPSPAM_VARS][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
     int err = OK;				// store error code from the write functions
     
     int scg_code = 186;         // fao code for serbia and montenegro
@@ -74,7 +74,11 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     float *irr_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
     float *rfd_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
 
-    
+	float *crop_grid;  // 1d array to store current crop data; start up left corner, row by row; lon varies faster
+    float *pasture_grid;  // 1d array to store current pasture data; start up left corner, row by row; lon varies faster
+    float *urban_grid;  // 1d array to store current urban data; start up left corner, row by row; lon varies faster
+	float **lu_detail_grid;		// for the rest of the hyde types; dim1=hyde types, dim2=cells
+	
     // output tables as 3-d arrays; ctry, glu, crop; crop varies fastest
     float ****irr_out;		// the irrigated crop area in ha
     float ****rfd_out;		// the rainfed crop area in ha
@@ -167,6 +171,41 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         } // end for j loop over aezs
     } // end for i loop over fao country
     
+    crop_grid = calloc(NUM_CELLS, sizeof(float));
+    if(crop_grid == NULL) {
+        fprintf(fplog,"Failed to allocate memory for crop_grid: proc_land_type_area()\n");
+        return ERROR_MEM;
+    }
+    pasture_grid = calloc(NUM_CELLS, sizeof(float));
+    if(pasture_grid == NULL) {
+        fprintf(fplog,"Failed to allocate memory for pasture_grid: proc_land_type_area()\n");
+        return ERROR_MEM;
+    }
+    urban_grid = calloc(NUM_CELLS, sizeof(float));
+    if(urban_grid == NULL) {
+        fprintf(fplog,"Failed to allocate memory for urban_grid: proc_land_type_area()\n");
+        return ERROR_MEM;
+    }
+    
+    lu_detail_grid = calloc(NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN, sizeof(float*));
+	if(lu_detail_grid == NULL) {
+		fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_grid: proc_mapspam()\n", get_systime(), ERROR_MEM);
+		return ERROR_MEM;
+	}
+	for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
+		lu_detail_grid[i] = calloc(NUM_CELLS, sizeof(float));
+		if(lu_detail_grid[i] == NULL) {
+			fprintf(fplog,"\nProgram terminated at %s with error_code = %i\nFailed to allocate memory for lu_detail_grid[%i]: proc_mapspam()\n", get_systime(), ERROR_MEM, i);
+			return ERROR_MEM;
+		}
+	}
+    
+    if((err = read_hyde32(in_args, &raster_info, MAPSPAM_YEAR, crop_grid, pasture_grid, urban_grid, lu_detail_grid)) != OK)
+		{
+			fprintf(fplog, "Failed to read lu hyde data for year %i: proc_mapspam()\n", MAPSPAM_YEAR);
+			return err;
+		}
+		
     // loop over the mapspam variables and crops
     for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) { // For each variable in var_names
 		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
@@ -423,5 +462,12 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     }
     free(irr_out);
     free(rfd_out);
+    free(crop_grid);
+    free(pasture_grid);
+    free(urban_grid);
+    for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
+		free(lu_detail_grid[i]);
+	}
+	free(lu_detail_grid);
     
     return OK;}
