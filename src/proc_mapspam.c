@@ -60,12 +60,16 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     int i, j, k = 0;
     int crop_index;             // the index for looping over mapspam crops
+    int crop_ind;				// second crop index for harmonizing with HYDE
     char crop_names[NUM_MAPSPAM_CROPS][5]	= {"WHEA","RICE","MAIZ","BARL","MILL","PMIL","SORG","OCER","POTA","SWPO","YAMS","CASS","ORTS","BEAN","CHIC","COWP","PIGE","LENT","OPUL","SOYB","GROU","CNUT","OILP","SUNF","RAPE","SESA","OOIL","SUGC","SUGB","COTT","OFIB","COFF","RCOF","COCO","TEAS","TOBA","BANA","PLNT","CITR","TROF","TEMF","TOMA","ONIO","VEGE","RUBB","REST"}; // the mapspam crop names
-    int var_index;			// the index for looping over mapspam variables
+    int var_index;				// the index for looping over mapspam variables
     char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_A","_P","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
     char csv_tags[NUM_MAPSPAM_VARS][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
     char var_long_names[NUM_MAPSPAM_VARS][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
     int err = OK;				// store error code from the write functions
+    int HYDE_violation = 0;		// counter for HYDE-mapSPAM cropland violations
+    int add_crops_rfd = 0;		// counter for HYDE-mapSPAM cropland violations
+	int add_crops_irr = 0;		// counter for HYDE-mapSPAM cropland violations
     
     int scg_code = 186;         // fao code for serbia and montenegro
     int srb_code = 272;         // fao code for serbia
@@ -73,6 +77,8 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     float *irr_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
     float *rfd_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
+    float cropland_irr;   // value to harmonize HYDE cropland
+    float cropland_rfd;   // value to harmonize HYDE cropland
 
 	float *crop_grid;  // 1d array to store current crop data; start up left corner, row by row; lon varies faster
     float *pasture_grid;  // 1d array to store current pasture data; start up left corner, row by row; lon varies faster
@@ -208,6 +214,8 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		
     // loop over the mapspam variables and crops
     for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) { // For each variable in var_names
+    	add_crops_rfd = 0;
+    	add_crops_irr = 0;
 		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 			
 			// read the irrigated crop files
@@ -287,6 +295,19 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 						return ERROR_IND;
 					}
 					
+					// For cases where HYDE does not have cropland but mapSPAM has crop values we set the pixel to zero
+					if (crop_grid[land_cells_sage[j]] < 0) {
+						if (irr_grid[land_cells_sage[j]] > 0) {
+							irr_grid[land_cells_sage[j]] = 0; // Harmonize cropland with HYDE
+							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
+						}
+						if (rfd_grid[land_cells_sage[j]] > 0) {
+							rfd_grid[land_cells_sage[j]] = 0; // Harmonize cropland with HYDE
+							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
+						}
+					}
+			
+					// We want to set NaN in the irr/rfd_grid to zero to avoid -inf errors
 					if (irr_grid[land_cells_sage[j]] < 0) {
 						irr_grid[land_cells_sage[j]] = 0; // replace NAN values
 					}
@@ -296,11 +317,29 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 					
 					irr_out[ctry_ind][aez_ind][crop_index][var_index] = irr_out[ctry_ind][aez_ind][crop_index][var_index] + irr_grid[land_cells_sage[j]];
 					rfd_out[ctry_ind][aez_ind][crop_index][var_index] = rfd_out[ctry_ind][aez_ind][crop_index][var_index] + rfd_grid[land_cells_sage[j]];
+					
+					// For cases where mapSPAM has no crop value but HYDE has cropland we want to add one to the 'REST' crop
+					if (crop_index == 45 && crop_grid[land_cells_sage[j]] > 0) { // check for HYDE cropland and REST crop index
+						for (crop_ind = 0; crop_ind < NUM_MAPSPAM_CROPS; crop_ind++) { // check if mapSPAM has no crops
+							cropland_irr = cropland_irr + irr_out[ctry_ind][aez_ind][crop_ind][var_index];
+							cropland_rfd = cropland_rfd + rfd_out[ctry_ind][aez_ind][crop_ind][var_index];
+						}
+						if (cropland_irr == 0) { // if mapSPAM had no crops add one ha to REST
+							irr_out[ctry_ind][aez_ind][crop_index][var_index] = 1;
+							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
+						}
+						if (cropland_rfd == 0) { // if mapSPAM had no crops add one ha to REST
+							rfd_out[ctry_ind][aez_ind][crop_index][var_index] = 1;
+							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
+						}
+					}
 			
 				}	// end if valid aez cell
 			}	// end for j loop over valid sage land cells
 		}   // end for loop over the mapspam crops
 	}	// end for loop over mapspam variables
+    
+    fprintf(fplog, "The number of mapSPAM cells that have crops in a non-cropland HYDE cell is: %i\n", HYDE_violation);
     
     // Write values
 	for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) {
