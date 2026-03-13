@@ -67,9 +67,8 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     char csv_tags[NUM_MAPSPAM_VARS][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
     char var_long_names[NUM_MAPSPAM_VARS][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
     int err = OK;				// store error code from the write functions
-    int HYDE_violation = 0;		// counter for HYDE-mapSPAM cropland violations
-    int add_crops_rfd = 0;		// counter for HYDE-mapSPAM cropland violations
-	int add_crops_irr = 0;		// counter for HYDE-mapSPAM cropland violations
+    float *HYDE_violation_irr;		// counter for HYDE-mapSPAM cropland violations
+    float *HYDE_violation_rfd;		// counter for HYDE-mapSPAM cropland violations
     
     int scg_code = 186;         // fao code for serbia and montenegro
     int srb_code = 272;         // fao code for serbia
@@ -77,8 +76,11 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     float *irr_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
     float *rfd_grid;  // 1d array to store current mapspam raster file; start up left corner, row by row; lon varies faster
-    float cropland_irr;   // value to harmonize HYDE cropland
-    float cropland_rfd;   // value to harmonize HYDE cropland
+    float *cropland_irr;			// value to harmonize HYDE cropland
+    float *cropland_rfd;			// value to harmonize HYDE cropland
+    float HYDE_cropland;   			// value to harmonize HYDE cropland
+    float HYDE_nocrop;				// value to harmonize HYDE cropland
+    float HYDE_total = 0;		// value to get hyde cropland total
 
 	float *crop_grid;  // 1d array to store current crop data; start up left corner, row by row; lon varies faster
     float *pasture_grid;  // 1d array to store current pasture data; start up left corner, row by row; lon varies faster
@@ -114,6 +116,28 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     // mapspam output file names
     const char ha_csv_tag[] = "_ha.csv";
     const char Mt_csv_tag[] = "_Mt.csv";
+    
+    HYDE_violation_irr = calloc(num_land_cells_sage, sizeof(float));
+    if(HYDE_violation_irr == NULL) {
+        fprintf(fplog,"Failed to allocate memory for HYDE_violation_irr: proc_mapspam()\n");
+        return ERROR_MEM;
+    }
+    HYDE_violation_rfd = calloc(num_land_cells_sage, sizeof(float));
+    if(HYDE_violation_rfd == NULL) {
+        fprintf(fplog,"Failed to allocate memory for HYDE_violation_rfd: proc_mapspam()\n");
+        return ERROR_MEM;
+    }
+
+    cropland_irr = calloc(num_land_cells_sage, sizeof(float));
+    if(cropland_irr == NULL) {
+        fprintf(fplog,"Failed to allocate memory for cropland_irr: proc_mapspam()\n");
+        return ERROR_MEM;
+    }
+    cropland_rfd = calloc(num_land_cells_sage, sizeof(float));
+    if(cropland_rfd == NULL) {
+        fprintf(fplog,"Failed to allocate memory for cropland_rfd: proc_mapspam()\n");
+        return ERROR_MEM;
+    }
     
     // allocate arrays
     irr_grid = calloc(NUM_CELLS, sizeof(float));
@@ -214,8 +238,12 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		
     // loop over the mapspam variables and crops
     for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) { // For each variable in var_names
-    	add_crops_rfd = 0;
-    	add_crops_irr = 0;
+	HYDE_cropland = 0;
+	HYDE_nocrop = 0;
+	memset(HYDE_violation_irr, 0, sizeof(HYDE_violation_irr));
+	memset(HYDE_violation_rfd, 0, sizeof(HYDE_violation_rfd));
+	memset(cropland_irr, 0, sizeof(cropland_irr));
+	memset(cropland_rfd, 0, sizeof(cropland_rfd));
 		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 			
 			// read the irrigated crop files
@@ -296,14 +324,15 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 					}
 					
 					// For cases where HYDE does not have cropland but mapSPAM has crop values we set the pixel to zero
+					// This should be a small subset of total SPAM cropland so we don't worry about data loss here
 					if (crop_grid[land_cells_sage[j]] < 0) {
 						if (irr_grid[land_cells_sage[j]] > 0) {
+							HYDE_violation_irr[j] = HYDE_violation_irr[j] + irr_grid[land_cells_sage[j]]; // count cells that had to be harmonized with the HYDE crop_grid mask
 							irr_grid[land_cells_sage[j]] = 0; // Harmonize cropland with HYDE
-							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
 						}
 						if (rfd_grid[land_cells_sage[j]] > 0) {
+							HYDE_violation_rfd[j] = HYDE_violation_rfd[j] + rfd_grid[land_cells_sage[j]]; // count cells that had to be harmonized with the HYDE crop_grid mask
 							rfd_grid[land_cells_sage[j]] = 0; // Harmonize cropland with HYDE
-							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
 						}
 					}
 			
@@ -315,31 +344,147 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 						rfd_grid[land_cells_sage[j]] = 0; // replace NAN values
 					}
 					
+					// Add grid values to out array for each sage land cell that corresponds to ctry_ind and aez_ind
 					irr_out[ctry_ind][aez_ind][crop_index][var_index] = irr_out[ctry_ind][aez_ind][crop_index][var_index] + irr_grid[land_cells_sage[j]];
 					rfd_out[ctry_ind][aez_ind][crop_index][var_index] = rfd_out[ctry_ind][aez_ind][crop_index][var_index] + rfd_grid[land_cells_sage[j]];
-					
-					// For cases where mapSPAM has no crop value but HYDE has cropland we want to add one to the 'REST' crop
-					if (crop_index == 45 && crop_grid[land_cells_sage[j]] > 0) { // check for HYDE cropland and REST crop index
-						for (crop_ind = 0; crop_ind < NUM_MAPSPAM_CROPS; crop_ind++) { // check if mapSPAM has no crops
-							cropland_irr = cropland_irr + irr_out[ctry_ind][aez_ind][crop_ind][var_index];
-							cropland_rfd = cropland_rfd + rfd_out[ctry_ind][aez_ind][crop_ind][var_index];
-						}
-						if (cropland_irr == 0) { // if mapSPAM had no crops add one ha to REST
-							irr_out[ctry_ind][aez_ind][crop_index][var_index] = 1;
-							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
-						}
-						if (cropland_rfd == 0) { // if mapSPAM had no crops add one ha to REST
-							rfd_out[ctry_ind][aez_ind][crop_index][var_index] = 1;
-							HYDE_violation++; // count cells that had to be harmonized with the HYDE crop_grid mask
-						}
-					}
 			
+					// Check the total cropland allocated to each land cell j (looping over SPAM crops)
+					if (crop_grid[land_cells_sage[j]] > 0) {
+						cropland_irr[j] = cropland_irr[j] + irr_grid[land_cells_sage[j]];
+						cropland_rfd[j] = cropland_rfd[j] + rfd_grid[land_cells_sage[j]];
+					}
+					
 				}	// end if valid aez cell
 			}	// end for j loop over valid sage land cells
 		}   // end for loop over the mapspam crops
+	
+		for (j = 0; j < num_land_cells_sage; j++) {
+				aez_val = aez_bounds_new[land_cells_sage[j]]; // get the basin value for this sage pixel
+				ctry_code = country_fao[land_cells_sage[j]]; // get country code for this sage pixel
+				
+				if (aez_val != raster_info.aez_new_nodata) { // check that this is a valid pixel
+					// get the fao country index
+					ctry_ind = NOMATCH;
+					for (i = 0; i < NUM_FAO_CTRY; i++) {
+						if (countrycodes_fao[i] == ctry_code) {
+							ctry_ind = i;
+							break;
+						}
+					} // end for i loop to get ctry index
+					
+					// merge serbia and montenegro for scg record
+					if (ctry_code == mne_code || ctry_code == srb_code) {
+						ctry_code = scg_code;
+						ctry_ind = NOMATCH;
+						for (i = 0; i < NUM_FAO_CTRY; i++) {
+							if (countrycodes_fao[i] == ctry_code) {
+								ctry_ind = i;
+								break;
+							}
+						}
+						if (ctry_ind == NOMATCH) {
+							// this should never happen
+							fprintf(fplog, "Error finding scg ctry index: proc_mapspam()\n");
+							return ERROR_IND;
+						}
+					} // end if serbia or montenegro
+					
+					if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
+						continue;
+					}
+					
+					// get the aez index within the country aez list
+					aez_ind = NOMATCH;
+					for (i = 0; i < ctry_aez_num[ctry_ind]; i++) {
+						if (ctry_aez_list[ctry_ind][i] == aez_val) {
+							aez_ind = i;
+							break;
+						}
+					} // end for i loop to get aez index
+					
+					// this shouldn't happen because the countryXglu list has been made already
+					if (aez_ind == NOMATCH) {
+						fprintf(fplog, "Failed to match aez %i to country %i: proc_mapspam()\n",aez_val,ctry_code);
+						return ERROR_IND;
+					}
+					
+				// For cases where mapSPAM has no crop value but HYDE has cropland we want to add to our HYDE_cropland variable
+				if (cropland_irr[j] == 0 && cropland_rfd[j] == 0 && crop_grid[land_cells_sage[j]] > 0) {
+					HYDE_cropland = HYDE_cropland + crop_grid[land_cells_sage[j]];
+				}
+				
+				// For cases where mapSPAM has a crop value but HYDE does not have cropland we want to add to our HYDE_nocrop variable
+				if ((HYDE_violation_rfd[j] > 0 || HYDE_violation_irr[j] > 0) && crop_grid[land_cells_sage[j]] < 0) {
+					HYDE_nocrop = HYDE_nocrop + HYDE_violation_rfd[j] + HYDE_violation_irr[j];
+				}
+			}
+				
+		}
+
+		if (var_index == 0) {
+    		fprintf(fplog, "The cropland area defined in SPAM that is not cropland in HYDE is: %.0f\n", HYDE_nocrop);
+    		fprintf(fplog, "The cropland area defined in HYDE that does not have a crop reflected in mapSPAM is: %.0f\n", HYDE_cropland);
+    	}
 	}	// end for loop over mapspam variables
-    
-    fprintf(fplog, "The number of mapSPAM cells that have crops in a non-cropland HYDE cell is: %i\n", HYDE_violation);
+
+	for (j = 0; j < num_land_cells_sage; j++) {
+	// check that cells sage j maps to aez and ctry, skip if not
+				aez_val = aez_bounds_new[land_cells_sage[j]]; // get the basin value for this sage pixel
+				ctry_code = country_fao[land_cells_sage[j]]; // get country code for this sage pixel
+				
+				if (aez_val != raster_info.aez_new_nodata) { // check that this is a valid pixel
+					// get the fao country index
+					ctry_ind = NOMATCH;
+					for (i = 0; i < NUM_FAO_CTRY; i++) {
+						if (countrycodes_fao[i] == ctry_code) {
+							ctry_ind = i;
+							break;
+						}
+					} // end for i loop to get ctry index
+					
+					// merge serbia and montenegro for scg record
+					if (ctry_code == mne_code || ctry_code == srb_code) {
+						ctry_code = scg_code;
+						ctry_ind = NOMATCH;
+						for (i = 0; i < NUM_FAO_CTRY; i++) {
+							if (countrycodes_fao[i] == ctry_code) {
+								ctry_ind = i;
+								break;
+							}
+						}
+						if (ctry_ind == NOMATCH) {
+							// this should never happen
+							fprintf(fplog, "Error finding scg ctry index: proc_mapspam()\n");
+							return ERROR_IND;
+						}
+					} // end if serbia or montenegro
+					
+					if (ctry_ind == NOMATCH || ctry2ctry87codes_gtap[ctry_ind] == NOMATCH) {
+						continue;
+					}
+					
+					// get the aez index within the country aez list
+					aez_ind = NOMATCH;
+					for (i = 0; i < ctry_aez_num[ctry_ind]; i++) {
+						if (ctry_aez_list[ctry_ind][i] == aez_val) {
+							aez_ind = i;
+							break;
+						}
+					} // end for i loop to get aez index
+					
+					// this shouldn't happen because the countryXglu list has been made already
+					if (aez_ind == NOMATCH) {
+						fprintf(fplog, "Failed to match aez %i to country %i: proc_mapspam()\n",aez_val,ctry_code);
+						return ERROR_IND;
+					}
+					
+		if (crop_grid[land_cells_sage[j]] > 0) {
+			HYDE_total = HYDE_total + crop_grid[land_cells_sage[j]];
+		}
+		}
+	}
+	
+	fprintf(fplog, "The total HYDE cropland area is: %.0f\n", HYDE_total);
     
     // Write values
 	for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) {
@@ -502,6 +647,10 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     free(irr_out);
     free(rfd_out);
     free(crop_grid);
+    free(HYDE_violation_irr);
+    free(HYDE_violation_rfd);
+    free(cropland_irr);
+    free(cropland_rfd);
     free(pasture_grid);
     free(urban_grid);
     for (i = 0; i < NUM_HYDE_TYPES - NUM_HYDE_TYPES_MAIN; i++) {
