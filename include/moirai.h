@@ -98,7 +98,8 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
-#define NUM_MAPSPAM_CROPS		46				// number of crops in the mapSPAM2020 data set
+#define NUM_MAPSPAM_CROPS_2020	46				// number of crops in the mapSPAM2020 data set
+#define NUM_MAPSPAM_CROPS_2000	21				// number of crops in the mapSPAM2000 data set
 #define NUM_MAPSPAM_VARS		4				// number of variables in the mapSPAM2020 data set
 #define MAPSPAM_YEAR			2020			// the year of mapSPAM data to read in
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA

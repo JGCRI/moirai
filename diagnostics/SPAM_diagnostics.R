@@ -54,6 +54,13 @@ Harvested_Area <- mapSPAM_H_tot %>%
 HA_combined <- Harvested_Area %>%
   group_by(type, crop_name, source) %>%
   summarize(value = sum(value))
+  
+HA_glu_iso <- mapSPAM_H_ha %>%
+  group_by(iso, glu_code, type) %>%
+  summarize(value_SPAM = sum(value)) %>%
+  left_join(MIRCA_H_ha %>%
+              group_by(iso, glu_code, type) %>%
+              summarize(value_MIRCA = sum(value)), by = c('iso', 'glu_code', 'type'))
 
 # Plot mapSPAM and MIRCA harvested area stats ======
 p_mapSPAM_H_tot <- ggplot(mapSPAM_H_tot, aes(crop_name, value, color = type)) +
@@ -76,3 +83,10 @@ p_H_tot <- ggplot(HA_combined, aes(crop_name, value, color = type, shape = sourc
   ylab('ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
 ggsave('HA_combined_tot.png', p_H_tot)
+
+p_H_iso <- ggplot(HA_glu_iso,aes(x=value_MIRCA,y=value_SPAM, color = type))+
+  geom_point()+
+  geom_abline(slope = 1, intercept = 0) +
+  ggtitle("Comparing total harvested area between MIRCA and mapSPAM across all crops")+
+  labs(subtitle = "This is a comparison at the ISO level")
+ggsave('HA_glu_iso.png', p_H_iso)
