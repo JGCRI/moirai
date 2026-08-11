@@ -80,15 +80,15 @@
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
 //map 2023-01-19 update input arguments to include carbon boolean
-#define NUM_IN_ARGS						131					// number of input variables in the input file
-#define NUM_ORIG_AEZ						18							// number of original GTAP/GCAM AEZs
+#define NUM_IN_ARGS						134					// number of input variables in the input file
+#define NUM_ORIG_AEZ					18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
 // this applies to the yield, harvest area, production, and prod price input FAO data
 // these four files all need to be in the same format with the same years, in order and contiguous
 #define FAO_START_YEAR_COL					8		// the column of the start year in the fao input data
 #define FAO_START_YEAR						1993	// first year in fao yield, HA, prod, and prodprice files
-#define FAO_END_YEAR						2016	// last year in fao yield, HA, prod, and prodprice files
+#define FAO_END_YEAR						2021	// last year in fao yield, HA, prod, and prodprice files
 #define NUM_FAO_YRS							(FAO_END_YEAR - FAO_START_YEAR + 1)	// number of years in the files
 
 // averaging periods and years for production, harvest area, yield, and land rent data
@@ -98,6 +98,10 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
+#define NUM_MAPSPAM_CROPS_2020	46				// number of crops in the mapSPAM2020 data set
+#define NUM_MAPSPAM_CROPS_2000	21				// number of crops in the mapSPAM2000 data set
+#define NUM_MAPSPAM_VARS		4				// number of variables in the mapSPAM2020 data set
+#define MAPSPAM_YEAR			2020			// the year of mapSPAM data to read in
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define NUM_CARBON_TYPES        4              //Types of carbon
@@ -105,8 +109,8 @@
 #define NUM_LULC_LC_TYPES       23            	// number of ordered lulc types that are land cover (not land use)
 #define NUM_HYDE_TYPES_MAIN		3				// first 3 types that include all land use area: urban, crop, grazing
 #define HYDE_START_YEAR         1700            // the first hyde year
-#define NUM_HYDE_YEARS          47            	// number of available hyde years
-#define NUM_HYDE_POST2000_YEARS 16            	// number of hyde years >= 2001; these are each year
+#define NUM_HYDE_YEARS          56            	// number of available hyde years
+#define NUM_HYDE_POST2000_YEARS 25            	// number of hyde years >= 2001; these are each year
 #define CROP_LT_CODE            10              // used to generate land type category
 #define PASTURE_LT_CODE         20              // used to generate land type category
 #define URBAN_LT_CODE           30              // used to generate land type category
@@ -523,6 +527,7 @@ typedef struct {
 	char hydepath[MAXCHAR];				// path to the directory containing the HYDE files
 	char lulcpath[MAXCHAR];				// path to the directory containing the LULC files
 	char mircapath[MAXCHAR];			// path to the directory containing the MIRCA ascii grid files
+	char mapspampath[MAXCHAR];			// path to the directory containing the mapSPAM ascii grid files
     char wfpath[MAXCHAR];               // path to the directory containing the water footprint esri grid files
     char ldsdestpath[MAXCHAR];              // destination path for the gcam data system input files
     char mapdestpath[MAXCHAR];              // destination path for the gcam data system mapping files
@@ -652,6 +657,8 @@ typedef struct {
 	char rent_fname[MAXCHAR];				// file name for land rent output
     char mirca_irr_fname[MAXCHAR];			// file name for mirca irrigated crop area output
     char mirca_rfd_fname[MAXCHAR];			// file name for mirca rainfed crop area output
+    char mapspam_irr_fname[MAXCHAR];		// file name for mapSPAM irrigated output
+    char mapspam_rfd_fname[MAXCHAR];		// file name for mapSPAM rainfed output
     char land_type_area_fname[MAXCHAR];     // file name for land type area output
     char refveg_carbon_fname[MAXCHAR];      // file name for reference veg carbon output
     char wf_fname[MAXCHAR];                 // file name for water footprint output
@@ -682,6 +689,7 @@ int read_country_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_region_gcam(args_struct in_args, rinfo_struct *raster_info);
 int read_sage_crop(char *fname, char *sagepath, char *cropfilebase_sage, rinfo_struct raster_info);
 int read_mirca(char *fname, float *mirca_grid);
+int read_mapspam(char *fname, float *mapspam_grid);
 int read_protected(args_struct in_args, rinfo_struct *raster_info);
 int read_lu_hyde(args_struct in_args, int year, float *crop_grid, float *pasture_grid, float *urban_grid);
 int read_lulc_isam(args_struct in_args, int year, float **lulc_input_grid);
@@ -718,6 +726,7 @@ int proc_water_footprint(args_struct in_args, rinfo_struct raster_info);
 
 // additional spatial data processing functions
 int proc_mirca(args_struct in_args, rinfo_struct raster_info);
+int proc_mapspam(args_struct in_args, rinfo_struct raster_info);
 int proc_lulc_area(args_struct in_args, rinfo_struct raster_info, double *lulc_area, int *lu_indices, double **lu_area, double *refveg_area_out, int *refveg_them, int num_lu_cells, int lulc_index);
 int proc_land_type_area(args_struct in_args, rinfo_struct raster_info);
 int proc_refveg_carbon(args_struct in_args, rinfo_struct raster_info);
