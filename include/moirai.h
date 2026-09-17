@@ -80,7 +80,7 @@
 // counts of useful variables
 //kbn 2020-06-01 Updating input arguments to include 6 new carbon states for soil_carbon
 //map 2023-01-19 update input arguments to include carbon boolean
-#define NUM_IN_ARGS						134					// number of input variables in the input file
+#define NUM_IN_ARGS						135					// number of input variables in the input file
 #define NUM_ORIG_AEZ					18							// number of original GTAP/GCAM AEZs
 
 // necessary FAO input data info
@@ -98,10 +98,8 @@
 
 // useful values for processing the additional spatial data
 #define NUM_MIRCA_CROPS         26              // number of crops in the mirca2000 data set
-#define NUM_MAPSPAM_CROPS_2020	46				// number of crops in the mapSPAM2020 data set
-#define NUM_MAPSPAM_CROPS_2000	21				// number of crops in the mapSPAM2000 data set
+#define NUM_MAPSPAM_CROPS		46				// max number of crops in the mapSPAM data set (2020)
 #define NUM_MAPSPAM_VARS		4				// number of variables in the mapSPAM2020 data set
-#define MAPSPAM_YEAR			2020			// the year of mapSPAM data to read in
 #define NUM_EPA_PROTECTED       8              // Categories of suitability and protection from the EPA
 #define NUM_CARBON              6              //Categories of carbon states (0- Weighted average, 1- Median, 2- Min, 3- Max, 4- Q1 carbon, 5 -Q3 ) 
 #define NUM_CARBON_TYPES        4              //Types of carbon
@@ -519,6 +517,8 @@ typedef struct {
 	
 	// year to write set of output land use/cover rasters
 	int lulc_out_year;					// if this year falls outside of processing years then no output
+	
+	int mapspam_year;					// year of mapSPAM to read
 	
 	// useful paths
 	char inpath[MAXCHAR];				// path to the input data directory

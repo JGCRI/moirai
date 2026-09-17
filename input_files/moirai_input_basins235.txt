@@ -17,6 +17,9 @@
 # year to write output land use/cover rasters (outputs only if year is processed)
 2000							# lulc_out_year set this to invalid year (e.g., 0) for no output 
 
+# year to read mapSPAM irrigated/rainfed crop area
+2020							# mapspam_year set this to the mapspam year we want to read (2000 and 2020 available)
+
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
 ./example_outputs/basins235/                			# outpath: path to output files
@@ -24,7 +27,7 @@
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
-./indata/mapSPAM/spam2000V2r0_global/					# mapspampath: path to mapSPAM files
+./indata/mapSPAM/										# mapspampath: path to mapSPAM files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
 ./example_outputs/basins235/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
 ./example_outputs/basins235/aglu-data/mappings/    		# mapdestpath: destination path for the gcam data system mapping files

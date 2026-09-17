@@ -58,16 +58,51 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     // valid values in the sage land area data set determine the land cells to process
     
-    int i, j, k = 0;
+    int i, j, k, l = 0;
     int crop_index;             // the index for looping over mapspam crops
     int crop_ind;				// second crop index for harmonizing with HYDE
-    //char crop_names[NUM_MAPSPAM_CROPS_2020][5]	= {"WHEA","RICE","MAIZ","BARL","MILL","PMIL","SORG","OCER","POTA","SWPO","YAMS","CASS","ORTS","BEAN","CHIC","COWP","PIGE","LENT","OPUL","SOYB","GROU","CNUT","OILP","SUNF","RAPE","SESA","OOIL","SUGC","SUGB","COTT","OFIB","COFF","RCOF","COCO","TEAS","TOBA","BANA","PLNT","CITR","TROF","TEMF","TOMA","ONIO","VEGE","RUBB","REST"}; // mapspam crop names 2020
-    char crop_names[NUM_MAPSPAM_CROPS_2000][5]	= {"WHEA","RICE","MAIZ","BARL","MILL","SORG","POTA","SWPY","CASS","BANP","SOYB","BEAN","OPUL","SUGC","SUGB","COFF","COTT","OFIB","GROU","OOIL","OTHE"}; // mapspam crop names 2000
+    
+    fprintf(fplog,"NUM_MAPSPAM_CROPS: %i\n", NUM_MAPSPAM_CROPS);
+    
+    // mapSPAM crop names read in to crop_names
+    FILE *fpin;						// file pointer
+    char spam_crops[] = "indata/mapspam_crops.csv";
+    char crop_names[NUM_MAPSPAM_CROPS][5];
+    
+    if((fpin = fopen(spam_crops, "r")) == NULL)
+    {
+        fprintf(fplog,"Failed to open file %s:  proc_mapspam()\n", spam_crops);
+        return ERROR_FILE;
+    }
+    
+	// %4s limits reading to 4 characters and automatically appends the '\0'
+	while (l < NUM_MAPSPAM_CROPS && fscanf(fpin, "%4s,%*[^\n]", crop_names[l]) == 1) {
+    	l++;
+	}
+    fclose(fpin);
+    
+    // Print list of crops to check read worked
+	for (int m = 0; m < NUM_MAPSPAM_CROPS; m++) {
+		// 1. Print the string safely
+		printf("Crop Index %d: %s\n", m, crop_names[m]);
+	}
+    
     int var_index;				// the index for looping over mapspam variables
-    //char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_A","_P","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
-    char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_P","_R","_Y"}; // mapspam variables (harvested area, physical area, production, yield)
+    char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_A","_P","_Y"}; // mapspam variables 2020 (harvested area, physical area, production, yield)
     char csv_tags[NUM_MAPSPAM_VARS][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
     char var_long_names[NUM_MAPSPAM_VARS][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
+    
+    // mapspam input file names
+    const char mapspam_base[] = "/spam_global";   // mapspam file base; 5 arcmin
+    const char irr_tag[] = "_I";   // mapspam irrigated file end; 5 arcmin
+    const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
+    const char envi_tag[] = ".envi"; // mapspam envi file tag
+    
+    // mapspam output file names
+    const char ha_csv_tag[] = "_ha.csv";
+    const char Mt_csv_tag[] = "_Mt.csv";
+    
+    
     int err = OK;				// store error code from the write functions
     float *HYDE_violation_irr;		// counter for HYDE-mapSPAM cropland violations
     float *HYDE_violation_rfd;		// counter for HYDE-mapSPAM cropland violations
@@ -109,17 +144,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     FILE *fpout;                // out file pointer for irrigation
     FILE *fpout2;               // out file pointer for rainfed
 
-    // mapspam input file names
-    //const char mapspam_base[] = "spam2020_V2r0_global";   // mapspam file base; 5 arcmin
-    const char mapspam_base[] = "spam2000V3r107_global";   // mapspam file base; 5 arcmin
-    const char irr_tag[] = "_I";   // mapspam irrigated file end; 5 arcmin
-    const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
-    const char envi_tag[] = ".envi"; // mapspam envi file tag
-    
-    // mapspam output file names
-    const char ha_csv_tag[] = "_ha.csv";
-    const char Mt_csv_tag[] = "_Mt.csv";
-    
     HYDE_violation_irr = calloc(num_land_cells_sage, sizeof(float));
     if(HYDE_violation_irr == NULL) {
         fprintf(fplog,"Failed to allocate memory for HYDE_violation_irr: proc_mapspam()\n");
@@ -178,18 +202,18 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
         }
     // allocate crop dimension
         for (j = 0; j < ctry_aez_num[i]; j++) {
-            irr_out[i][j] = calloc(NUM_MAPSPAM_CROPS_2000, sizeof(float*));
+            irr_out[i][j] = calloc(NUM_MAPSPAM_CROPS, sizeof(float*));
             if(irr_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for irr_out[%i][%i]: proc_mapspam()\n", i, j);
                 return ERROR_MEM;
             }
-            rfd_out[i][j] = calloc(NUM_MAPSPAM_CROPS_2000, sizeof(float*));
+            rfd_out[i][j] = calloc(NUM_MAPSPAM_CROPS, sizeof(float*));
             if(rfd_out[i][j] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for rfd_out[%i][%i]: proc_mapspam()\n", i, j);
                 return ERROR_MEM;
             }
     // allocate variable dimension
-    	for (k = 0; k < NUM_MAPSPAM_CROPS_2000; k++) {
+    	for (k = 0; k < NUM_MAPSPAM_CROPS; k++) {
     		irr_out[i][j][k] = calloc(NUM_MAPSPAM_VARS, sizeof(float));
             if(irr_out[i][j][k] == NULL) {
                 fprintf(fplog,"Failed to allocate memory for irr_out[%i][%i][%i]: proc_mapspam()\n", i, j, k);
@@ -233,9 +257,9 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		}
 	}
     
-    if((err = read_hyde32(in_args, &raster_info, MAPSPAM_YEAR, crop_grid, pasture_grid, urban_grid, lu_detail_grid)) != OK)
+    if((err = read_hyde32(in_args, &raster_info, in_args.mapspam_year, crop_grid, pasture_grid, urban_grid, lu_detail_grid)) != OK)
 		{
-			fprintf(fplog, "Failed to read lu hyde data for year %i: proc_mapspam()\n", MAPSPAM_YEAR);
+			fprintf(fplog, "Failed to read lu hyde data for year %i: proc_mapspam()\n", in_args.mapspam_year);
 			return err;
 		}
 		
@@ -247,12 +271,14 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 	memset(HYDE_violation_rfd, 0, sizeof(HYDE_violation_rfd));
 	memset(cropland_irr, 0, sizeof(cropland_irr));
 	memset(cropland_rfd, 0, sizeof(cropland_rfd));
-		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS_2000; crop_index++) {
+		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 			
 			// read the irrigated crop files
 			strcpy(fname, in_args.mapspampath);
+			sprintf(tmp_str, "%i", in_args.mapspam_year);
+			strcat(fname, tmp_str);
 			strcat(fname, mapspam_base);
-			sprintf(tmp_str, "%s%s%s%s%s", (var_names[var_index]), "_", (crop_names[crop_index]), irr_tag, envi_tag);
+			sprintf(tmp_str, "%s_%s%s%s", (var_names[var_index]), (crop_names[crop_index]), irr_tag, envi_tag);
 			strcat(fname, tmp_str);
 			
 			if((err = read_mapspam(fname, irr_grid)) != OK)
@@ -263,8 +289,10 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 			
 			// read the rainfed crop file
 			strcpy(fname, in_args.mapspampath);
+			sprintf(tmp_str, "%i", in_args.mapspam_year);
+			strcat(fname, tmp_str);
 			strcat(fname, mapspam_base);
-			sprintf(tmp_str, "%s%s%s%s%s", (var_names[var_index]), "_", (crop_names[crop_index]), rfd_tag, envi_tag);
+			sprintf(tmp_str, "%s_%s%s%s", (var_names[var_index]), (crop_names[crop_index]), rfd_tag, envi_tag);
 			strcat(fname, tmp_str);
 			
 			if((err = read_mapspam(fname, rfd_grid)) != OK)
@@ -499,7 +527,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		fprintf(fpout,"# File: %s\n", fname);
 		fprintf(fpout,"# Author: %s\n", CODENAME);
 		fprintf(fpout,"# Description: mapspam irrigated %s for sage land cells in country X glu\n", var_long_names[var_index]);
-		fprintf(fpout,"# Original source: mapspam2000; country raster; new glu raster\n");
+		fprintf(fpout,"# Original source: mapspam%i; country raster; new glu raster\n", in_args.mapspam_year);
 		fprintf(fpout,"# ----------\n");
 		fprintf(fpout,"iso,glu_code,mapspam_crop,value");
 		
@@ -519,14 +547,14 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		fprintf(fpout2,"# File: %s\n", fname2);
 		fprintf(fpout2,"# Author: %s\n", CODENAME);
 		fprintf(fpout2,"# Description: mapspam rainfed %s for sage land cells in country X glu\n", var_long_names[var_index]);
-		fprintf(fpout2,"# Original source: mapspam2000; country raster; new glu raster\n");
+		fprintf(fpout2,"# Original source: mapspam%i; country raster; new glu raster\n", in_args.mapspam_year);
 		fprintf(fpout2,"# ----------\n");
 		fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
 		
 		// write the records (rounded to nearest integer)
 		for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
 			for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-				for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS_2000; crop_index++) {
+				for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 					// irrigated
 					outval = (float) floor((double) 0.5 + irr_out[ctry_ind][aez_ind][crop_index][var_index]);
 					// output only positive values
@@ -571,7 +599,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 	fprintf(fpout,"# File: %s\n", fname);
 	fprintf(fpout,"# Author: %s\n", CODENAME);
 	fprintf(fpout,"# Description: mapspam irrigated %s for sage land cells in country X glu\n", var_long_names[var_index]);
-	fprintf(fpout,"# Original source: mapspam2000; country raster; new glu raster\n");
+	fprintf(fpout,"# Original source: mapspam%i; country raster; new glu raster\n", in_args.mapspam_year);
 	fprintf(fpout,"# ----------\n");
 	fprintf(fpout,"iso,glu_code,mapspam_crop,value");
 	
@@ -591,30 +619,30 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 	fprintf(fpout2,"# File: %s\n", fname2);
 	fprintf(fpout2,"# Author: %s\n", CODENAME);
 	fprintf(fpout2,"# Description: mapspam rainfed %s for sage land cells in country X glu\n", var_long_names[var_index]);
-	fprintf(fpout2,"# Original source: mapspam2000; country raster; new glu raster\n");
+	fprintf(fpout2,"# Original source: mapspam%i; country raster; new glu raster\n", in_args.mapspam_year);
 	fprintf(fpout2,"# ----------\n");
 	fprintf(fpout2,"iso,glu_code,mapspam_crop,value");
 	
 	// write the records (rounded to nearest integer)
 	for (ctry_ind = 0; ctry_ind < NUM_FAO_CTRY ; ctry_ind++) {
 		for (aez_ind = 0; aez_ind < ctry_aez_num[ctry_ind]; aez_ind++) {
-			for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS_2000; crop_index++) {
+			for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 				// irrigated
 				outval = (float) floor((double) 0.5 + (irr_out[ctry_ind][aez_ind][crop_index][2]/irr_out[ctry_ind][aez_ind][crop_index][0]));
-				// output only positive values
+				// output only positive and finite values
 				if (outval > 0 && !isinf(outval)) {
 					fprintf(fpout,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 							crop_index+1, outval);
 					nrecords_irr++;
-				} // end if value is positive
+				} // end if value is positive and finite
 				// rainfed
 				outval = (float) floor((double) 0.5 + (rfd_out[ctry_ind][aez_ind][crop_index][2]/rfd_out[ctry_ind][aez_ind][crop_index][0]));
-				// output only positive values
+				// output only positive and finite values
 				if (outval > 0 && !isinf(outval)) {
 					fprintf(fpout2,"\n%s,%i,%i,%.0f", countryabbrs_iso[ctry_ind], ctry_aez_list[ctry_ind][aez_ind],
 							crop_index+1, outval);
 					nrecords_rfd++;
-				} // end if value is positive
+				} // end if value is positive and finite
 			} // end for crop loop
 		} // end for aez loop
 	} // end for country loop
@@ -629,7 +657,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     free(rfd_grid);
     for (i = 0; i < NUM_FAO_CTRY; i++) {
         for (j = 0; j < ctry_aez_num[i]; j++) {
-        	for (k = 0; k < NUM_MAPSPAM_CROPS_2000; k++) {
+        	for (k = 0; k < NUM_MAPSPAM_CROPS; k++) {
         		free(irr_out[i][j][k]);
         		free(rfd_out[i][j][k]);
         	}

@@ -63,7 +63,6 @@
     int nrows = 2160;				// num input lats
     int ncols = 4320;				// num input lons
     int ncells = nrows * ncols;		// number of input grid cells
-    int insize_float = 4;			// 1 byte unsigned char for input // check that this is the correct format still
     double res = 5.0 / 60.0;		// resolution
     double xmin = -180.0;			// longitude min grid boundary
     double xmax = 180.0;			// longitude max grid boundary
@@ -77,13 +76,23 @@
     // open fname to fpin pointer
     if((fpin = fopen(fname, "rb")) == NULL)
     {
-        fprintf(fplog,"Failed to open file %s:  read_mapspam()\n", fname);
-        return ERROR_FILE;
+        fprintf(fplog,"%s not available:  read_mapspam()\n", fname);
+        for (i = 0; i < ncells; i++) {
+        	mapspam_grid[i] = 0; // memset explicit or loop assign elements to zero
+        }
+        return OK;
     }
 
     // read the data and check for same size as the working grid
-    num_read = (int) fread(mapspam_grid, insize_float, ncells, fpin);
+    num_read = (int) fread(mapspam_grid, sizeof(float), ncells, fpin);
     fclose(fpin);
+    
+    // Error if did not read
+    if(num_read == 0)
+    {
+    	fprintf(fplog,"Unable to read %s: read_mapspam()\n", fname);
+    	return ERROR_FILE;
+    }
     
     if(num_read != NUM_CELLS)
     {
@@ -91,4 +100,6 @@
                 fname, num_read, NUM_CELLS);
         return ERROR_FILE;
     }
+    
+    return OK;
  }
