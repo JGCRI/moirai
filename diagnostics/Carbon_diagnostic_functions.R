@@ -25,14 +25,80 @@ library(ggplot2)
 library(dplyr)
 library(raster)
 library(data.table)
-library(rgdal)
-library(reldist)
+#library(rgdal)
+#library(reldist)
 library(ggsci)
 library(scales)
 library(tidyr)
 
 # the working directory must be .../moirai/diagnostics/, which is where this script resides
 setwd("./")
+
+
+
+####################################
+# use this function instead of one from the reldist library
+weighted_quantile <- function(x, q = 0.5, na.rm = FALSE, weight = NULL) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
+  }
+
+  if (is.null(weight)) {
+    return(stats::quantile(x, probs = q, na.rm = na.rm, names = FALSE))
+  }
+
+  if (length(x) != length(weight)) {
+    stop("x and weight must have the same length")
+  }
+
+  if (na.rm) {
+    keep <- !is.na(x) & !is.na(weight)
+    x <- x[keep]
+    weight <- weight[keep]
+  } else if (anyNA(x) || anyNA(weight)) {
+    return(NA_real_)
+  }
+
+  if (any(!is.finite(weight)) || any(weight < 0)) {
+    stop("weight must contain finite, non-negative values")
+  }
+
+  if (sum(weight) == 0) {
+    return(NA_real_)
+  }
+
+  ordering <- order(x)
+  x <- x[ordering]
+  weight <- weight[ordering]
+
+  cumulative_weight <- cumsum(weight) / sum(weight)
+  result <- numeric(length(q))
+
+  for (i in seq_along(q)) {
+    if (q[i] <= 0) {
+      result[i] <- x[1]
+    } else if (q[i] >= 1) {
+      result[i] <- x[length(x)]
+    } else {
+      upper <- which(cumulative_weight >= q[i])[1]
+
+      if (upper == 1) {
+        result[i] <- x[1]
+      } else {
+        lower <- upper - 1
+        fraction <- (q[i] - cumulative_weight[lower]) /
+          (cumulative_weight[upper] - cumulative_weight[lower])
+
+        result[i] <- x[lower] +
+          fraction * (x[upper] - x[lower])
+      }
+    }
+  }
+
+  result
+}
+###################################
+
 
 
 
@@ -45,6 +111,7 @@ setwd("./")
 #    path_to_carbon_outputs
 #    path_to_land_outputs
 #    path_to_lt_mapping
+#    proc_carbon_state - this selects which carbon state data are plotted
 # use these arguments to specify the output basin, land type, and year:
 #    basin_for_testing
 #    moirai_LC
@@ -59,6 +126,7 @@ setwd("./")
 compare_carbon_distribution_ESA<-function(
   
   carbon_type = "above ground biomass",
+  proc_carbon_state = "q3_value",
   path_to_glu_data = "../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
   path_to_carbon_outputs = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
   path_to_land_outputs = "../example_outputs/basins235/Land_type_area_ha.csv",
@@ -106,9 +174,9 @@ compare_carbon_distribution_ESA<-function(
     group_by(glu_code, LT_SAGE) %>% 
     mutate(min_value = min(min_value),
            max_value = max(max_value),
-           q1_value = wtd.quantile(q1_value, q=0.25,weight = value),
-           q3_value = wtd.quantile(q3_value, q=0.75,weight = value),
-           median_value = wtd.quantile(median_value, q=0.5,weight = value),
+           q1_value = weighted_quantile(q1_value, q=0.25,weight = value),
+           q3_value = weighted_quantile(q3_value, q=0.75,weight = value),
+           median_value = weighted_quantile(median_value, q=0.5,weight = value),
            weighted_average = sum(weighted_average*value)/sum(value)) %>% 
     ungroup() %>% 
     filter(LT_SAGE %in% c(moirai_LC)) %>%
@@ -133,6 +201,23 @@ compare_carbon_distribution_ESA<-function(
     scaler = 0.1
   }
   
+  GLU_Data <- as.data.frame(rasterToPoints(raster(path_to_glu_data))) %>% 
+    filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin == basin_id)
+  
+  # need to round x and y to the 6 digits because precision error is causing no matches to be found
+  round_coords <- function(df, digits) {
+    df$x <- round(df$x, digits)
+    df$y <- round(df$y, digits)
+    return(df)
+  }
+
+  # choose `digits` based on the raster resolution, e.g. 5 arcmin ~ 0.0833 deg
+  digits <- 6
+  
+  # round to 6 digits for matching
+  glu_rounded <- round_coords(GLU_Data, digits)
+  
+  #####
   if(produce_ESA_distribution){
   
   ESA_map <- read.csv(path_to_moirai_ESA, stringsAsFactors = FALSE) %>% 
@@ -155,12 +240,6 @@ compare_carbon_distribution_ESA<-function(
     return(tmp)
   }
   
-  
-  GLU_Data <- as.data.frame(rasterToPoints(raster(path_to_glu_data))) %>% 
-    filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin == basin_id)
-  
-  
-  
   list.files(path= paste0(path_to_ESA_rasters,"/",carbon_type_tag),pattern=paste0(ESA_vegetation_type,"_",carbon_type_tag,'.*.bil'), recursive=TRUE)->l
   
   
@@ -168,9 +247,13 @@ compare_carbon_distribution_ESA<-function(
   
   data_list_bind <- rbindlist(data_list) %>% mutate(value=value*scaler)
   
-  data_list_bind %>% inner_join(GLU_Data) ->t
+  # round x and y for matching
+  data_list_bind_rounded = round_coords(as.data.frame(data_list_bind), digits)
+  
+  data_list_bind_rounded %>% inner_join(glu_rounded,by = c("x","y")) ->t
   
   } # end if produce_ESA_distribution
+  #####
   
   #Step 3: Get the harmonized carbon layer for moirai
   
@@ -178,32 +261,54 @@ compare_carbon_distribution_ESA<-function(
     path <- paste0(path_to_harmonized_rasters,name)  
     tmp <- as.data.frame(rasterToPoints(raster(path)))
     names(tmp)[3] <- "value"
+    # need to map the data file name to the carbon state label
+    # use q3 as the default
+    cfn = tools::file_path_sans_ext(basename(name))
+    csl = case_when(
+    	grepl("min", cfn)	~ "min_value",
+    	grepl("max", cfn)	~ "max_value",
+    	grepl("q1", cfn)	~ "q1_value",
+    	grepl("q3", cfn)	~ "q3_value",
+    	grepl("median", cfn)	~ "median_value",
+    	grepl("weighted_average", cfn)	~ "weighted_average",
+		TRUE				~ "unknown_value"
+    )
+
+    tmp$carbon_state <- csl
     
     return(tmp)
   }
   
   data_list_harmonized <- lapply(harmonized_carbon_raster_file_names, get_carbon_data_harmonized)
-  data_harmonized <- rbindlist(data_list_harmonized)
+  data_harmonized <- as.data.frame(rbindlist(data_list_harmonized))
+  
+  # keep only the specified carbon state for processing
+  data_harmonized = data_harmonized[data_harmonized$carbon_state == proc_carbon_state, ]
   
   ref_veg_thematic <- as.data.frame(rasterToPoints(raster(path_to_moirai_ref_veg_thematic)))
+  names(ref_veg_thematic)[3] <- "refveg_carbon_thematic"
   
   SAGE_mapping <- read.csv(path_to_sage_mapping, skip=3, stringsAsFactors = FALSE) %>% 
     mutate(LT_SAGE_NAME = gsub(" ","",LT_SAGE_NAME)) %>% 
     filter(LT_SAGE_NAME %in% moirai_LC)
   
-  
+  # merge carbon values with thematic ids and filter to keep only the specified land type in the specified basin
   data_harmonized %>% 
     inner_join(ref_veg_thematic %>% 
                  filter(refveg_carbon_thematic %in% 
-                          c(unique(SAGE_mapping$LT_SAGE_CODE))),by = c("x","y")) %>% 
-    inner_join(GLU_Data, by = c("x","y")) %>% 
-    filter(value != -9999) ->harmonized_data_filtered
+                          c(unique(SAGE_mapping$LT_SAGE_CODE))),by = c("x","y")) -> filtered_df
+
+  # round these x y values for merging                          
+  filtered_rounded = round_coords(filtered_df, digits)
+
+  # remove non-id cell records
+  harmonized_data_filtered <- filtered_rounded %>%
+  inner_join(glu_rounded, by = c("x", "y")) %>%
+  filter(value != -9999)
   
   if(carbon_type != "soil"){
-    
     harmonized_data_filtered %>% 
       mutate(value = value *scaler)->harmonized_data_filtered
-    
   }
   
   cv <- round(sd(harmonized_data_filtered$value)/mean(harmonized_data_filtered$value),2)
@@ -215,9 +320,9 @@ compare_carbon_distribution_ESA<-function(
   	ymax = max(hist(t$value, breaks=seq(min(t$value), max(t$value), by=(max(t$value)-min(t$value))/nbins), plot=FALSE)$counts)
 
     g <- ggplot()+
-      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
+      geom_vline(data=Carbon_data_csv %>% filter(state== proc_carbon_state), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
       geom_histogram(data= t, aes(x=t$value,fill="Primary ESA distribution"),bins =100,alpha=0.1,color="black")+
-      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),bins =nbins,alpha=0.4,color="black")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill=paste(proc_carbon_state, "moirai output distribution")),bins =nbins,alpha=0.4,color="black")+
       ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
       xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
       labs(subtitle = paste0("Basin name - ",basin_for_testing),
@@ -232,9 +337,9 @@ compare_carbon_distribution_ESA<-function(
   	       by=(max(harmonized_data_filtered$value)-min(harmonized_data_filtered$value))/nbins), plot=FALSE)$counts)
   	
     g <- ggplot()+
-      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), size = 1.2,linetype="dashed")+
+      geom_vline(data=Carbon_data_csv %>% filter(state== proc_carbon_state), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
       #geom_histogram(data= t, aes(x=t$value,fill="Distribution from ESA"),bins =100,alpha=0.1,color="white",fill="transparent")+
-      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),alpha=0.5,bins =nbins,color="black")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill=paste(proc_carbon_state, "moirai output distribution")),alpha=0.5,bins =nbins,color="black")+
       ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
       xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
       labs(subtitle = paste0("Basin name - ",basin_for_testing),
@@ -279,6 +384,7 @@ compare_carbon_distribution_ESA<-function(
 compare_carbon_distribution_HYDE<-function(
   
   carbon_type = "above ground biomass",
+  proc_carbon_state = "q3_value",
   path_to_glu_data = "../ancillary/carbon_harmonization/input_files/gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin.tif",
   path_to_carbon_outputs = "../example_outputs/basins235/Ref_veg_carbon_Mg_per_ha.csv",
   path_to_land_outputs = "../example_outputs/basins235/Land_type_area_ha.csv",
@@ -326,9 +432,9 @@ compare_carbon_distribution_HYDE<-function(
     group_by(glu_code, LT_SAGE) %>% 
     mutate(min_value = min(min_value),
            max_value = max(max_value),
-           q1_value = wtd.quantile(q1_value, q=0.25,weight = value),
-           q3_value = wtd.quantile(q3_value, q=0.75,weight = value),
-           median_value = wtd.quantile(median_value, q=0.5,weight = value),
+           q1_value = weighted_quantile(q1_value, q=0.25,weight = value),
+           q3_value = weighted_quantile(q3_value, q=0.75,weight = value),
+           median_value = weighted_quantile(median_value, q=0.5,weight = value),
            weighted_average = sum(weighted_average*value)/sum(value)) %>% 
     ungroup() %>% 
     filter(LT_SAGE %in% c(moirai_LC)) %>%
@@ -354,9 +460,28 @@ compare_carbon_distribution_HYDE<-function(
   GLU_Data <- as.data.frame(rasterToPoints(raster(path_to_glu_data))) %>% 
     filter(gcam_glu_boundaries_moirai_land_cells_3p1_0p5arcmin == basin_id)
   
+  # need to round x and y to the 6 digits because precision error is causing no matches to be found
+  round_coords <- function(df, digits) {
+    df$x <- round(df$x, digits)
+    df$y <- round(df$y, digits)
+    return(df)
+  }
+
+  # choose `digits` based on the raster resolution, e.g. 5 arcmin ~ 0.0833 deg
+  digits <- 6
+  
+  # round to 6 digits for matching
+  glu_rounded <- round_coords(GLU_Data, digits)
+
   
   #Step 3: Get the harmonized carbon layer for moirai
   
+  
+  
+  
+  
+  
+  ###
   get_carbon_data_harmonized<- function(name){
     path <- paste0(path_to_harmonized_rasters,name)  
     tmp <- as.data.frame(rasterToPoints(raster(path)))
@@ -373,6 +498,47 @@ compare_carbon_distribution_HYDE<-function(
   data_harmonized %>% 
     inner_join(GLU_Data, by = c("x","y")) %>% 
     filter(value != -9999) ->harmonized_data_filtered
+  #####
+  
+  
+  
+  
+  
+  get_carbon_data_harmonized<- function(name){
+    path <- paste0(path_to_harmonized_rasters,name)  
+    tmp <- as.data.frame(rasterToPoints(raster(path)))
+    names(tmp)[3] <- "value"
+    # need to map the data file name to the carbon state label
+    # use q3 as the default
+    cfn = tools::file_path_sans_ext(basename(name))
+    csl = case_when(
+    	grepl("min", cfn)	~ "min_value",
+    	grepl("max", cfn)	~ "max_value",
+    	grepl("q1", cfn)	~ "q1_value",
+    	grepl("q3", cfn)	~ "q3_value",
+    	grepl("median", cfn)	~ "median_value",
+    	grepl("weighted_average", cfn)	~ "weighted_average",
+		TRUE				~ "unknown_value"
+    )
+
+    tmp$carbon_state <- csl
+    
+    return(tmp)
+  }
+  
+  data_list_harmonized <- lapply(harmonized_carbon_raster_file_names, get_carbon_data_harmonized)
+  data_harmonized <- as.data.frame(rbindlist(data_list_harmonized))
+  
+  # keep only the specified carbon state for processing
+  data_harmonized = data_harmonized[data_harmonized$carbon_state == proc_carbon_state, ]
+
+  # round these x y values for merging                          
+  data_harmonized_rounded = round_coords(data_harmonized, digits)
+
+  # remove non-id cell records
+  harmonized_data_filtered <- data_harmonized_rounded %>%
+  inner_join(glu_rounded, by = c("x", "y")) %>%
+  filter(value != -9999)
   
   if(carbon_type != "soil"){
     
@@ -380,7 +546,7 @@ compare_carbon_distribution_HYDE<-function(
       mutate(value = value *scaler)->harmonized_data_filtered
     
   }
-  
+    
   cv <- round(sd(harmonized_data_filtered$value)/mean(harmonized_data_filtered$value),2)
   
    # cannot use geom_text() when data is specified in ggplot(data=###) call
@@ -391,8 +557,8 @@ compare_carbon_distribution_HYDE<-function(
   	       by=(max(harmonized_data_filtered$value)-min(harmonized_data_filtered$value))/nbins), plot=FALSE)$counts)
 
     g <- ggplot(data=harmonized_data_filtered)+
-      geom_vline(data=Carbon_data_csv %>% filter(state=="q3_value"), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
-      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill="Harmonized input distribution"),alpha=0.5,bins =nbins,color="black")+
+      geom_vline(data=Carbon_data_csv %>% filter(state==proc_carbon_state), aes(xintercept=value, color=state), linewidth = 1.2,linetype="dashed")+
+      geom_histogram(data= harmonized_data_filtered, aes(x=harmonized_data_filtered$value,fill=paste(proc_carbon_state, "moirai output distribution")),alpha=0.5,bins =nbins,color="black")+
       ggtitle(paste0(moirai_LC," ",carbon_type," carbon in Mgc/ha"))+
       xlab("MgC/ha")+scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6), limits=c(0,ymax))+
       labs(subtitle = paste0("Basin name - ",basin_for_testing),

@@ -38,6 +38,8 @@ diagnostics/basins235_example_outputs_spatial_output_files/
 example_outputs/basins235/*
 example_outputs/basins235/aglu-data/
 *.stackdump
+*.out
+*.zsh
 
 ancillary/carbon_harmonization/outputs/
 diagnostics/data_for_plot.csv

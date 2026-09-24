@@ -49,9 +49,9 @@
 int init_moirai(args_struct *in_args) {
     
 	// input argument structure
-   // flags
+    // flags
 	in_args->diagnostics = 0;
-   in_args->carbon_enabled = 0;
+    in_args->carbon_enabled = 0;
 	// data years for calibration
 	in_args->out_year_prod_ha_lr = 0;
 	in_args->in_year_sage_crops = 0;
@@ -65,6 +65,7 @@ int init_moirai(args_struct *in_args) {
 	memset(in_args->hydepath, '\0', MAXCHAR);
 	memset(in_args->lulcpath, '\0', MAXCHAR);
     memset(in_args->mircapath, '\0', MAXCHAR);
+    memset(in_args->mapspampath, '\0', MAXCHAR);
     memset(in_args->wfpath, '\0', MAXCHAR);
     memset(in_args->ldsdestpath, '\0', MAXCHAR);
     memset(in_args->mapdestpath, '\0', MAXCHAR);
@@ -187,6 +188,8 @@ int init_moirai(args_struct *in_args) {
     memset(in_args->rent_fname, '\0', MAXCHAR);
     memset(in_args->mirca_irr_fname, '\0', MAXCHAR);
     memset(in_args->mirca_rfd_fname, '\0', MAXCHAR);
+    memset(in_args->mapspam_irr_fname, '\0', MAXCHAR);
+    memset(in_args->mapspam_rfd_fname, '\0', MAXCHAR);
     memset(in_args->land_type_area_fname, '\0', MAXCHAR);
     memset(in_args->refveg_carbon_fname, '\0', MAXCHAR);
     memset(in_args->wf_fname, '\0', MAXCHAR);
