@@ -1,3 +1,11 @@
+######
+# plot_mapspam_crop.r
+#
+# There are only two variables that the user should set (lines 28-29)
+#   mapSPAM_2020_path:	This should point to a folder where the mapSPAM output files from a run set to use 2020 mapSPAM data are located
+#   mapSPAM_2000_path:	This should point to a folder where the mapSPAM output files from a run set to use 2000 mapSPAM data are located	
+#
+
 library(ggplot2)
 library(dplyr)
 library(rgcam)
@@ -117,7 +125,7 @@ p_MIRCA_H_tot <- ggplot(MIRCA_H_tot %>%
   ggtitle("MIRCA Harvested Area by Crop") +
   ylab('million ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-ggsave('MIRCA_H_tot_2020.png', p_MIRCA_H_tot)
+ggsave('examples/MIRCA_H_tot_2020.png', p_MIRCA_H_tot)
 
 # Plot mapSPAM harvested area stats 2020 ======
 p_mapSPAM_H_tot_2020 <- ggplot(mapSPAM_H_tot_2020 %>%
@@ -126,7 +134,7 @@ p_mapSPAM_H_tot_2020 <- ggplot(mapSPAM_H_tot_2020 %>%
   ggtitle("mapSPAM 2020 Harvested Area by Crop") +
   ylab('million ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-ggsave('mapSPAM_H_tot_2020.png', p_mapSPAM_H_tot_2020)
+ggsave('examples/mapSPAM_H_tot_2020.png', p_mapSPAM_H_tot_2020)
 
 p_H_tot_2020 <- ggplot(HA_combined_2020 %>%
                          mutate(value = value/1000000), aes(crop_name, value, color = type, shape = source)) +
@@ -134,7 +142,7 @@ p_H_tot_2020 <- ggplot(HA_combined_2020 %>%
   ggtitle("2020 Harvested Area by Crop and Source") +
   ylab('million ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-ggsave('HA_combined_tot_2020.png', p_H_tot_2020)
+ggsave('examples/HA_combined_tot_2020.png', p_H_tot_2020)
 
 global_total_H <- HA_glu_iso_2020 %>%
   replace_na(list(value_MIRCA = 0)) %>%
@@ -189,7 +197,7 @@ p_H_iso_2020 <- ggplot(HA_glu_iso_2020 %>%
   ggtitle("Comparing total harvested area between MIRCA and mapSPAM 2020 across all crops") +
   labs(subtitle = "This is a comparison at the ISO level")
 
-ggsave('HA_glu_iso_2020.png', p_H_iso_2020)
+ggsave('examples/HA_glu_iso_2020.png', p_H_iso_2020, width = 10, height = 8)
 
 # Plot mapSPAM harvested area stats 2000 ======
 p_mapSPAM_H_tot_2000 <- ggplot(mapSPAM_H_tot_2000, aes(crop_name, value, color = type)) +
@@ -197,24 +205,44 @@ p_mapSPAM_H_tot_2000 <- ggplot(mapSPAM_H_tot_2000, aes(crop_name, value, color =
   ggtitle("mapSPAM 2000 Harvested Area by Crop") +
   ylab('ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-ggsave('mapSPAM_H_tot_2000.png', p_mapSPAM_H_tot_2000)
+ggsave('examples/mapSPAM_H_tot_2000.png', p_mapSPAM_H_tot_2000)
 
 p_H_tot_2000 <- ggplot(HA_combined_2000, aes(crop_name, value, color = type, shape = source)) +
   geom_point() +
   ggtitle("2000 Harvested Area by Crop and Source") +
   ylab('ha') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-ggsave('HA_combined_tot_2000.png', p_H_tot_2000)
+ggsave('examples/HA_combined_tot_2000.png', p_H_tot_2000)
 
-p_H_iso_2000 <- ggplot(HA_glu_iso_2000,aes(x=value_MIRCA,y=value_SPAM, color = type))+
-  geom_point()+
+
+global_total_H_2000 <- HA_glu_iso_2000 %>%
+  replace_na(list(value_MIRCA = 0)) %>%
+  group_by(type) %>%
+  summarize(value_SPAM = sum(value_SPAM)/1000000,
+            value_MIRCA = sum(value_MIRCA)/1000000)
+
+# 2. Regenerate your table grob
+my_table_grob <- create_table_grob(global_total_H_2000)
+
+# 3. Re-run your p_H_iso_2020 ggplot script
+p_H_iso_2000 <- ggplot(HA_glu_iso_2000 %>%
+                         mutate(value_SPAM = value_SPAM/1000000,
+                                value_MIRCA = value_MIRCA/1000000), 
+                       aes(x = value_MIRCA, y = value_SPAM, color = type)) +
+  geom_point() +
   geom_abline(slope = 1, intercept = 0) +
-  ggtitle("Comparing total harvested area between MIRCA and mapSPAM 2000 across all crops")+
+  annotation_custom(
+    grob = my_table_grob, 
+    xmin = 0, xmax = 10,   # Kept left at 0, expanded right to 10
+    ymin = 20, ymax = 30   # Expanded height slightly (from 25 to 23) to comfortably fit the title
+  ) +
+  ggtitle("Comparing total harvested area between MIRCA and mapSPAM 2020 across all crops") +
   labs(subtitle = "This is a comparison at the ISO level")
-ggsave('HA_glu_iso_2000.png', p_H_iso_2000)
+
+ggsave('examples/HA_glu_iso_2000.png', p_H_iso_2000, width = 10, height = 8)
 
 # Plot major crop maps by GLU ======
-major_crops <- mapSPAM_H_ha_2020 %>%
+major_crops_2000 <- mapSPAM_H_ha_2000 %>%
   filter(crop_name %in% c('Wheat', 'Rice', 'Maize')) %>%
   pivot_wider(names_from = crop_name, values_from = value) %>%
   group_by(glu_code, type) %>%
@@ -222,23 +250,63 @@ major_crops <- mapSPAM_H_ha_2020 %>%
             Rice = sum(Rice),
             Maize = sum(Maize))
 
-major_crops_irr <- major_crops %>%
+major_crops_2020 <- mapSPAM_H_ha_2020 %>%
+  filter(crop_name %in% c('Wheat', 'Rice', 'Maize')) %>%
+  pivot_wider(names_from = crop_name, values_from = value) %>%
+  group_by(glu_code, type) %>%
+  summarize(Wheat = sum(Wheat),
+            Rice = sum(Rice),
+            Maize = sum(Maize))
+
+major_crops_irr_2000 <- major_crops_2000 %>%
   filter(type == 'irr')
-major_crops_rfd <- major_crops %>%
+major_crops_rfd_2000 <- major_crops_2000 %>%
+  filter(type == 'rfd')
+
+major_crops_irr_2020 <- major_crops_2020 %>%
+  filter(type == 'irr')
+major_crops_rfd_2020 <- major_crops_2020 %>%
   filter(type == 'rfd')
 
 GLU_shp <- st_as_sf(st_read("../GCIMS-Reuse/GCAM_v9_RegGLU_boundaries/GCAM_v9_401RegGLU_boundaries.shp"))
-plot(st_geometry(GLU_shp))
 
-combined_shapes <- GLU_shp %>%
+sf_use_s2(FALSE)
+GLU_shp_clean <- GLU_shp %>% 
+  st_make_valid() %>%
+  st_wrap_dateline(options = c("WRAPDATELINE=YES", "DATELINEOFFSET=180"))
+
+plot(st_geometry(GLU_shp_clean))
+
+combined_shapes <- GLU_shp_clean %>%
   group_by(glu_id, glu_nm) %>%
-  summarize(geometry = st_union(geometry))
+  summarize(geometry = st_union(geometry), .groups = "drop") %>%
+  st_make_valid()
+
 plot(st_geometry(combined_shapes))
 
-merged_data <- combined_shapes %>%
-  left_join(major_crops_irr, by = c("glu_id" = "glu_code"))
+sf_use_s2(TRUE)
 
-ggplot(data = merged_data) +
+merged_data_irr_2000 <- combined_shapes %>%
+  left_join(major_crops_irr_2000, by = c("glu_id" = "glu_code")) %>%
+  mutate(type = 'irr')
+merged_data_rfd_2000 <- combined_shapes %>%
+  left_join(major_crops_rfd_2000, by = c("glu_id" = "glu_code")) %>%
+  mutate(type = 'rfd')
+
+merged_data_irr_2020 <- combined_shapes %>%
+  left_join(major_crops_irr_2020, by = c("glu_id" = "glu_code")) %>%
+  mutate(type = 'irr')
+merged_data_rfd_2020 <- combined_shapes %>%
+  left_join(major_crops_rfd_2020, by = c("glu_id" = "glu_code")) %>%
+  mutate(type = 'rfd')
+
+merged_data_2000 <- merged_data_irr_2000 %>%
+  bind_rows(merged_data_rfd_2000)
+
+merged_data_2020 <- merged_data_irr_2020 %>%
+  bind_rows(merged_data_rfd_2020)
+
+p_mapSPAM_wheat_2000 <- ggplot(data = merged_data_2000) +
   geom_sf(aes(fill = Wheat), color = "white", size = 0.2) +
   scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
   theme_minimal() +
@@ -246,8 +314,19 @@ ggplot(data = merged_data) +
     title = "Wheat",
     fill = "Harvested Area"
   )
+ggsave('examples/mapSPAM_H_tot_2000_wheat.png', p_mapSPAM_wheat_2000, width = 20, height = 10)
 
-ggplot(data = merged_data) +
+p_mapSPAM_wheat_2020 <- ggplot(data = merged_data_2020) +
+  geom_sf(aes(fill = Wheat), color = "white", size = 0.2) +
+  scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
+  theme_minimal() +
+  labs(
+    title = "Wheat",
+    fill = "Harvested Area"
+  )
+ggsave('examples/mapSPAM_H_tot_2020_wheat.png', p_mapSPAM_wheat_2020, width = 20, height = 10)
+
+p_mapSPAM_rice_2000 <- ggplot(data = merged_data_2000) +
   geom_sf(aes(fill = Rice), color = "white", size = 0.2) +
   scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
   theme_minimal() +
@@ -255,8 +334,19 @@ ggplot(data = merged_data) +
     title = "Rice",
     fill = "Harvested Area"
   )
+ggsave('examples/mapSPAM_H_tot_2000_rice.png', p_mapSPAM_rice_2000, width = 20, height = 10)
 
-ggplot(data = merged_data) +
+p_mapSPAM_rice_2020 <- ggplot(data = merged_data_2020) +
+  geom_sf(aes(fill = Rice), color = "white", size = 0.2) +
+  scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
+  theme_minimal() +
+  labs(
+    title = "Rice",
+    fill = "Harvested Area"
+  )
+ggsave('examples/mapSPAM_H_tot_2020_rice.png', p_mapSPAM_rice_2020, width = 20, height = 10)
+
+p_mapSPAM_maize_2000 <- ggplot(data = merged_data_2000) +
   geom_sf(aes(fill = Maize), color = "white", size = 0.2) +
   scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
   theme_minimal() +
@@ -264,3 +354,14 @@ ggplot(data = merged_data) +
     title = "Maize",
     fill = "Harvested Area"
   )
+ggsave('examples/mapSPAM_H_tot_2000_maize.png', p_mapSPAM_maize_2000, width = 20, height = 10)
+
+p_mapSPAM_maize_2020 <- ggplot(data = merged_data_2020) +
+  geom_sf(aes(fill = Maize), color = "white", size = 0.2) +
+  scale_fill_viridis_c() + # Use _c() for continuous data, _d() for discrete categories
+  theme_minimal() +
+  labs(
+    title = "Maize",
+    fill = "Harvested Area"
+  )
+ggsave('examples/mapSPAM_H_tot_2020_maize.png', p_mapSPAM_maize_2020, width = 20, height = 10)
