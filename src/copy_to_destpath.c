@@ -54,6 +54,7 @@ int copy_to_destpath(args_struct in_args) {
     
     char cp_str[] = "cp -f ";
     char space_str[] = " ";
+    char wildcsv_str[] = "*.csv";
     
     // harvested area
     strcpy(fname, in_args.outpath);
@@ -106,6 +107,32 @@ int copy_to_destpath(args_struct in_args) {
     // rainfed harvested area
     strcpy(fname, in_args.outpath);
     strcat(fname, in_args.mirca_rfd_fname);
+    strcpy(sys_string, cp_str);
+    strcat(sys_string, fname);
+    strcat(sys_string, space_str);
+    strcat(sys_string, in_args.ldsdestpath);
+    if((err = system(sys_string)) == -1) {
+        fprintf(fplog, "\nError copying file %s to %s\n", fname, in_args.ldsdestpath);
+        return ERROR_COPY;
+    }
+    
+    // mapspam irrigated files
+    strcpy(fname, in_args.outpath);
+    strcat(fname, in_args.mapspam_irr_fname);
+    strcat(fname, wildcsv_str);
+    strcpy(sys_string, cp_str);
+    strcat(sys_string, fname);
+    strcat(sys_string, space_str);
+    strcat(sys_string, in_args.ldsdestpath);
+    if((err = system(sys_string)) == -1) {
+        fprintf(fplog, "\nError copying file %s to %s\n", fname, in_args.ldsdestpath);
+        return ERROR_COPY;
+    }
+    
+    // mapspam rainfed files
+    strcpy(fname, in_args.outpath);
+    strcat(fname, in_args.mapspam_rfd_fname);
+    strcat(fname, wildcsv_str);
     strcpy(sys_string, cp_str);
     strcat(sys_string, fname);
     strcat(sys_string, space_str);

@@ -89,7 +89,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     
     int var_index;				// the index for looping over mapspam variables
     char var_names[NUM_MAPSPAM_VARS][3] = {"_H","_A","_P","_Y"}; // mapspam variables 2020 (harvested area, physical area, production, yield)
-    char csv_tags[NUM_MAPSPAM_VARS][8] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt.csv"};
+    char csv_tags[NUM_MAPSPAM_VARS][15] = {"_ha.csv", "_ha.csv", "_Mt.csv", "_Mt_per_ha.csv"};
     char var_long_names[NUM_MAPSPAM_VARS][20] = {"harvested area (ha)", "physical area (ha)", "production (mt)", "yield (mt/ha)"};
     
     // mapspam input file names
@@ -97,11 +97,6 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     const char irr_tag[] = "_I";   // mapspam irrigated file end; 5 arcmin
     const char rfd_tag[] = "_R";   // mapspam rainfed file end; 5 arcmin   
     const char envi_tag[] = ".envi"; // mapspam envi file tag
-    
-    // mapspam output file names
-    const char ha_csv_tag[] = "_ha.csv";
-    const char Mt_csv_tag[] = "_Mt.csv";
-    
     
     int err = OK;				// store error code from the write functions
     float *HYDE_violation_irr;		// counter for HYDE-mapSPAM cropland violations
@@ -267,10 +262,10 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
     for (var_index = 0; var_index < NUM_MAPSPAM_VARS; var_index++) { // For each variable in var_names
 	HYDE_cropland = 0;
 	HYDE_nocrop = 0;
-	memset(HYDE_violation_irr, 0, sizeof(HYDE_violation_irr));
-	memset(HYDE_violation_rfd, 0, sizeof(HYDE_violation_rfd));
-	memset(cropland_irr, 0, sizeof(cropland_irr));
-	memset(cropland_rfd, 0, sizeof(cropland_rfd));
+	memset(HYDE_violation_irr, 0, num_land_cells_sage * sizeof(float));
+	memset(HYDE_violation_rfd, 0, num_land_cells_sage * sizeof(float));
+	memset(cropland_irr, 0, num_land_cells_sage * sizeof(float));
+	memset(cropland_rfd, 0, num_land_cells_sage * sizeof(float));
 		for (crop_index = 0; crop_index < NUM_MAPSPAM_CROPS; crop_index++) {
 			
 			// read the irrigated crop files
@@ -517,7 +512,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		sprintf(tmp_str, "%s%s", (var_names[var_index]), csv_tags[var_index]);
 		strcat(fname, tmp_str);
 		fpout = fopen(fname,"w"); //float
-		
+		        
 		if(fpout == NULL)
 		{
 			fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname);
@@ -537,7 +532,7 @@ int proc_mapspam(args_struct in_args, rinfo_struct raster_info) {
 		sprintf(tmp_str, "%s%s", (var_names[var_index]), csv_tags[var_index]);
 		strcat(fname2, tmp_str);
 		fpout2 = fopen(fname2,"w"); //float
-		
+		        
 		if(fpout2 == NULL)
 		{
 			fprintf(fplog,"Failed to open file  %s for write:  proc_mapspam()\n", fname2);
