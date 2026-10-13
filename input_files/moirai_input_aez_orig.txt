@@ -15,7 +15,10 @@
 2001		# in_year_lr_usd: the US dollar value year for the input land rent data
 
 # year to write output land use/cover rasters (outputs only if year is processed)
-2015		# set this to invalid year (e.g., 0) for no output
+2015		# lulc_out_year set this to invalid year (e.g., 0) for no output
+
+# year to read mapSPAM irrigated/rainfed crop area
+2020                            # mapspam_year set this to the mapspam year we want to read (2000 and 2020 available)
 
 # file paths; must include final "/"
 ./indata/	                                            # inpath: path to input data files
@@ -24,6 +27,7 @@
 ./indata/HYDE32_baseline/								# hydepath: path to hyde land use files (unzipped)
 ./indata/ISAM_LC/										# lulcpath: path to LULC files
 ./indata/Mirca2000CropIrrRfdHarvArea/                 	# mircapath: path to mirca files
+./indata/mapSPAM/                                        # mapspampath: path to mapSPAM files
 ./indata/WaterFootprint/Report47-App-IV-RasterMaps/   	# wfpath: path to water footprint files
 ./example_outputs/aez_orig/aglu-data/moirai/     		# ldsdestpath: destination path for the gcam data system input files
 ./example_outputs/aez_orig/aglu-data/mappings/     		# mapdestpath: destination path for the gcam data system mapping files
@@ -129,11 +133,11 @@ GTAP_use.csv				# use_gtap_fname: GTAP product use categories
 SAGE_PVLT.csv				# lt_sage_fname: SAGE land cover types for potential vegetation
 hyde32_lu.csv				# lu_hyde_fname: HYDE land use types
 isam_2_sage_hyde_mapping.csv	# lulc_fname: LULC types and mapping to sage and hyde
-SAGE_gtap_fao_crop2use.csv	# crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
-FAO_production_1993_2016.csv	# production_fao_fname: FAO production data
-FAO_yield_1993_2016.csv			# yield_fao_fname: FAO yield data
-FAO_harvarea_1993_2016.csv		# harvestarea_fao_fname: FAO harvest area data
-FAO_producerprice_1993_2016.csv	# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
+SAGE_gtap_fao_crop2use.csv	    # crop_fname: FAO crop, SAGE crop, and GTAP use mapping list
+FAO_production_1993_2021.csv	# production_fao_fname: FAO production data
+FAO_yield_1993_2021.csv			# yield_fao_fname: FAO yield data
+FAO_harvarea_1993_2021.csv		# harvestarea_fao_fname: FAO harvest area data
+FAO_producerprice_1993_2021.csv	# prodprice_fao_fname: FA0 production price data (currency year is equal to data year)
 cpi_all_1970_2017_bls_june2018_annual.csv		# convert_usd_fname: consumer price index table to convert from one US dollar year to another
 
 # output file names (without path)
@@ -143,6 +147,8 @@ MOIRAI_ag_prod_t.csv            # production_fname:	file name for production out
 MOIRAI_value_milUSD.csv         # rent_fname: file name for rent output
 MIRCA_irrHA_ha.csv              # mirca_irr_fname: file name for mirca irrigated harvested area output
 MIRCA_rfdHA_ha.csv              # mirca_rfd_fname: file name for mirca rainfed harvested area output
+mapSPAM_irr                     # mapspam_irr_fname: file name for mapSPAM irrigated output # need to add .csv after variable definition
+mapSPAM_rfd                     # mapspam_rfd_fname: file name for mapSPAM rainfed output # need to add .csv after variable definition
 Land_type_area_ha.csv           # land_type_area_fname: file name for land type area output
 Ref_veg_carbon_Mg_per_ha.csv    # refveg_carbon_fname: file name for reference veg carbon and soil carbon
 Water_footprint_m3.csv          # wf_fname: file name for water footprint output

@@ -137,6 +137,9 @@ These data are now available at [http://www.earthstat.org/data-download/](http:/
 ### MIRCA2000 crop irrigated and rainfed harvested area data, circa 2000
 These data are available at [https://www.uni-frankfurt.de/45218031/data_download/](https://www.uni-frankfurt.de/45218031/data_download/). The specific data are labeled “Annual harvested area grids for 26 irrigated and rainfed crop classes.” Login as a guest, and put all of the 5 arcmin individual crop files (ANNUAL_AREA_HARVESTED_IRC_CROP#_HA.ASC.gz and ANNUAL_AREA_HARVESTED_RFC_CROP#_HA.ASC.gz) into a single directory, gunzip them (use `gunzip -k` if you want to retain the gzipped files), then set this directory in the Moirai LDS input file. The Moirai LDS will NOT automatically unzip these files (because the included files are already unzipped). A metadata file is included for reference, and the corresponding journal article is also available. Please also cite the MIRCA journal article when using Moirai: PORTMANN, F. T., SIEBERT, S. & DÖLL, P. 2010. MIRCA2000—Global monthly irrigated and rainfed crop areas around the year 2000: A new high-resolution data set for agricultural and hydrological modeling. Global Biogeochemical Cycles, 24, GB1011, doi: 10.1029/2008GB003435. Units are hectares.
 
+### MapSPAM 2000 and 2020 crop irrigated and rainfed harvested area data
+These data are available at [https://www.mapspam.info/](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/SWPENT). Download the geotiff files and convert to .envi format. Set NAflag = 0 to avoid large negative value errors in moirai. Upload only the .envi files (no .hdr files needed) to moirai under the folder structure /indata/mapSPAM/<mapSPAM-year>/spam_global_<variable>_<crop>_<A/I/R>.envi where <variable> is A (area), H (harvested area), Y (yield), or P (productivity), <crop> is the 4 letter crop index as defined in indata/mapspam_crops.csv and <A/I/R> indicates all area, irrigated area, or rainfed area.
+
 ### HYDE 3.2.000 baseline land use data
 These data are available at [ftp://ftp.pbl.nl/hyde/hyde3.2/2017_beta_release/](ftp://ftp.pbl.nl/hyde/hyde3.2/2017_beta_release/). Only 1700-2016 baseline land use data are included here, and the Moirai LDS works only with "AD" era years (the "BC" era years are not supported). Note that there is a newer version (3.2.1) of these data available at [ftp://ftp.pbl.nl/hyde/hyde3.2/](ftp://ftp.pbl.nl/hyde/hyde3.2/), which can also be used as input to the Moirai LDS, but we include 3.2.000 here because it is the same version used to generate the included ISAM land cover data (see below). Put all of the zipped files in a single directory, then set this directory in the Moirai LDS input file. The Moirai LDS will automatically unzip these files. The corresponding README file is included for reference. Please cite these data when using Moirai: Klein-Goldewijk, K., Beusen, A., Doelman, J. & Stehfest, E. 2017. Anthropogenic land use estimates for the Holocene – HYDE 3.2. Earth Syst. Sci. Data, 9, 927-953. Units are square kilometers.
 
@@ -200,12 +203,20 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 
 ### Flags
 * diagnostics: 0 = no, 1 = output diagnostics files
+* carbon_enabled: Set to 1 to process carbon by land type in moirai. Setting to 0 only produces land type outputs.
 
 ### data years for recalibration
 * out_year_prod_ha_lr: output year for crop production, harvest area, and land rent; 0 = no recalibration (retain circa 2000 sage source data); (valid recalibration years 1995 - 2014 based on the FAO inputs specified below)
 * in_year_sage_crops: input year of the 175 crop harvest area and yield data
 * out_year_usd: the output US dollar value year for land rent (valid years 1970 - 2017 based on the cpi input specified below)
 * in_year_lr_usd: the US dollar value year for the input land rent data
+
+### year to write output land use/cover rasters (outputs only if year is processed)
+
+* lulc_out_year: writes output rasters for this year, set theis to invalid year (e.g., 0) for no output
+
+### year to read mapSPAM irrigated/rainfed crop area
+* mapspam_year: set this to the mapspam year you want to read/process (2000 and 2020 available)
 
 ### File paths (must include final "/")
 * inpath: path to directory containing all input files except for the SAGE 175 crops, HYDE, ISAM land cover, MIRCA2000, and water footprint data (`…/moirai/indata/`)
@@ -214,6 +225,7 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * hydepath: path to directory containing the unzipped hyde land use files (`./indata/HYDE32_baseline/`)
 * lulcpath: path to directory containing the ISAM land cover files (`./indata/ISAM_LC/`)
 * mircapath: path to directory containing the MIRCA2000 ascii grid files (`./indata/Mirca2000CropIrrRfdHarvArea/`)
+* mapspampath: path to directory containing mapSPAM files (`./indata/mapSPAM/`)
 * wfpath: path to directory containing the water footprint simple binary raster files (`./indata/WaterFootprint/Report47-App-IV-RasterMaps/`)
 * ldsdestpath: path to directory where the eight Moirai LDS output data files will be copied to (e.g., `./outputs/basins235/aglu-data/moirai/`)
 * mapdestpath: path to directory where the two Moirai LDS output mapping files will be copied to (e.g., `./outputs/basins235/aglu-data/mappings/`)
@@ -275,10 +287,10 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * **Mapping list of HYDE 3.2.000 names to integer codes** (`hyde32_lu.csv`): Assigns integer codes to HYDE 3.2.000 land use types
 * **Mapping list of ISAM land cover types to SAGE land cover types** (`isam_2_sage_hyde_mapping.csv`): Maps ISAM land cover types to SAGE land cover and HYDE land use
 * **Mapping list of SAGE crops to FAO crops and GTAP use sectors** (`SAGE_gtap_fao_crop2use.csv`): Maps the 175 sage crops to GTAP use sectors and FAO crops. The fourth column (gtap_crop_name) is the crop label used by Moirai LDS and GCAM. See `SAGE_gtap_fao_crop2use_readme.txt` for additional details
-* **FAO production data** (`FAO_production_1993_2016.csv`): FAO production data used in land rent calculations. This is also a source for recalibration to a different year. Format and years must match FAO_ag_ yield, HA, and prodprice files. FAO Downloaded July 2018 from `www.fao.org/faostat/`
-* **FAO yield data** (`FAO_yield_1993_2016.csv`): Source of FAO yield data for diagnostics. Format and years must match FAO_ag_ prod, HA, and prodprice files. Downloaded July 2018 from `www.fao.org/faostat/`
-* **FAO harvested area data** (`FAO_harvarea_1993_2016.csv`): Source of FAO harvested area data for recalibration to a different year. Format and years must match FAO_ag_ yield, prod, and prodprice files. Downloaded July 2018 from `www.fao.org/faostat/`
-* **FAO price data** (`FAO_producerprice_1993_2016.csv`): FAO price data used in land rent calculations. Format and years must match FAO_ag_ yield, HA, and prod files. Currency year is equal to data year. Downloaded July 2018 from `www.fao.org/faostat/`
+* **FAO production data** (`FAO_production_1993_2021.csv`): FAO production data used in land rent calculations. This is also a source for recalibration to a different year. Format and years must match FAO_ag_ yield, HA, and prodprice files. FAO Downloaded July 2018 from `www.fao.org/faostat/`
+* **FAO yield data** (`FAO_yield_1993_2021.csv`): Source of FAO yield data for diagnostics. Format and years must match FAO_ag_ prod, HA, and prodprice files. Downloaded July 2018 from `www.fao.org/faostat/`
+* **FAO harvested area data** (`FAO_harvarea_1993_2021.csv`): Source of FAO harvested area data for recalibration to a different year. Format and years must match FAO_ag_ yield, prod, and prodprice files. Downloaded July 2018 from `www.fao.org/faostat/`
+* **FAO price data** (`FAO_producerprice_1993_2021.csv`): FAO price data used in land rent calculations. Format and years must match FAO_ag_ yield, HA, and prod files. Currency year is equal to data year. Downloaded July 2018 from `www.fao.org/faostat/`
 * **Consumer price index table** (`cpi_all_1970_2017_bls_june2018_annual.csv`): Consumer price index table to convert from one US dollar year to another. Downloaded from `https://www.bls.gov/cpi/ June 2018`
 
 
@@ -289,14 +301,14 @@ The Moirai LDS input file specifies the input and output paths, the file names o
 * The land rent output file (`MOIRAI_value_milUSD.csv`)
 * The crop irrigated harvested area output file (`MIRCA_irrHA_ha.csv`)
 * The crop rainfed harvested area output file (`MIRCA_rfdHA_ha.csv`)
+* The mapSPAM irrigated files base name (`mapSPAM_irr`)
+* The mapSPAM rainfed files base name (`mapSPAM_rfd`)
 * The historical land type area output file (`Land_type_area_ha.csv`)
 * The carbon density output file (`Ref_veg_carbon_Mg_per_ha.csv`)
 * The crop water volume consumption output file (`Water_footprint_m3.csv`)
 * The country X GLU mapping output file (`MOIRAI_ctry_GLU.csv`)
 * The land type mapping output file (`MOIRAI_land_types.csv`)
 
-### Carbon Flag
-* carbon_enabled: Set to 1 to process carbon by land type in moirai. Setting to 0 only produces land accounts.
 
 ## Diagnostics
 A detailed description of all the diagnostics features is available in:  `…/moirai/diagnostics/readme.md`

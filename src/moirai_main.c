@@ -786,6 +786,13 @@ int main(int argc, const char * argv[]) {
         return error_code;
     }
     
+    // process the mapspam data
+    //  mapspam grid is allocated/freed within proc_mapspam()
+    if((error_code = proc_mapspam(in_args, raster_info))) {
+        fprintf(fplog, "\nProgram terminated at %s with error_code = %i\n", get_systime(), error_code);
+        return error_code;
+    }
+    
     //kbn 2020
     protected_EPA = calloc(NUM_EPA_PROTECTED, sizeof(float*));
     if(protected_EPA == NULL) {

@@ -98,11 +98,11 @@ setwd("./")
 
 # flag to denote whether this is 18 aez or 235 water basin lds output
 AEZ = FALSE
-BOTH = TRUE
+BOTH = FALSE
 
 # location of the old moirai lds output files (include final "/")
-#olddir = "../example_outputs/basins235/"
-olddir = "../example_outputs/aez_orig/"
+olddir = "../example_outputs/basins235/"
+#olddir = "../example_outputs/aez_orig/"
 
 # location of the new moirai lds output files (include final "/")
 newdir = "../example_outputs/basins235/"
@@ -303,8 +303,8 @@ lds_new_sage = aggregate(value ~ year + LT_SAGE, lds_new[lds_new$LT_HYDE=="Unman
 
 # now aggregate unmanaged land types to forest, savanna, grassland, shrubland, and other (tundra, desert, polar desert/rock/ice, unknown)
 # unknown is 1-2 orders of magnitude less than the rest, and is relatively constant, so group it with other
-forest_names = levels(lds_new$LT_SAGE)[grep("Forest", levels(lds_new$LT_SAGE), fixed = TRUE)]
-shrub_names = levels(lds_new$LT_SAGE)[grep("Shrubland", levels(lds_new$LT_SAGE), fixed = TRUE)]
+forest_names = unique(lds_new$LT_SAGE)[grep("Forest", unique(lds_new$LT_SAGE), fixed = TRUE)]
+shrub_names = unique(lds_new$LT_SAGE)[grep("Shrubland", unique(lds_new$LT_SAGE), fixed = TRUE)]
 other_names = c("Tundra", "Desert", "PolarDesert/Rock/Ice", "Unknown")
 
 # old gis data

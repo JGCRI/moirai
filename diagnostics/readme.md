@@ -219,6 +219,8 @@ To diagnose country-level harvested area and production outputs, use `plot_moira
 
 To diagnose GCAM-region_GLU harvested area and production outputs, use `plot_moirai_crop_rglu.r`. Note that the difference statistics and the KS tests in `plot_moirai_crop_rglu.r` are invalid when the geographic land units are not identical among the different data sets.
 
+To diagnose mapSPAM harvested area outputs, use `plot_mapspam_crop.r`. This script requires outputs from both the mapSPAM 2000 run and a mapSPAM 2020 run to generate comparison plots.
+
 ## Land area diagnostics
 To diagnose the land type area output, use `plot_moirai_land_type_area.r`. This script plots land area over time for cropland, pasture, urban, and remaining land, by country_GLU and globally, for two specified Moirai outputs and a legacy output of the original GCAM GIS system. It also makes comparison plots between these data at the country level and globally.
 
